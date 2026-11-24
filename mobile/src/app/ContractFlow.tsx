@@ -9,6 +9,7 @@ import { ActivityScreen } from '../ui/screens/ActivityScreen';
 import { ContractScreen } from '../ui/screens/ContractScreen';
 import { ContractsScreen } from '../ui/screens/ContractsScreen';
 import { ProposeContractScreen } from '../ui/screens/ProposeContractScreen';
+import { matchdayHandlers } from './matchdayHandlers';
 import type { MatchCtx } from './MatchFlow';
 
 export function Contracts({ token, navigator, teamId }: MatchCtx & { teamId: number }) {
@@ -36,24 +37,7 @@ export function ContractDetail({ token, navigator, contractId }: MatchCtx & { co
         };
         navigator.push({ name: 'bookVenue', match, city: contract.host.city });
       }}
-      onCallUp={(contract) =>
-        navigator.push({
-          name: 'callup',
-          contractId: contract.id,
-          teamId: contract.my_side === 'HOST' ? contract.host.id : contract.guest.id,
-          isAdmin: contract.is_admin,
-        })
-      }
-      onRate={(contract) => navigator.push({ name: 'rate', contractId: contract.id })}
-      onLoan={(contract) => {
-        const host = contract.my_side === 'HOST';
-        navigator.push({
-          name: 'loanRequest',
-          contractId: contract.id,
-          teamId: host ? contract.host.id : contract.guest.id,
-          rivalId: host ? contract.guest.id : contract.host.id,
-        });
-      }}
+      matchday={matchdayHandlers(navigator)}
       onLineup={(contract) => {
         const host = contract.my_side === 'HOST';
         const score = (host ? contract.result?.host_score : contract.result?.guest_score) ?? 0;

@@ -86,7 +86,7 @@ describe('RefereeMatchesScreen', () => {
       handleRespond: jest.fn(async () => undefined),
       handleReport: jest.fn(async () => undefined),
     };
-    await render(<RefereeMatchesScreen controller={c} onBack={jest.fn()} />);
+    await render(<RefereeMatchesScreen controller={c} onChat={jest.fn()} onBack={jest.fn()} />);
     await fireEvent.press(screen.getByText('Aceptar partido'));
     expect(c.handleRespond).toHaveBeenCalledWith(5, true);
     await fireEvent.changeText(screen.getAllByLabelText('Goles de Águilas')[0]!, '2');

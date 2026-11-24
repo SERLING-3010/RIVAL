@@ -16,12 +16,13 @@ import { colors, font } from '../theme';
 
 interface Props {
   controller: RefereeMatchesController;
+  onChat: (contractId: number) => void;
   onBack: () => void;
 }
 
 const goals = (text: string): number | null => (/^\d{1,3}$/.test(text.trim()) ? Number(text) : null);
 
-export function RefereeMatchesScreen({ controller, onBack }: Props) {
+export function RefereeMatchesScreen({ controller, onChat, onBack }: Props) {
   const [scores, setScores] = useState<Record<number, { host: string; guest: string }>>({});
   const [error, setError] = useState<string | null>(null);
   const busy = controller.action.busy;
@@ -56,6 +57,11 @@ export function RefereeMatchesScreen({ controller, onBack }: Props) {
                     : 'Aceptado'
               }
             >
+              <PrimaryButton
+                label="Chat del partido"
+                variant="secondary"
+                onPress={() => onChat(m.contract_id)}
+              />
               {m.status === 'PENDING' ? (
                 <>
                   <PrimaryButton

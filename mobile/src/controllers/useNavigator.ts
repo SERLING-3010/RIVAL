@@ -52,7 +52,8 @@ export type Route =
   | { name: 'moderation' }
   | { name: 'blockedTeams'; teamId: number }
   | { name: 'loanRequest'; contractId: number; teamId: number; rivalId: number }
-  | { name: 'loans' };
+  | { name: 'loans' }
+  | { name: 'chat'; contractId: number };
 
 export interface Navigator {
   current: Route;

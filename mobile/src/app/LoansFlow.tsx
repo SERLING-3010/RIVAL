@@ -1,8 +1,10 @@
-// Composición del Sprint 13: pedir un jugador prestado y decidir préstamos.
+// Composición de los Sprints 13 y 14: préstamos y chat del partido.
 
 import { useLoanRequest, useMyLoans } from '../controllers/useLoans';
+import { useMatchChat } from '../controllers/useMatchChat';
 import { LoanRequestScreen } from '../ui/screens/LoanRequestScreen';
 import { LoansScreen } from '../ui/screens/LoansScreen';
+import { MatchChatScreen } from '../ui/screens/MatchChatScreen';
 import type { MatchCtx } from './MatchFlow';
 
 export function LoanRequest({
@@ -22,4 +24,8 @@ export function LoanRequest({
 
 export function MyLoans({ token, navigator }: MatchCtx) {
   return <LoansScreen controller={useMyLoans(token)} onBack={navigator.goBack} />;
+}
+
+export function MatchChat({ token, navigator, contractId }: MatchCtx & { contractId: number }) {
+  return <MatchChatScreen controller={useMatchChat(token, contractId)} onBack={navigator.goBack} />;
 }

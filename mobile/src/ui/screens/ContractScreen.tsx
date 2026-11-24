@@ -5,6 +5,7 @@ import type { ContractController } from '../../controllers/useContracts';
 import type { Contract } from '../../domain/contractModels';
 import { CONTRACT_STATUS_LABEL, contractActions } from '../../domain/contractRules';
 import { BookingCard } from '../components/BookingCard';
+import type { MatchdayHandlers } from '../components/MatchdayButtons';
 import { MatchdayButtons } from '../components/MatchdayButtons';
 import { ContractVersionCard as VersionCard } from '../components/ContractVersionCard';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -20,9 +21,7 @@ interface Props {
   onActivity: (contractId: number) => void;
   onBookVenue: (contract: Contract) => void;
   onLineup: (contract: Contract) => void;
-  onCallUp: (contract: Contract) => void;
-  onRate: (contract: Contract) => void;
-  onLoan: (contract: Contract) => void;
+  matchday: MatchdayHandlers;
   onBack: () => void;
 }
 
@@ -112,12 +111,7 @@ export function ContractScreen(props: Props) {
                   />
                 </>
               ) : null}
-              <MatchdayButtons
-                contract={contract}
-                onCallUp={props.onCallUp}
-                onRate={props.onRate}
-                onLoan={props.onLoan}
-              />
+              <MatchdayButtons contract={contract} handlers={props.matchday} />
               <PrimaryButton
                 label="Ver actividad"
                 variant="secondary"

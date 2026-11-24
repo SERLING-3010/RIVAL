@@ -72,6 +72,8 @@ const ACTION_LABEL: Record<string, string> = {
   LOAN_PLAYER_REJECTED: 'El jugador rechazó el préstamo',
   LOAN_CANCELLED: 'Canceló el préstamo',
   TRANSFER_WINDOW_SET: 'Cambió la ventana de traspasos de la liga',
+  CHAT_MESSAGE_DELETED: 'Borró un mensaje del chat',
+  CHAT_READ_BY_MODERATOR: 'Una persona moderadora revisó el chat por un reporte',
 };
 
 const FIELD_LABEL: Record<string, string> = {

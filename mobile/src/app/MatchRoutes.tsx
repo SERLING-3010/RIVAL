@@ -6,7 +6,7 @@ import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
 import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
 import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
-import { LoanRequest, MyLoans } from './LoansFlow';
+import { LoanRequest, MatchChat, MyLoans } from './LoansFlow';
 import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
 import { BlockedTeams, Moderation, MySanctions, Report } from './ModerationFlow';
@@ -112,6 +112,8 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       );
     case 'loans':
       return <MyLoans {...ctx} />;
+    case 'chat':
+      return <MatchChat {...ctx} contractId={route.contractId} />;
     default:
       return null;
   }

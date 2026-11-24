@@ -80,5 +80,11 @@ export function Season({
 }
 
 export function RefereeMatches({ token, navigator }: MatchCtx) {
-  return <RefereeMatchesScreen controller={useRefereeMatches(token)} onBack={navigator.goBack} />;
+  return (
+    <RefereeMatchesScreen
+      controller={useRefereeMatches(token)}
+      onChat={(contractId) => navigator.push({ name: 'chat', contractId })}
+      onBack={navigator.goBack}
+    />
+  );
 }

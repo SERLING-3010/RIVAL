@@ -47,7 +47,7 @@ def require_moderator(ctx: ServiceContext, actor: UserAccount) -> None:
         raise PermissionDeniedError("MODERATORS_ONLY", "Solo las personas moderadoras pueden hacer esto.")
 
 
-def _involved(ctx: ServiceContext, report: Report, user_id: int) -> bool:
+def involved(ctx: ServiceContext, report: Report, user_id: int) -> bool:
     team = ctx.db.get(Team, report.target_team_id) if report.target_team_id else None
     return user_id in {report.reporter_id, report.target_user_id} or bool(
         team and any(m.user_id == user_id for m in team.memberships))
@@ -58,7 +58,7 @@ def _open_report(ctx: ServiceContext, actor: UserAccount, report_id: int) -> Rep
     report = ctx.db.get(Report, report_id, with_for_update=True)
     if report is None:
         raise NotFoundError("REPORT_NOT_FOUND", "El reporte no existe.")
-    if _involved(ctx, report, actor.id):
+    if involved(ctx, report, actor.id):
         raise PermissionDeniedError("CONFLICT_OF_INTEREST", "No puedes decidir un reporte en el que estás involucrado.")
     if report.status != "OPEN":
         raise ConflictError("REPORT_ALREADY_DECIDED", "Este reporte ya fue decidido.")
@@ -69,7 +69,7 @@ def queue(ctx: ServiceContext, actor: UserAccount) -> list[ReportView]:
     require_moderator(ctx, actor)
     views = []
     for r in ctx.db.scalars(select(Report).where(Report.status == "OPEN").order_by(Report.created_at)):
-        if _involved(ctx, r, actor.id):
+        if involved(ctx, r, actor.id):
             continue
         user = ctx.db.get(UserAccount, r.target_user_id) if r.target_user_id else None
         team = ctx.db.get(Team, r.target_team_id) if r.target_team_id else None
