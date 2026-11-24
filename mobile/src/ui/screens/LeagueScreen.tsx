@@ -1,6 +1,7 @@
 import { StyleSheet, Text } from 'react-native';
 
 import type { LeagueController } from '../../controllers/useLeagues';
+import type { TransferWindowController } from '../../controllers/useTransferWindow';
 import { ENTRY_STATUS_LABEL, leagueActions, myEntries, STAFF_ROLE_LABEL } from '../../domain/leagueRules';
 import type { MyTeam, User } from '../../domain/models';
 import { Card } from '../components/Card';
@@ -8,6 +9,7 @@ import { PendingRequests } from '../components/PendingRequests';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
+import { TransferWindowCard } from '../components/TransferWindowCard';
 import { colors, font } from '../theme';
 
 interface Props {
@@ -15,10 +17,11 @@ interface Props {
   user: User;
   myTeams: MyTeam[];
   onSeason: (canManage: boolean) => void;
+  windowController: TransferWindowController;
   onBack: () => void;
 }
 
-export function LeagueScreen({ controller, user, myTeams, onSeason, onBack }: Props) {
+export function LeagueScreen({ controller, user, myTeams, onSeason, windowController, onBack }: Props) {
   const busy = controller.action.busy;
   return (
     <Screen title="Liga" onBack={onBack}>
@@ -50,6 +53,12 @@ export function LeagueScreen({ controller, user, myTeams, onSeason, onBack }: Pr
                 ))}
               </Card>
               <PrimaryButton label="Calendario y tabla" onPress={() => onSeason(can.canDecideTeams)} />
+              <TransferWindowCard
+                start={detail.transfer_window_start}
+                end={detail.transfer_window_end}
+                canEdit={detail.my_role === 'ORGANIZER' || detail.my_role === 'CO_ORGANIZER'}
+                controller={windowController}
+              />
               <Card title="Personal">
                 {detail.staff.map((m) => (
                   <Text key={m.user_id} style={styles.line}>

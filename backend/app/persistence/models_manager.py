@@ -1,4 +1,4 @@
-"""Modo manager (Sprint 7): planilla del partido, libro de monedas RIVAL, jugadores transferibles y ofertas.
+"""Modo manager (Sprints 7 y 13): planilla del partido, libro de monedas RIVAL, jugadores transferibles y ofertas.
 
 El libro de monedas solo recibe asientos nuevos (suma o resta); el saldo es la suma de los asientos.
 """
@@ -11,6 +11,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.persistence.database import Base, UtcDateTime
 
 _ACTIVE = text("status IN ('PENDING_OWNER', 'PENDING_PLAYER')")
+_OPEN_LOAN = text("status IN ('PENDING_OWNER', 'PENDING_PLAYER', 'ACTIVE')")
 
 
 class MatchAppearance(Base):
@@ -68,3 +69,23 @@ class TransferOffer(Base):
     owner_decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
     player_decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
     closed_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
+
+
+class PlayerLoan(Base):
+    """Préstamo de un jugador para un solo partido (Sprint 13). No cambia de equipo ni mueve monedas."""
+
+    __tablename__ = "player_loan"
+    __table_args__ = (
+        Index("uq_player_loan_open", "contract_id", "player_id", unique=True,
+              sqlite_where=_OPEN_LOAN, postgresql_where=_OPEN_LOAN),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    contract_id: Mapped[int] = mapped_column(ForeignKey("match_contract.id"), index=True)
+    player_id: Mapped[int] = mapped_column(ForeignKey("user_account.id"), index=True)
+    from_team_id: Mapped[int] = mapped_column(ForeignKey("team.id"), index=True)
+    to_team_id: Mapped[int] = mapped_column(ForeignKey("team.id"), index=True)
+    status: Mapped[str] = mapped_column(String(20), index=True)
+    requested_by: Mapped[int] = mapped_column(ForeignKey("user_account.id"))
+    created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    decided_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)

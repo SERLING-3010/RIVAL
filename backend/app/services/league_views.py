@@ -1,6 +1,7 @@
 """Entradas y vistas de ligas (Sprint 5). Nunca incluyen correos ni datos personales."""
 
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from app.services.team_views import TeamSummaryView
 
@@ -63,6 +64,8 @@ class LeagueDetailView:
     league: LeagueSummaryView
     description: str | None
     my_role: str | None  # rol del usuario en el personal de la liga, si tiene
+    transfer_window_start: datetime | None  # ventana de traspasos (Sprint 13); None = siempre abierta
+    transfer_window_end: datetime | None
     staff: list[StaffView]
     teams: list[TeamEntryView]
     referees: list[RefereeEntryView]

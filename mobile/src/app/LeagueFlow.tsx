@@ -4,6 +4,7 @@ import { useCreateLeague } from '../controllers/useCreateLeague';
 import { useLeague, useLeagueHome } from '../controllers/useLeagues';
 import { useMyTeams } from '../controllers/useMyTeams';
 import { useRefereeMatches, useSeason } from '../controllers/useSeason';
+import { useTransferWindow } from '../controllers/useTransferWindow';
 import type { RefereeEntry } from '../domain/leagueModels';
 import type { MyTeam } from '../domain/models';
 import { CreateLeagueScreen } from '../ui/screens/CreateLeagueScreen';
@@ -41,6 +42,7 @@ export function CreateLeague({ token, navigator, user, sports }: MatchCtx) {
 
 export function LeagueDetail({ token, navigator, user, leagueId }: MatchCtx & { leagueId: number }) {
   const controller = useLeague(token, leagueId);
+  const windowController = useTransferWindow(token, leagueId, controller.handleReload);
   return (
     <LeagueScreen
       controller={controller}
@@ -54,6 +56,7 @@ export function LeagueDetail({ token, navigator, user, leagueId }: MatchCtx & { 
           referees: controller.state.kind === 'success' ? controller.state.data.referees : [],
         })
       }
+      windowController={windowController}
       onBack={navigator.goBack}
     />
   );

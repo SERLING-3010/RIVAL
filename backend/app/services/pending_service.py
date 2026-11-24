@@ -12,6 +12,7 @@ from sqlalchemy import select
 from app.domain.team_rules import resolve_admin
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team, TeamMembership
+from app.services import loan_queries
 from app.services import pending_sources as sources
 from app.services.context import ServiceContext
 from app.services.team_service import member_views
@@ -22,7 +23,7 @@ class PendingItem:
     kind: str  # SIGN_CONTRACT, REPORT_RESULT, RESULT_DISPUTED, CALLUP, TRANSFER_PLAYER, TRANSFER_OWNER, ...
     title: str
     detail: str
-    target: str  # contract, team, league, venue, transfers, referee
+    target: str  # contract, team, league, venue, transfers, referee, loans
     target_id: int | None
     due_at: datetime | None
 
@@ -44,6 +45,9 @@ def pending(ctx: ServiceContext, actor: UserAccount) -> list[PendingItem]:
         + sources.bookings(ctx, actor)
         + sources.leagues(ctx, actor)
         + sources.ratings(ctx, actor, member_teams)
+        + [("LOAN_PLAYER" if loan.status == "PENDING_PLAYER" else "LOAN_OWNER",
+            f"Préstamo: {loan.player_name} para {loan.to_team}", "Acepta o rechaza el préstamo para un partido.",
+            "loans", loan.id, loan.kickoff_at) for loan in loan_queries.awaiting_me(ctx, actor)]
     )
     items = [PendingItem(*r) for r in raw]
     far = datetime.max.replace(tzinfo=ctx.clock.now().tzinfo)

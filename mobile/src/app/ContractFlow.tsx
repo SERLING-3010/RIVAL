@@ -45,6 +45,15 @@ export function ContractDetail({ token, navigator, contractId }: MatchCtx & { co
         })
       }
       onRate={(contract) => navigator.push({ name: 'rate', contractId: contract.id })}
+      onLoan={(contract) => {
+        const host = contract.my_side === 'HOST';
+        navigator.push({
+          name: 'loanRequest',
+          contractId: contract.id,
+          teamId: host ? contract.host.id : contract.guest.id,
+          rivalId: host ? contract.guest.id : contract.host.id,
+        });
+      }}
       onLineup={(contract) => {
         const host = contract.my_side === 'HOST';
         const score = (host ? contract.result?.host_score : contract.result?.guest_score) ?? 0;

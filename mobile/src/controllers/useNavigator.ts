@@ -50,7 +50,9 @@ export type Route =
   | { name: 'report'; target: ReportTarget }
   | { name: 'mySanctions' }
   | { name: 'moderation' }
-  | { name: 'blockedTeams'; teamId: number };
+  | { name: 'blockedTeams'; teamId: number }
+  | { name: 'loanRequest'; contractId: number; teamId: number; rivalId: number }
+  | { name: 'loans' };
 
 export interface Navigator {
   current: Route;

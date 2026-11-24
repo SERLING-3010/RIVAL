@@ -1,6 +1,6 @@
 """Esquemas de ligas y cuerpo arbitral (Sprint 5)."""
 
-from pydantic import BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field
 
 from app.api.schemas_auth import StrictModel
 from app.api.schemas_teams import TeamSummaryOut
@@ -66,6 +66,8 @@ class LeagueDetailOut(BaseModel):
     league: LeagueSummaryOut
     description: str | None
     my_role: str | None
+    transfer_window_start: AwareDatetime | None
+    transfer_window_end: AwareDatetime | None
     staff: list[StaffOut]
     teams: list[TeamEntryOut]
     referees: list[RefereeEntryOut]

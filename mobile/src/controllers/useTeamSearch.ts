@@ -10,9 +10,7 @@ import { successOrEmpty } from '../domain/viewState';
 import { teamApi } from '../services/teamApi';
 
 export type JoinStatus =
-  | { kind: 'sending' }
-  | { kind: 'sent'; message: string }
-  | { kind: 'failed'; message: string };
+  { kind: 'sending' } | { kind: 'sent'; message: string } | { kind: 'failed'; message: string };
 
 export interface TeamSearchController {
   sport: string | null;

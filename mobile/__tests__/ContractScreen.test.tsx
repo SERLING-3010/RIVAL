@@ -18,6 +18,7 @@ describe('ContractScreen', () => {
         onLineup={jest.fn()}
         onCallUp={jest.fn()}
         onRate={jest.fn()}
+        onLoan={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -36,6 +37,7 @@ describe('ContractScreen', () => {
         onLineup={jest.fn()}
         onCallUp={jest.fn()}
         onRate={jest.fn()}
+        onLoan={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -59,6 +61,7 @@ describe('ContractScreen', () => {
         onLineup={jest.fn()}
         onCallUp={jest.fn()}
         onRate={jest.fn()}
+        onLoan={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -79,6 +82,7 @@ describe('ContractScreen', () => {
         onLineup={jest.fn()}
         onCallUp={jest.fn()}
         onRate={jest.fn()}
+        onLoan={jest.fn()}
         onBack={jest.fn()}
       />,
     );

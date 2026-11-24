@@ -81,6 +81,7 @@ def league_detail(ctx: ServiceContext, actor: UserAccount, league_id: int) -> Le
     my_ref = next((r for r in _referee_entries(ctx, league.id, ACTIVE_STATUSES) if r.user_id == actor.id), None)
     return LeagueDetailView(
         league=league_summary(ctx, league), description=league.description, my_role=role.value if role else None,
+        transfer_window_start=league.transfer_window_start, transfer_window_end=league.transfer_window_end,
         staff=staff, teams=_team_entries(ctx, league.id, (_APPROVED,)),
         referees=_referee_entries(ctx, league.id, (_APPROVED,)),
         pending_teams=_team_entries(ctx, league.id, pending) if role else [],

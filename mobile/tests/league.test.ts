@@ -50,6 +50,8 @@ function detail(overrides: Partial<LeagueDetail> = {}): LeagueDetail {
     },
     description: null,
     my_role: null,
+    transfer_window_start: null,
+    transfer_window_end: null,
     staff: [],
     teams: [],
     referees: [],

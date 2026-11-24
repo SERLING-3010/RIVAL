@@ -1,6 +1,6 @@
 // Pendientes del usuario (Sprint 11): lo que espera su acción, calculado por el backend.
 
-export type PendingTarget = 'contract' | 'team' | 'league' | 'venue' | 'transfers' | 'referee';
+export type PendingTarget = 'contract' | 'team' | 'league' | 'venue' | 'transfers' | 'referee' | 'loans';
 
 export interface PendingItem {
   kind: string;

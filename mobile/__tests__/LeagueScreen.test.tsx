@@ -32,6 +32,8 @@ function detail(overrides: Partial<LeagueDetail> = {}): LeagueDetail {
     },
     description: 'Sábados en la tarde',
     my_role: null,
+    transfer_window_start: null,
+    transfer_window_end: null,
     staff: [{ user_id: 1, display_name: 'José Peña', role: 'ORGANIZER' }],
     teams: [{ id: 10, team: team(2, 'Bravos'), status: 'APPROVED' }],
     referees: [],
@@ -54,13 +56,26 @@ function controller(data: LeagueDetail): LeagueController {
   };
 }
 
+const windowCtl = {
+  action: idleAction(),
+  handleSave: jest.fn(async () => undefined),
+  handleClear: jest.fn(async () => undefined),
+};
+
 const myTeam = { team: team(1, 'Águilas'), my_role: 'COACH' as const, is_admin: true, pending_requests: 0 };
 
 describe('LeagueScreen', () => {
   test('el DT ve su equipo elegible y puede pedir inscripción', async () => {
     const c = controller(detail());
     await render(
-      <LeagueScreen controller={c} user={user} myTeams={[myTeam]} onSeason={jest.fn()} onBack={jest.fn()} />,
+      <LeagueScreen
+        controller={c}
+        user={user}
+        myTeams={[myTeam]}
+        onSeason={jest.fn()}
+        windowController={windowCtl}
+        onBack={jest.fn()}
+      />,
     );
     expect(screen.getByText('Bravos · El Prado')).toBeTruthy();
     await fireEvent.press(screen.getByText('Inscribir a Águilas'));
@@ -77,7 +92,14 @@ describe('LeagueScreen', () => {
       }),
     );
     await render(
-      <LeagueScreen controller={c} user={user} myTeams={[]} onSeason={jest.fn()} onBack={jest.fn()} />,
+      <LeagueScreen
+        controller={c}
+        user={user}
+        myTeams={[]}
+        onSeason={jest.fn()}
+        windowController={windowCtl}
+        onBack={jest.fn()}
+      />,
     );
     expect(screen.getByText('Solicitudes por revisar (2)')).toBeTruthy();
     await fireEvent.press(screen.getAllByText('Aprobar')[1]!);
@@ -89,7 +111,14 @@ describe('LeagueScreen', () => {
       detail({ my_team_requests: [{ id: 10, team: team(1, 'Águilas'), status: 'APPROVED' }] }),
     );
     await render(
-      <LeagueScreen controller={c} user={user} myTeams={[myTeam]} onSeason={jest.fn()} onBack={jest.fn()} />,
+      <LeagueScreen
+        controller={c}
+        user={user}
+        myTeams={[myTeam]}
+        onSeason={jest.fn()}
+        windowController={windowCtl}
+        onBack={jest.fn()}
+      />,
     );
     expect(screen.queryByText('Inscribir a Águilas')).toBeNull();
     await fireEvent.press(screen.getByText('Salir de la liga'));

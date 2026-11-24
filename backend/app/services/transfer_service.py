@@ -14,7 +14,7 @@ from app.domain.roles import TeamRole
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_manager import TransferListing, TransferOffer
 from app.persistence.models_teams import TeamMembership
-from app.services import coin_service
+from app.services import coin_service, transfer_window_service
 from app.services.audit_service import record_event
 from app.services.transfer_listing_service import close_others as _close_others
 from app.services.transfer_listing_service import listing as _listing
@@ -35,6 +35,7 @@ def make_offer(ctx: ServiceContext, actor: UserAccount, buyer_team_id: int, play
         raise ConflictError("ALREADY_IN_TEAM", "Ese jugador ya está en tu equipo.")
     if seller.sport_code != buyer.sport_code:
         raise ConflictError("TEAM_SPORT_MISMATCH", "Solo puedes fichar jugadores de equipos de tu mismo deporte.")
+    transfer_window_service.check_teams(ctx, [seller.id, buyer.id])  # ventanas de liga (Sprint 13)
     check_balance(coin_service.balance(ctx, buyer.id), amount)
     for previous in ctx.db.scalars(select(TransferOffer).where(
             TransferOffer.player_id == player_id, TransferOffer.to_team_id == buyer.id,
@@ -102,6 +103,7 @@ def _complete(ctx: ServiceContext, offer: TransferOffer, player: UserAccount) ->
     member = next((m for m in seller.memberships if m.user_id == player.id), None)
     if member is None or member.role != TeamRole.PLAYER or _listing(ctx, player.id) is None:
         raise ConflictError("TRANSFER_NO_LONGER_VALID", "Este traspaso ya no es posible: cambió la plantilla.")
+    transfer_window_service.check_teams(ctx, [seller.id, buyer.id])
     reference = f"transfer:{offer.id}"
     coin_service.move(ctx, buyer.id, -offer.amount, "TRANSFER_PAID", reference, player.id)
     coin_service.move(ctx, seller.id, offer.amount, "TRANSFER_RECEIVED", reference, player.id)

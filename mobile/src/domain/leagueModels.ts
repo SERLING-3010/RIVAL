@@ -47,6 +47,8 @@ export interface LeagueDetail {
   league: LeagueSummary;
   description: string | null;
   my_role: StaffRole | null;
+  transfer_window_start: string | null;
+  transfer_window_end: string | null;
   staff: StaffMember[];
   teams: TeamEntry[];
   referees: RefereeEntry[];

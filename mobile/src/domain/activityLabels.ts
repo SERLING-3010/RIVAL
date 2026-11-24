@@ -65,6 +65,13 @@ const ACTION_LABEL: Record<string, string> = {
   PLAYER_RATED: 'Valoró a un compañero',
   TEAM_BLOCKED: 'Bloqueó a un equipo',
   TEAM_UNBLOCKED: 'Desbloqueó a un equipo',
+  LOAN_REQUESTED: 'Pidió un jugador prestado para el partido',
+  LOAN_OWNER_ACCEPTED: 'El DT dueño aceptó prestar al jugador',
+  LOAN_OWNER_REJECTED: 'El DT dueño rechazó el préstamo',
+  LOAN_ACTIVE: 'El jugador aceptó jugar prestado',
+  LOAN_PLAYER_REJECTED: 'El jugador rechazó el préstamo',
+  LOAN_CANCELLED: 'Canceló el préstamo',
+  TRANSFER_WINDOW_SET: 'Cambió la ventana de traspasos de la liga',
 };
 
 const FIELD_LABEL: Record<string, string> = {

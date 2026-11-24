@@ -11,6 +11,7 @@ from app.domain.manager_rules import validate_lineup
 from app.domain.result_rules import ResultStatus
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_manager import MatchAppearance
+from app.services import loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import admin_side, load_contract
@@ -24,7 +25,8 @@ def record(ctx: ServiceContext, actor: UserAccount, contract_id: int, entries: l
     if result is None or result.status != ResultStatus.CONFIRMED or result.host_score is None:
         raise ConflictError("RESULT_NOT_CONFIRMED", "La planilla se registra cuando el resultado está confirmado.")
     score = result.host_score if side == "HOST" else result.guest_score
-    validate_lineup(entries, team_score=score or 0, members={m.user_id for m in team.memberships})
+    members = {m.user_id for m in team.memberships} | loan_service.active_players(ctx, contract.id, team.id)
+    validate_lineup(entries, team_score=score or 0, members=members)  # con préstamos activos (Sprint 13)
     previous = list(ctx.db.scalars(select(MatchAppearance).where(
         MatchAppearance.contract_id == contract.id, MatchAppearance.team_id == team.id)))
     before = {str(a.user_id): a.goals for a in previous} or None

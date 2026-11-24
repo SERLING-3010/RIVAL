@@ -15,6 +15,7 @@ from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matchday import CallUp
 from app.persistence.models_teams import Team
+from app.services import loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import admin_side, get_version, load_contract, member_side, side_teams, terms_of
@@ -55,7 +56,7 @@ def call_up(ctx: ServiceContext, actor: UserAccount, contract_id: int, user_ids:
     if contract.status == ContractStatus.CANCELLED:
         raise ConflictError("CONTRACT_CANCELLED", "Este partido fue cancelado.")
     check_before_kickoff(_kickoff(ctx, contract), ctx.clock.now())
-    members = {m.user_id for m in team.memberships}
+    members = {m.user_id for m in team.memberships} | loan_service.active_players(ctx, contract.id, team.id)
     if not user_ids or not set(user_ids) <= members:
         raise DomainError("NOT_A_TEAM_MEMBER", "Solo puedes convocar a jugadores de tu equipo.")
     called = set(ctx.db.scalars(select(CallUp.user_id).where(CallUp.contract_id == contract.id)))

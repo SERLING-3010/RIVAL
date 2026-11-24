@@ -6,6 +6,7 @@ import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
 import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
 import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
+import { LoanRequest, MyLoans } from './LoansFlow';
 import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
 import { BlockedTeams, Moderation, MySanctions, Report } from './ModerationFlow';
@@ -105,6 +106,12 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <Moderation {...ctx} />;
     case 'blockedTeams':
       return <BlockedTeams {...ctx} teamId={route.teamId} />;
+    case 'loanRequest':
+      return (
+        <LoanRequest {...ctx} contractId={route.contractId} teamId={route.teamId} rivalId={route.rivalId} />
+      );
+    case 'loans':
+      return <MyLoans {...ctx} />;
     default:
       return null;
   }

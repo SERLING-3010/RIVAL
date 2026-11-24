@@ -22,6 +22,7 @@ interface Props {
   onLineup: (contract: Contract) => void;
   onCallUp: (contract: Contract) => void;
   onRate: (contract: Contract) => void;
+  onLoan: (contract: Contract) => void;
   onBack: () => void;
 }
 
@@ -111,7 +112,12 @@ export function ContractScreen(props: Props) {
                   />
                 </>
               ) : null}
-              <MatchdayButtons contract={contract} onCallUp={props.onCallUp} onRate={props.onRate} />
+              <MatchdayButtons
+                contract={contract}
+                onCallUp={props.onCallUp}
+                onRate={props.onRate}
+                onLoan={props.onLoan}
+              />
               <PrimaryButton
                 label="Ver actividad"
                 variant="secondary"

@@ -22,6 +22,8 @@ export function routeFor(item: PendingItem): Route | null {
       return { name: 'transferOffers' };
     case 'referee':
       return { name: 'refereeMatches' };
+    case 'loans':
+      return { name: 'loans' };
   }
 }
 
