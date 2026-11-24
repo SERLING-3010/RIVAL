@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 
 import type { ContractController } from '../../controllers/useContracts';
-import type { Contract, ContractVersion } from '../../domain/contractModels';
-import { CONTRACT_STATUS_LABEL, contractActions, describeTerms } from '../../domain/contractRules';
-import { formatLocal } from '../../domain/dateTime';
-import { PLACE_LABEL, REFEREE_LABEL } from '../../domain/matchLabels';
-import { Card } from '../components/Card';
+import type { Contract } from '../../domain/contractModels';
+import { CONTRACT_STATUS_LABEL, contractActions } from '../../domain/contractRules';
+import { ContractVersionCard as VersionCard } from '../components/ContractVersionCard';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { ResultPanel } from '../components/ResultPanel';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
 import { TextField } from '../components/TextField';
@@ -16,40 +15,11 @@ import { colors, font } from '../theme';
 interface Props {
   controller: ContractController;
   onPropose: (contract: Contract) => void;
+  onActivity: (contractId: number) => void;
   onBack: () => void;
 }
 
-const SIDE_NAME = (c: Contract, side: string) => (side === 'HOST' ? c.host.name : c.guest.name);
-
-function VersionCard({
-  contract,
-  version,
-  title,
-}: {
-  contract: Contract;
-  version: ContractVersion;
-  title: string;
-}) {
-  const t = version.terms;
-  const signatures = version.signed_by.map((s) => SIDE_NAME(contract, s)).join(' y ') || 'nadie';
-  return (
-    <Card title={`${title} · v${version.version}`} subtitle={formatLocal(t.kickoff_at)}>
-      <Text style={styles.line}>
-        {REFEREE_LABEL[t.referee_mode]} · {PLACE_LABEL[t.place_kind]}
-      </Text>
-      {t.place_note ? <Text style={styles.line}>Lugar: {t.place_note}</Text> : null}
-      {describeTerms(t, contract.host.name, contract.guest.name).map((line) => (
-        <Text key={line} style={styles.line}>
-          {line}
-        </Text>
-      ))}
-      {version.note ? <Text style={styles.meta}>“{version.note}”</Text> : null}
-      <Text style={styles.meta}>Firmada por: {signatures}</Text>
-    </Card>
-  );
-}
-
-export function ContractScreen({ controller, onPropose, onBack }: Props) {
+export function ContractScreen({ controller, onPropose, onActivity, onBack }: Props) {
   const [reason, setReason] = useState('');
   const busy = controller.action.busy;
   return (
@@ -82,6 +52,12 @@ export function ContractScreen({ controller, onPropose, onBack }: Props) {
               {amendment && contract.signed ? (
                 <VersionCard contract={contract} version={contract.signed} title="Versión firmada vigente" />
               ) : null}
+              <ResultPanel
+                contract={contract}
+                canReport={can.canReportResult}
+                busy={busy}
+                onReport={(h, g) => void controller.handleReport(h, g)}
+              />
               {can.canSign ? <PrimaryButton label="Firmar" disabled={busy} onPress={confirmSign} /> : null}
               {can.canRejectAmendment ? (
                 <PrimaryButton
@@ -114,6 +90,11 @@ export function ContractScreen({ controller, onPropose, onBack }: Props) {
                   />
                 </>
               ) : null}
+              <PrimaryButton
+                label="Ver actividad"
+                variant="secondary"
+                onPress={() => onActivity(contract.id)}
+              />
               <Text style={styles.meta}>
                 Sin pagos en la app: árbitro y cancha se pagan por fuera, como lo acuerden.
               </Text>

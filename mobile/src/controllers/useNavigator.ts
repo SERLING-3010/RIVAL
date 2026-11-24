@@ -24,7 +24,8 @@ export type Route =
   | { name: 'offers'; requestId: number; isRequestAdmin: boolean; myTeamIds: number[]; requestOpen: boolean }
   | { name: 'contracts'; teamId: number }
   | { name: 'contract'; contractId: number }
-  | { name: 'proposeContract'; contract: Contract };
+  | { name: 'proposeContract'; contract: Contract }
+  | { name: 'activity'; scope: 'contracts' | 'teams'; id: number; title: string };
 
 export interface Navigator {
   current: Route;

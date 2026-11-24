@@ -101,12 +101,12 @@ def decide(ctx: ServiceContext, actor: UserAccount, offer_id: int, accept: bool)
                 MatchOffer.request_id == request.id, MatchOffer.status == _PENDING, MatchOffer.id != offer.id)):
             other.status, other.decided_by, other.decided_at = OfferStatus.SUPERSEDED.value, actor.id, now
     ctx.db.flush()
-    if accept:
-        contract_service.create_from_offer(ctx, request, offer, actor.id)
     offering_admin = resolve_admin_id(ctx, offer.team_id)
     record_event(ctx, action="MATCH_OFFER_ACCEPTED" if accept else "MATCH_OFFER_REJECTED", entity="match_offer",
                  entity_id=offer.id, initiated_by=offering_admin, approved_by=actor.id,
                  before={"status": _PENDING}, after={"status": offer.status, "request_status": request.status})
+    if accept:  # después del evento de la oferta, para que la actividad se lea en orden
+        contract_service.create_from_offer(ctx, request, offer, actor.id)
     return offer
 
 

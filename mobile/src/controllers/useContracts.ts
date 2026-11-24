@@ -25,6 +25,7 @@ export interface ContractController extends Loader<Contract> {
   handleSign: (version: number) => Promise<void>;
   handleRejectAmendment: (version: number) => Promise<void>;
   handleCancel: (reason: string) => Promise<void>;
+  handleReport: (hostScore: number, guestScore: number) => Promise<void>;
 }
 
 export function useContract(token: string, contractId: number): ContractController {
@@ -55,7 +56,16 @@ export function useContract(token: string, contractId: number): ContractControll
       action.run(() => contractApi.cancel(token, contractId, reason), 'Partido cancelado.', handleReload),
     [action, contractId, handleReload, token],
   );
-  return { ...loader, action, handleSign, handleRejectAmendment, handleCancel };
+  const handleReport = useCallback(
+    (hostScore: number, guestScore: number) =>
+      action.run(
+        () => contractApi.reportResult(token, contractId, hostScore, guestScore),
+        'Marcador reportado.',
+        handleReload,
+      ),
+    [action, contractId, handleReload, token],
+  );
+  return { ...loader, action, handleSign, handleRejectAmendment, handleCancel, handleReport };
 }
 
 export interface ProposalController {

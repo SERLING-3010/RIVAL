@@ -18,6 +18,22 @@ class VersionView:
 
 
 @dataclass(frozen=True)
+class ResultReportView:
+    side: str
+    host_score: int
+    guest_score: int
+    reported_at: datetime
+
+
+@dataclass(frozen=True)
+class ResultView:
+    status: str  # PENDING, CONFIRMED o DISPUTED; el marcador solo existe si está CONFIRMED
+    host_score: int | None
+    guest_score: int | None
+    reports: list[ResultReportView]
+
+
+@dataclass(frozen=True)
 class ContractView:
     id: int
     request_id: int
@@ -30,6 +46,7 @@ class ContractView:
     signed: VersionView | None
     versions: list[VersionView]
     cancel_reason: str | None
+    result: ResultView | None
 
 
 @dataclass(frozen=True)
@@ -41,3 +58,6 @@ class ContractSummaryView:
     kickoff_at: datetime
     my_side: str
     awaiting_my_signature: bool
+    result_status: str | None
+    host_score: int | None
+    guest_score: int | None

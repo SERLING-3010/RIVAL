@@ -24,6 +24,13 @@ export function TeamActions({ team, isAdmin, navigator }: Props) {
         onPress={() => navigator.push({ name: 'contracts', teamId: team.id })}
       />
       <PrimaryButton
+        label="Actividad del equipo"
+        variant="secondary"
+        onPress={() =>
+          navigator.push({ name: 'activity', scope: 'teams', id: team.id, title: 'Actividad del equipo' })
+        }
+      />
+      <PrimaryButton
         label="Partidos para mi equipo"
         variant="secondary"
         onPress={() => navigator.push({ name: 'matchFeed', teamId: team.id, isAdmin })}

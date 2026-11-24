@@ -10,6 +10,7 @@ from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team
 from app.services.context import ServiceContext
 from app.services.contract_views import ContractSummaryView, ContractView, VersionView
+from app.services.result_queries import get_result, result_view
 from app.services.rival_service import require_member
 from app.services.team_service import get_active_team, member_views, summary
 
@@ -85,7 +86,7 @@ def get_contract(ctx: ServiceContext, actor: UserAccount, contract_id: int) -> C
         id=contract.id, request_id=contract.request_id, host=summary(teams[HOST]), guest=summary(teams[GUEST]),
         status=contract.status, my_side=side, is_admin=is_admin_of(teams[side], actor),
         current=by_id[contract.current_version_id or 0], signed=signed, versions=list(by_id.values()),
-        cancel_reason=contract.cancel_reason,
+        cancel_reason=contract.cancel_reason, result=result_view(ctx, contract),
     )
 
 
@@ -106,7 +107,10 @@ def team_contracts(ctx: ServiceContext, actor: UserAccount, team_id: int) -> lis
         current = get_version(ctx, contract.current_version_id)
         effective = get_version(ctx, contract.signed_version_id or contract.current_version_id)
         awaiting = contract.status == ContractStatus.NEGOTIATING and side not in signed_sides(ctx, contract, current)
+        outcome = get_result(ctx, contract.id)
         result.append(ContractSummaryView(
             id=contract.id, host=summary(teams[HOST]), guest=summary(teams[GUEST]), status=contract.status,
-            kickoff_at=terms_of(effective).kickoff_at, my_side=side, awaiting_my_signature=awaiting))
+            kickoff_at=terms_of(effective).kickoff_at, my_side=side, awaiting_my_signature=awaiting,
+            result_status=outcome.status if outcome else None, host_score=outcome.host_score if outcome else None,
+            guest_score=outcome.guest_score if outcome else None))
     return result

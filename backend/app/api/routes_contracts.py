@@ -1,14 +1,16 @@
-"""Rutas del contrato de partido: ver, proponer cambios, firmar, rechazar un cambio y cancelar."""
+"""Rutas del contrato de partido (firmas, cambios, cancelación), resultado y actividad."""
 
 from dataclasses import asdict
 
 from fastapi import APIRouter
 
 from app.api.dependencies import CtxDep, UserDep
-from app.api.schemas_contracts import CancelBody, ContractOut, ContractSummaryOut, ProposalBody, VersionBody
+from app.api.schemas_contracts import (
+    ActivityOut, CancelBody, ContractOut, ContractSummaryOut, ProposalBody, ScoreBody, VersionBody,
+)
 from app.domain.contract_rules import ContractTerms
 from app.persistence.models_identity import UserAccount
-from app.services import contract_queries, contract_service
+from app.services import activity_service, contract_queries, contract_service, result_service
 from app.services.context import ServiceContext
 
 router = APIRouter(prefix="/api/v1")
@@ -51,3 +53,19 @@ def reject_amendment(contract_id: int, body: VersionBody, ctx: CtxDep, user: Use
 def cancel(contract_id: int, body: CancelBody, ctx: CtxDep, user: UserDep) -> ContractOut:
     contract_service.cancel(ctx, user, contract_id, body.reason)
     return _out(ctx, user, contract_id)
+
+
+@router.post("/contracts/{contract_id}/result")
+def report_result(contract_id: int, body: ScoreBody, ctx: CtxDep, user: UserDep) -> ContractOut:
+    result_service.report(ctx, user, contract_id, body.host_score, body.guest_score)
+    return _out(ctx, user, contract_id)
+
+
+@router.get("/contracts/{contract_id}/activity")
+def contract_activity(contract_id: int, ctx: CtxDep, user: UserDep) -> list[ActivityOut]:
+    return [ActivityOut.model_validate(asdict(a)) for a in activity_service.contract_activity(ctx, user, contract_id)]
+
+
+@router.get("/teams/{team_id}/activity")
+def team_activity(team_id: int, ctx: CtxDep, user: UserDep) -> list[ActivityOut]:
+    return [ActivityOut.model_validate(asdict(a)) for a in activity_service.team_activity(ctx, user, team_id)]

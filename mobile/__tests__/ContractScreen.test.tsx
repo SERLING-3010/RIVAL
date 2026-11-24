@@ -9,7 +9,14 @@ describe('ContractScreen', () => {
   test('el administrador que no ha firmado ve "Firmar" y la firma pide confirmación', async () => {
     const controller = contractController(contract());
     const alert = jest.spyOn(Alert, 'alert');
-    await render(<ContractScreen controller={controller} onPropose={jest.fn()} onBack={jest.fn()} />);
+    await render(
+      <ContractScreen
+        controller={controller}
+        onPropose={jest.fn()}
+        onActivity={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
     expect(screen.getByText(/Falta la firma de tu equipo/)).toBeTruthy();
     await fireEvent.press(screen.getByText('Firmar'));
     expect(alert).toHaveBeenCalledWith('¿Firmar esta versión?', expect.any(String), expect.any(Array));
@@ -20,6 +27,7 @@ describe('ContractScreen', () => {
       <ContractScreen
         controller={contractController(contract({ is_admin: false }))}
         onPropose={jest.fn()}
+        onActivity={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -34,7 +42,14 @@ describe('ContractScreen', () => {
     const controller = contractController(
       contract({ signed, current: pending, versions: [signed, pending] }),
     );
-    await render(<ContractScreen controller={controller} onPropose={jest.fn()} onBack={jest.fn()} />);
+    await render(
+      <ContractScreen
+        controller={controller}
+        onPropose={jest.fn()}
+        onActivity={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
     expect(screen.getByText('Versión firmada vigente · v1')).toBeTruthy();
     expect(screen.getByText('Duración: 90 min')).toBeTruthy();
     await fireEvent.press(screen.getByText('Rechazar cambio'));
@@ -43,7 +58,14 @@ describe('ContractScreen', () => {
 
   test('cancelar exige un motivo de al menos 5 caracteres', async () => {
     const controller = contractController(contract());
-    await render(<ContractScreen controller={controller} onPropose={jest.fn()} onBack={jest.fn()} />);
+    await render(
+      <ContractScreen
+        controller={controller}
+        onPropose={jest.fn()}
+        onActivity={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
     await fireEvent.press(screen.getByText('Cancelar partido'));
     expect(controller.handleCancel).not.toHaveBeenCalled();
     await fireEvent.changeText(screen.getByLabelText('Motivo para cancelar'), 'Lluvia fuerte');

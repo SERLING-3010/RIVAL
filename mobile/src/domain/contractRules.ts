@@ -1,6 +1,13 @@
 // Qué puede hacer cada administrador con el contrato. El backend vuelve a validar todo.
 
-import type { Contract, ContractStatus, ContractTerms, CostSplit, Side } from './contractModels';
+import type {
+  Contract,
+  ContractStatus,
+  ContractTerms,
+  CostSplit,
+  ResultStatus,
+  Side,
+} from './contractModels';
 
 export const CONTRACT_STATUS_LABEL: Record<ContractStatus, string> = {
   NEGOTIATING: 'En negociación',
@@ -14,11 +21,18 @@ export const COST_SPLIT_LABEL: Record<CostSplit, string> = {
   GUEST: 'Lo paga el visitante',
 };
 
+export const RESULT_STATUS_LABEL: Record<ResultStatus, string> = {
+  PENDING: 'Falta el reporte del rival',
+  CONFIRMED: 'Resultado confirmado',
+  DISPUTED: 'En disputa: los marcadores no coinciden',
+};
+
 export interface ContractActions {
   canSign: boolean;
   canPropose: boolean;
   canRejectAmendment: boolean;
   canCancel: boolean;
+  canReportResult: boolean;
   /** Mensaje corto sobre a quién le toca. */
   status: string;
 }
@@ -27,9 +41,16 @@ export function otherSide(side: Side): Side {
   return side === 'HOST' ? 'GUEST' : 'HOST';
 }
 
-export function contractActions(contract: Contract): ContractActions {
+/** Hora de inicio que cuenta: la de la versión firmada; si no hay, la de la versión en negociación. */
+export function effectiveKickoff(contract: Contract): number {
+  return Date.parse((contract.signed ?? contract.current).terms.kickoff_at);
+}
+
+export function contractActions(contract: Contract, now: Date = new Date()): ContractActions {
   const open = contract.status !== 'CANCELLED';
+  const started = now.getTime() >= effectiveKickoff(contract);
   const admin = contract.is_admin && open;
+  const changeable = admin && !started;
   const iSigned = contract.current.signed_by.includes(contract.my_side);
   const negotiating = contract.status === 'NEGOTIATING';
   const amendment = negotiating && contract.signed !== null;
@@ -41,10 +62,11 @@ export function contractActions(contract: Contract): ContractActions {
     status += ' Mientras tanto vale la versión firmada.';
   }
   return {
-    canSign: admin && negotiating && !iSigned,
-    canPropose: admin,
+    canSign: changeable && negotiating && !iSigned,
+    canPropose: changeable,
     canRejectAmendment: admin && amendment,
-    canCancel: admin,
+    canCancel: changeable,
+    canReportResult: admin && started && contract.signed !== null && contract.result?.status !== 'CONFIRMED',
     status,
   };
 }

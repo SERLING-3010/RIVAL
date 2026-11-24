@@ -55,7 +55,7 @@ def _insert_version(ctx: ServiceContext, contract: MatchContract, terms: Contrac
     return version
 
 
-def _admin_side(ctx: ServiceContext, contract: MatchContract, actor: UserAccount) -> tuple[str, Team]:
+def admin_side(ctx: ServiceContext, contract: MatchContract, actor: UserAccount) -> tuple[str, Team]:
     teams = side_teams(ctx, contract)
     member_side(teams, actor)  # 404 si no pertenece a ninguno de los dos equipos
     sides = [side for side, team in teams.items() if is_admin_of(team, actor)]
@@ -70,7 +70,7 @@ def _open_for_changes(
     ctx: ServiceContext, contract_id: int, actor: UserAccount, version: int | None
 ) -> tuple[MatchContract, str, Team, MatchContractVersion]:
     contract = load_contract(ctx, contract_id, lock=True)
-    side, team = _admin_side(ctx, contract, actor)
+    side, team = admin_side(ctx, contract, actor)
     if contract.status == ContractStatus.CANCELLED:
         raise ConflictError("CONTRACT_CANCELLED", "Este partido fue cancelado.")
     current = get_version(ctx, contract.current_version_id)

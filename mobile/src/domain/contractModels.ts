@@ -1,4 +1,4 @@
-// Contrato del partido (Sprint 3): versiones inmutables y firmas de los dos administradores.
+// Contrato del partido (Sprint 3) y resultado (Sprint 4): versiones inmutables, firmas y marcador.
 
 import type { PlaceKind, RefereeMode } from './matchModels';
 import type { TeamSummary } from './models';
@@ -32,6 +32,22 @@ export interface ContractVersion {
   signed_by: Side[];
 }
 
+export type ResultStatus = 'PENDING' | 'CONFIRMED' | 'DISPUTED';
+
+export interface ResultReport {
+  side: Side;
+  host_score: number;
+  guest_score: number;
+  reported_at: string;
+}
+
+export interface MatchResult {
+  status: ResultStatus;
+  host_score: number | null;
+  guest_score: number | null;
+  reports: ResultReport[];
+}
+
 export interface Contract {
   id: number;
   request_id: number;
@@ -44,6 +60,7 @@ export interface Contract {
   signed: ContractVersion | null;
   versions: ContractVersion[];
   cancel_reason: string | null;
+  result: MatchResult | null;
 }
 
 export interface ContractSummary {
@@ -54,4 +71,7 @@ export interface ContractSummary {
   kickoff_at: string;
   my_side: Side;
   awaiting_my_signature: boolean;
+  result_status: ResultStatus | null;
+  host_score: number | null;
+  guest_score: number | null;
 }

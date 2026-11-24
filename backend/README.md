@@ -24,6 +24,7 @@ API FastAPI con capas:
 .\venv\Scripts\python.exe -m pytest -v
 .\venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 .\venv\Scripts\python.exe -m pip_audit -r requirements.txt   # opcional: escaneo de vulnerabilidades
+.\venv\Scripts\python.exe -m app.tools.health_check          # centro de salud (código 1 si hay S0 o S1)
 ```
 
 ## Catálogo de barrios (ADR-006)

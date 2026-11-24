@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 
 import type { Route } from '../controllers/useNavigator';
-import { ContractDetail, Contracts, ProposeContract } from './ContractFlow';
+import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
 import type { MatchCtx } from './MatchFlow';
 import {
   CreateRequest,
@@ -49,6 +49,8 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <ContractDetail {...ctx} contractId={route.contractId} />;
     case 'proposeContract':
       return <ProposeContract {...ctx} contract={route.contract} />;
+    case 'activity':
+      return <Activity {...ctx} scope={route.scope} id={route.id} title={route.title} />;
     default:
       return null;
   }
