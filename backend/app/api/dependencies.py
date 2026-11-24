@@ -5,10 +5,11 @@ from typing import Annotated
 
 from fastapi import Depends, Header, Request
 
-from app.domain.errors import AuthenticationError
+from app.domain.errors import AuthenticationError, PermissionDeniedError
 from app.persistence.database import session_scope
 from app.persistence.models_identity import UserAccount
-from app.services import auth_service
+from app.services import auth_service, sanction_service
+from app.services.clock import COLOMBIA_TZ
 from app.services.context import ServiceContext
 from app.services.ip_limiter import login_ip_limiter, register_limiter
 from app.services.rate_limiter import LoginRateLimiter
@@ -58,8 +59,19 @@ CtxDep = Annotated[ServiceContext, Depends(get_ctx)]
 TokenDep = Annotated[str, Depends(bearer_token)]
 
 
-def current_user(ctx: CtxDep, token: TokenDep) -> UserAccount:
-    return auth_service.authenticate(ctx, token)
+_SUSPENDED_ALLOWED = ("/auth/logout", "/appeal")  # un suspendido puede salir y apelar
+_READ_ONLY = ("GET", "HEAD", "OPTIONS")
+
+
+def current_user(request: Request, ctx: CtxDep, token: TokenDep) -> UserAccount:
+    user = auth_service.authenticate(ctx, token)
+    if request.method not in _READ_ONLY and not request.url.path.endswith(_SUSPENDED_ALLOWED):
+        suspension = sanction_service.active_suspension(ctx, user.id)
+        if suspension is not None:  # Sprint 12: puede ver la app y apelar, pero no actuar
+            until = suspension.ends_at.astimezone(COLOMBIA_TZ).strftime("%d/%m/%Y %H:%M") if suspension.ends_at else ""
+            raise PermissionDeniedError("ACCOUNT_SUSPENDED", f"Tu cuenta está suspendida hasta el {until}. "
+                                        "Puedes ver la app y apelar la sanción.")
+    return user
 
 
 UserDep = Annotated[UserAccount, Depends(current_user)]

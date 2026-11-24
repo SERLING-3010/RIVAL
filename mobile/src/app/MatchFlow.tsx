@@ -4,7 +4,7 @@ import { useFreeAgentPanel } from '../controllers/useFreeAgentPanel';
 import { useCreateMatchRequest, useOfferForm } from '../controllers/useMatchForms';
 import { useMatchFeed, useMyMatchRequests, useOffers } from '../controllers/useMatches';
 import type { Navigator } from '../controllers/useNavigator';
-import { useFreeAgentSearch, useRivalSearch } from '../controllers/useScouting';
+import { useFreeAgentSearch } from '../controllers/useScouting';
 import type { MatchRequest } from '../domain/matchModels';
 import type { Sport, TeamSummary, User } from '../domain/models';
 import { CreateMatchRequestScreen } from '../ui/screens/CreateMatchRequestScreen';
@@ -14,29 +14,12 @@ import { MakeOfferScreen } from '../ui/screens/MakeOfferScreen';
 import { MatchFeedScreen } from '../ui/screens/MatchFeedScreen';
 import { MatchRequestsScreen } from '../ui/screens/MatchRequestsScreen';
 import { OffersScreen } from '../ui/screens/OffersScreen';
-import { RivalSearchScreen } from '../ui/screens/RivalSearchScreen';
 
 export interface MatchCtx {
   user: User;
   token: string;
   navigator: Navigator;
   sports: Sport[];
-}
-
-export function Rivals({
-  token,
-  navigator,
-  teamId,
-  isAdmin,
-}: MatchCtx & { teamId: number; isAdmin: boolean }) {
-  return (
-    <RivalSearchScreen
-      controller={useRivalSearch(token, teamId)}
-      canChallenge={isAdmin}
-      onBack={navigator.goBack}
-      onChallenge={(target) => navigator.push({ name: 'createMatchRequest', teamId, targetTeamId: target })}
-    />
-  );
 }
 
 export function FreeAgentPanel({ token, navigator, sports, user }: MatchCtx) {

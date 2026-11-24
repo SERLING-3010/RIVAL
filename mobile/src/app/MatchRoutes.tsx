@@ -8,18 +8,11 @@ import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './L
 import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
 import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
+import { BlockedTeams, Moderation, MySanctions, Report } from './ModerationFlow';
 import { Pending } from './PendingFlow';
 import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
-import {
-  CreateRequest,
-  Feed,
-  FreeAgentPanel,
-  FreeAgentSearch,
-  Offer,
-  Offers,
-  Requests,
-  Rivals,
-} from './MatchFlow';
+import { CreateRequest, Feed, FreeAgentPanel, FreeAgentSearch, Offer, Offers, Requests } from './MatchFlow';
+import { Rivals } from './RivalsFlow';
 
 /** Devuelve la pantalla de partidos para la ruta, o null si la ruta no es de este flujo. */
 export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null {
@@ -104,6 +97,14 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <MyCallUps {...ctx} />;
     case 'pending':
       return <Pending {...ctx} />;
+    case 'report':
+      return <Report {...ctx} target={route.target} />;
+    case 'mySanctions':
+      return <MySanctions {...ctx} />;
+    case 'moderation':
+      return <Moderation {...ctx} />;
+    case 'blockedTeams':
+      return <BlockedTeams {...ctx} teamId={route.teamId} />;
     default:
       return null;
   }

@@ -18,6 +18,7 @@ from app.domain.venue_rules import BookingStatus
 from app.persistence.models_contracts import MatchContract, MatchContractSignature
 from app.persistence.models_manager import CoinEntry, TransferOffer
 from app.persistence.models_matches import MatchRequest
+from app.persistence.models_moderation import Sanction
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
 from app.persistence.models_venues import Booking, Slot
@@ -118,7 +119,13 @@ def _security(ctx: ServiceContext) -> list[HealthFinding]:
             for key in security_service.failure_spikes(ctx)]
 
 
+def _moderation(ctx: ServiceContext) -> list[HealthFinding]:
+    same = ctx.db.scalars(select(Sanction.id).where(Sanction.appeal_decided_by == Sanction.decided_by))
+    return [HealthFinding("S0", "APPEAL_WITHOUT_FOUR_EYES", "sanction", sid,
+                          "Apelación decidida por el mismo moderador que sancionó.") for sid in same]
+
+
 def run_checks(ctx: ServiceContext) -> list[HealthFinding]:
     findings = _audit(ctx) + _teams(ctx) + _contracts(ctx) + _requests(ctx) + _bookings(ctx) + _manager(ctx)
-    findings += _security(ctx)
+    findings += _security(ctx) + _moderation(ctx)
     return sorted(findings, key=lambda f: (f.severity, f.code, f.entity_id or 0))

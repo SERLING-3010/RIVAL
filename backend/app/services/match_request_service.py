@@ -8,6 +8,7 @@ from app.domain.match_rules import MAX_OPEN_REQUESTS_PER_TEAM, OfferStatus, Requ
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import Team
+from app.services import block_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.match_views import MatchRequestInput, MatchRequestView
@@ -54,6 +55,8 @@ def create_request(ctx: ServiceContext, actor: UserAccount, team_id: int, data: 
         nearby_keys(ctx, team, radius)  # falla con un mensaje claro si el barrio no está en el catálogo
     if data.target_team_id is not None:
         target = get_active_team(ctx, data.target_team_id)
+        if block_service.is_blocked(ctx, team.id, target.id):
+            raise NotFoundError("TEAM_NOT_FOUND", "El equipo no existe o ya no está activo.")
         same_game = (target.sport_code, target.modality_code, target.city_key) == (
             team.sport_code, team.modality_code, team.city_key)
         if target.id == team.id or not same_game:

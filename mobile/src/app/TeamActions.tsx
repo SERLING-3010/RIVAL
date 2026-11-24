@@ -46,6 +46,13 @@ export function TeamActions({ team, isAdmin, navigator }: Props) {
       />
       {isAdmin ? (
         <PrimaryButton
+          label="Equipos bloqueados"
+          variant="secondary"
+          onPress={() => navigator.push({ name: 'blockedTeams', teamId: team.id })}
+        />
+      ) : null}
+      {isAdmin ? (
+        <PrimaryButton
           label="Buscar agentes libres"
           variant="secondary"
           onPress={() => navigator.push({ name: 'freeAgentSearch', team })}

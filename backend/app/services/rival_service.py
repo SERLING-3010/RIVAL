@@ -12,7 +12,7 @@ from app.domain.geo import DEFAULT_RADIUS_KM, DistanceBand, SearchScope, distanc
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team
 from app.services import neighborhood_service
-from app.services import settlement_service
+from app.services import block_service, settlement_service
 from app.services.context import ServiceContext
 from app.services.team_service import MAX_PAGE_SIZE, get_active_team, summary
 from app.services.team_views import TeamSummaryView
@@ -68,6 +68,7 @@ def search_rivals(
     stmt = select(Team).where(
         Team.status == "ACTIVE", Team.id != team.id, Team.sport_code == team.sport_code,
         Team.modality_code == team.modality_code, Team.city_key == team.city_key,
+        Team.id.not_in(block_service.blocked_ids(ctx, team.id)),  # bloqueos entre equipos (Sprint 12)
     )
     distances: dict[str, float] = {}
     if scope == SearchScope.NEIGHBORHOOD:

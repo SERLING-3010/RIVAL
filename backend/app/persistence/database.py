@@ -65,6 +65,7 @@ def load_models() -> None:
         models_manager,
         models_matchday,
         models_matches,
+        models_moderation,
         models_places,
         models_results,
         models_scouting,

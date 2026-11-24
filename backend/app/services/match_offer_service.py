@@ -18,7 +18,7 @@ from app.domain.match_rules import (
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import Team
-from app.services import contract_service
+from app.services import block_service, contract_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.match_feed_service import is_visible_to, viewer_distances
@@ -42,7 +42,8 @@ def make_offer(ctx: ServiceContext, actor: UserAccount, team_id: int, request_id
     if request.team_id == team.id:
         raise ConflictError("OWN_REQUEST", "No puedes ofertar a la búsqueda de tu propio equipo.")
     owner = ctx.db.get(Team, request.team_id)
-    if owner is None or not is_visible_to(request, owner, team, viewer_distances(ctx, team)):
+    blocked = owner is not None and block_service.is_blocked(ctx, owner.id, team.id)
+    if owner is None or blocked or not is_visible_to(request, owner, team, viewer_distances(ctx, team)):
         raise NotFoundError("MATCH_REQUEST_NOT_FOUND", "La búsqueda de partido no existe.")
     check_proposed_start(data.proposed_start, request.window_start, request.window_end, ctx.clock.now())
     check_offer_referee(RefereeMode(request.referee_mode), data.referee_mode)

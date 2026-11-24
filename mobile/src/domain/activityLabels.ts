@@ -63,6 +63,8 @@ const ACTION_LABEL: Record<string, string> = {
   CALLUP_SENT: 'Envió la convocatoria',
   CALLUP_RESPONDED: 'Respondió a la convocatoria',
   PLAYER_RATED: 'Valoró a un compañero',
+  TEAM_BLOCKED: 'Bloqueó a un equipo',
+  TEAM_UNBLOCKED: 'Desbloqueó a un equipo',
 };
 
 const FIELD_LABEL: Record<string, string> = {

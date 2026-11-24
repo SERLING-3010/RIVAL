@@ -5,16 +5,18 @@ import { StyleSheet, Text } from 'react-native';
 import type { Loader } from '../../controllers/useLoader';
 import type { PlayerCard } from '../../domain/managerModels';
 import { Card } from '../components/Card';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
 import { colors, font } from '../theme';
 
 interface Props {
   controller: Loader<PlayerCard>;
+  onReport: (userId: number, name: string) => void;
   onBack: () => void;
 }
 
-export function PlayerCardScreen({ controller, onBack }: Props) {
+export function PlayerCardScreen({ controller, onReport, onBack }: Props) {
   return (
     <Screen title="Ficha del jugador" onBack={onBack}>
       <StateView state={controller.state} onRetry={controller.handleReload}>
@@ -41,6 +43,11 @@ export function PlayerCardScreen({ controller, onBack }: Props) {
               Solo cuentan partidos con resultado confirmado por ambos equipos y con el jugador en la
               planilla.
             </Text>
+            <PrimaryButton
+              label="Reportar jugador"
+              variant="secondary"
+              onPress={() => onReport(card.user_id, card.display_name)}
+            />
           </>
         )}
       </StateView>

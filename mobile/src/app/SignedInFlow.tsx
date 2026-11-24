@@ -5,6 +5,7 @@ import { renderMatchRoute } from './MatchRoutes';
 import { TeamActions } from './TeamActions';
 import { useCreateTeamForm } from '../controllers/useCreateTeamForm';
 import { useMyTeams } from '../controllers/useMyTeams';
+import { useModerationMe } from '../controllers/useModeration';
 import { pendingCount, usePending } from '../controllers/usePending';
 import type { Navigator } from '../controllers/useNavigator';
 import type { Session } from '../controllers/useSession';
@@ -32,6 +33,7 @@ interface Ctx extends Props {
 function HomeContainer({ session, user, token, navigator }: Ctx) {
   const teams = useMyTeams(token);
   const pending = usePending(token);
+  const moderation = useModerationMe(token);
   return (
     <HomeScreen
       user={user}
@@ -47,6 +49,9 @@ function HomeContainer({ session, user, token, navigator }: Ctx) {
       onMyCallUps={() => navigator.push({ name: 'myCallups' })}
       pendingCount={pendingCount(pending)}
       onPending={() => navigator.push({ name: 'pending' })}
+      moderation={moderation.state.kind === 'success' ? moderation.state.data : null}
+      onMySanctions={() => navigator.push({ name: 'mySanctions' })}
+      onModeration={() => navigator.push({ name: 'moderation' })}
       onOpenTeam={(teamId) => navigator.push({ name: 'team', teamId })}
       onLogout={() => void session.handleLogout()}
     />

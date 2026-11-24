@@ -1,6 +1,7 @@
 import { StyleSheet, Text } from 'react-native';
 
 import type { RivalSearchController } from '../../controllers/useScouting';
+import type { TeamSummary } from '../../domain/models';
 import { levelText } from '../../domain/matchdayModels';
 import { SCOPE_LABEL, distanceText } from '../../domain/matchLabels';
 import type { SearchScope } from '../../domain/matchModels';
@@ -16,13 +17,22 @@ interface Props {
   controller: RivalSearchController;
   canChallenge: boolean;
   onChallenge: (teamId: number) => void;
+  onReport: (team: TeamSummary) => void;
+  onBlock: (teamId: number) => void;
   onBack: () => void;
 }
 
 const SCOPES: SearchScope[] = ['NEARBY', 'NEIGHBORHOOD', 'CITY'];
 const RADII = [2, 5, 10, 15];
 
-export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBack }: Props) {
+export function RivalSearchScreen({
+  controller,
+  canChallenge,
+  onChallenge,
+  onBack,
+  onReport,
+  onBlock,
+}: Props) {
   return (
     <Screen title="Buscar rival" onBack={onBack}>
       <Text style={styles.note}>
@@ -67,6 +77,10 @@ export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBac
                     variant="secondary"
                     onPress={() => onChallenge(rival.team.id)}
                   />
+                ) : null}
+                <PrimaryButton label="Reportar" variant="secondary" onPress={() => onReport(rival.team)} />
+                {canChallenge ? (
+                  <PrimaryButton label="Bloquear" variant="danger" onPress={() => onBlock(rival.team.id)} />
                 ) : null}
               </Card>
             ))}

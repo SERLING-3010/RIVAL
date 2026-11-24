@@ -3,6 +3,7 @@
 import { StyleSheet, Text } from 'react-native';
 
 import { roleTitle, TEAM_ROLE_LABEL } from '../../domain/labels';
+import type { ModerationMe } from '../../domain/moderationModels';
 import { pendingCardTitle } from '../../domain/pendingModels';
 import type { MyTeam, User } from '../../domain/models';
 import type { ViewState } from '../../domain/viewState';
@@ -10,6 +11,7 @@ import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
+import { TrustCards } from '../components/TrustCards';
 import { colors, font } from '../theme';
 
 interface Props {
@@ -26,6 +28,9 @@ interface Props {
   onMyCallUps: () => void;
   pendingCount: number | null;
   onPending: () => void;
+  moderation: ModerationMe | null;
+  onMySanctions: () => void;
+  onModeration: () => void;
   onOpenTeam: (teamId: number) => void;
   onLogout: () => void;
 }
@@ -44,6 +49,9 @@ export function HomeScreen({
   onMyCallUps,
   pendingCount,
   onPending,
+  moderation,
+  onMySanctions,
+  onModeration,
   onOpenTeam,
   onLogout,
 }: Props) {
@@ -54,6 +62,7 @@ export function HomeScreen({
       <Text style={styles.lead}>
         {user.roles.map(roleTitle).join(' · ')} · {user.neighborhood}, {user.city}
       </Text>
+      <TrustCards me={moderation} onMySanctions={onMySanctions} onModeration={onModeration} />
       <Card
         title={pendingCardTitle(pendingCount)}
         subtitle="Firmas, marcadores, convocatorias, traspasos y más: lo que espera tu acción"

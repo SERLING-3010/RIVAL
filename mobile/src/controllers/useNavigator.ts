@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import type { Contract } from '../domain/contractModels';
 import type { RefereeEntry } from '../domain/leagueModels';
 import type { MatchRequest } from '../domain/matchModels';
+import type { ReportTarget } from '../domain/moderationModels';
 import type { MatchToBook } from '../domain/venueModels';
 import type { TeamSummary, UserRole } from '../domain/models';
 
@@ -45,7 +46,11 @@ export type Route =
   | { name: 'callup'; contractId: number; teamId: number; isAdmin: boolean }
   | { name: 'rate'; contractId: number }
   | { name: 'myCallups' }
-  | { name: 'pending' };
+  | { name: 'pending' }
+  | { name: 'report'; target: ReportTarget }
+  | { name: 'mySanctions' }
+  | { name: 'moderation' }
+  | { name: 'blockedTeams'; teamId: number };
 
 export interface Navigator {
   current: Route;

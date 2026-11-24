@@ -45,7 +45,13 @@ export function Market({
 }
 
 export function PlayerCardRoute({ token, navigator, userId }: MatchCtx & { userId: number }) {
-  return <PlayerCardScreen controller={usePlayerCard(token, userId)} onBack={navigator.goBack} />;
+  return (
+    <PlayerCardScreen
+      controller={usePlayerCard(token, userId)}
+      onReport={(id, name) => navigator.push({ name: 'report', target: { kind: 'user', id, name } })}
+      onBack={navigator.goBack}
+    />
+  );
 }
 
 export function TransferOffers({ token, navigator }: MatchCtx) {
