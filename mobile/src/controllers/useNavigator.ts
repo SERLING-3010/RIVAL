@@ -44,7 +44,8 @@ export type Route =
   | { name: 'refereeMatches' }
   | { name: 'callup'; contractId: number; teamId: number; isAdmin: boolean }
   | { name: 'rate'; contractId: number }
-  | { name: 'myCallups' };
+  | { name: 'myCallups' }
+  | { name: 'pending' };
 
 export interface Navigator {
   current: Route;

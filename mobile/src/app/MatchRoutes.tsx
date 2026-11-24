@@ -8,6 +8,7 @@ import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './L
 import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
 import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
+import { Pending } from './PendingFlow';
 import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
 import {
   CreateRequest,
@@ -101,6 +102,8 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <RateTeammates {...ctx} contractId={route.contractId} />;
     case 'myCallups':
       return <MyCallUps {...ctx} />;
+    case 'pending':
+      return <Pending {...ctx} />;
     default:
       return null;
   }

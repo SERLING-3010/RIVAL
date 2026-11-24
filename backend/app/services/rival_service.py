@@ -60,6 +60,7 @@ def search_rivals(
     radius_km: int = DEFAULT_RADIUS_KM,
     page: int = 1,
     page_size: int = 20,
+    by_level: bool = False,
 ) -> RivalPage:
     team = get_active_team(ctx, team_id)
     require_member(team, actor)
@@ -78,8 +79,11 @@ def search_rivals(
     rows = list(ctx.db.scalars(stmt.order_by(Team.name_key, Team.id)))
     if scope == SearchScope.NEARBY:
         rows.sort(key=lambda t: (distances[t.neighborhood_key], t.name_key))  # el más cercano primero
+    levels = settlement_service.ratings_for(ctx, [t.id for t in rows] + [team.id])
+    if by_level:  # nivel parecido primero; sin nivel, al final (Sprint 11)
+        mine = levels[team.id].rating if team.id in levels else 1500.0
+        rows.sort(key=lambda t: (t.id not in levels, abs(levels[t.id].rating - mine) if t.id in levels else 0.0))
     chosen = rows[(page - 1) * page_size: page * page_size]
-    levels = settlement_service.ratings_for(ctx, [t.id for t in chosen])
     items = [
         RivalView(team=summary(t), distance_band=distance_band(distances[t.neighborhood_key]) if distances else None,
                   level=round(levels[t.id].rating) if t.id in levels else None,

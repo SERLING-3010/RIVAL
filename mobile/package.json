@@ -25,7 +25,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/validation.test.ts tests/dateTime.test.ts tests/contract.test.ts tests/league.test.ts tests/venue.test.ts tests/manager.test.ts tests/season.test.ts tests/matchday.test.ts && jest"
+    "test": "node --experimental-strip-types --test tests/validation.test.ts tests/dateTime.test.ts tests/contract.test.ts tests/league.test.ts tests/venue.test.ts tests/manager.test.ts tests/season.test.ts tests/matchday.test.ts tests/pending.test.ts && jest"
   },
   "private": true,
   "jest": {

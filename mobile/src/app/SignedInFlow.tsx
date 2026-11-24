@@ -5,6 +5,7 @@ import { renderMatchRoute } from './MatchRoutes';
 import { TeamActions } from './TeamActions';
 import { useCreateTeamForm } from '../controllers/useCreateTeamForm';
 import { useMyTeams } from '../controllers/useMyTeams';
+import { pendingCount, usePending } from '../controllers/usePending';
 import type { Navigator } from '../controllers/useNavigator';
 import type { Session } from '../controllers/useSession';
 import { useTeamDetail } from '../controllers/useTeamDetail';
@@ -30,6 +31,7 @@ interface Ctx extends Props {
 
 function HomeContainer({ session, user, token, navigator }: Ctx) {
   const teams = useMyTeams(token);
+  const pending = usePending(token);
   return (
     <HomeScreen
       user={user}
@@ -43,6 +45,8 @@ function HomeContainer({ session, user, token, navigator }: Ctx) {
       onTransferOffers={() => navigator.push({ name: 'transferOffers' })}
       onRefereeMatches={() => navigator.push({ name: 'refereeMatches' })}
       onMyCallUps={() => navigator.push({ name: 'myCallups' })}
+      pendingCount={pendingCount(pending)}
+      onPending={() => navigator.push({ name: 'pending' })}
       onOpenTeam={(teamId) => navigator.push({ name: 'team', teamId })}
       onLogout={() => void session.handleLogout()}
     />

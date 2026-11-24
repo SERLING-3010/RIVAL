@@ -42,6 +42,15 @@ export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBac
           onToggle={(value) => controller.handleRadius(Number(value))}
         />
       ) : null}
+      <ChoiceChips
+        label="Ordenar"
+        selected={[controller.order]}
+        choices={[
+          { value: 'default', label: controller.scope === 'NEARBY' ? 'Más cerca' : 'Por nombre' },
+          { value: 'level', label: 'Nivel parecido' },
+        ]}
+        onToggle={(value) => controller.handleOrder(value === 'level' ? 'level' : 'default')}
+      />
       <StateView state={controller.state} onRetry={controller.handleReload}>
         {(page) => (
           <>

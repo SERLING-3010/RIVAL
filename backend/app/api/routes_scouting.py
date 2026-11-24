@@ -36,8 +36,9 @@ def rivals(
     scope: SearchScope = SearchScope.CITY,
     radius_km: Annotated[int, Query(ge=1, le=15)] = DEFAULT_RADIUS_KM,
     page: Annotated[int, Query(ge=1, le=1000)] = 1,
+    order: Annotated[str, Query(pattern="^(default|level)$")] = "default",
 ) -> RivalPageOut:
-    result = rival_service.search_rivals(ctx, user, team_id, scope, radius_km, page)
+    result = rival_service.search_rivals(ctx, user, team_id, scope, radius_km, page, by_level=order == "level")
     return RivalPageOut.model_validate(asdict(result))
 
 

@@ -3,6 +3,7 @@
 import { StyleSheet, Text } from 'react-native';
 
 import { roleTitle, TEAM_ROLE_LABEL } from '../../domain/labels';
+import { pendingCardTitle } from '../../domain/pendingModels';
 import type { MyTeam, User } from '../../domain/models';
 import type { ViewState } from '../../domain/viewState';
 import { Card } from '../components/Card';
@@ -23,6 +24,8 @@ interface Props {
   onTransferOffers: () => void;
   onRefereeMatches: () => void;
   onMyCallUps: () => void;
+  pendingCount: number | null;
+  onPending: () => void;
   onOpenTeam: (teamId: number) => void;
   onLogout: () => void;
 }
@@ -39,6 +42,8 @@ export function HomeScreen({
   onTransferOffers,
   onRefereeMatches,
   onMyCallUps,
+  pendingCount,
+  onPending,
   onOpenTeam,
   onLogout,
 }: Props) {
@@ -49,6 +54,11 @@ export function HomeScreen({
       <Text style={styles.lead}>
         {user.roles.map(roleTitle).join(' · ')} · {user.neighborhood}, {user.city}
       </Text>
+      <Card
+        title={pendingCardTitle(pendingCount)}
+        subtitle="Firmas, marcadores, convocatorias, traspasos y más: lo que espera tu acción"
+        onPress={onPending}
+      />
       {plays ? (
         <>
           <Text style={styles.section} accessibilityRole="header">
