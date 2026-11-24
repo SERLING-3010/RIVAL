@@ -45,6 +45,7 @@ export interface Booking {
 export interface VenueDetail {
   venue: VenueSummary;
   is_owner: boolean;
+  has_location: boolean;
   courts: Court[];
   slots: Slot[];
   pending_bookings: Booking[];

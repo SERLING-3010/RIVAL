@@ -1,4 +1,4 @@
-"""Día del partido (Sprint 10): nivel Glicko-2 del equipo, convocatoria y valoraciones."""
+"""Día del partido: nivel Glicko-2, convocatoria y valoraciones (Sprint 10) y check-in (Sprint 15)."""
 
 from datetime import datetime
 
@@ -43,3 +43,15 @@ class PlayerRating(Base):
     rated_id: Mapped[int] = mapped_column(ForeignKey("user_account.id"), index=True)
     score: Mapped[int]
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+
+
+class MatchCheckIn(Base):
+    """Solo "llegó" y la hora: la posición con la que se comprobó nunca se guarda."""
+
+    __tablename__ = "match_check_in"
+    __table_args__ = (UniqueConstraint("contract_id", "user_id", name="uq_match_check_in"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    contract_id: Mapped[int] = mapped_column(ForeignKey("match_contract.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id"), index=True)
+    checked_in_at: Mapped[datetime] = mapped_column(UtcDateTime)

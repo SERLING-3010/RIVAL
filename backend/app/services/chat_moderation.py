@@ -11,9 +11,10 @@ from app.persistence.models_identity import UserAccount
 from app.persistence.models_moderation import Report
 from app.services import sanction_service
 from app.services.audit_service import record_event
-from app.services.chat_service import ChatPageView, participants, view_messages
+from app.services.chat_service import ChatPageView, view_messages
 from app.services.context import ServiceContext
 from app.services.contract_queries import load_contract
+from app.services.match_participants import participants
 
 
 def read_for_report(ctx: ServiceContext, actor: UserAccount, contract_id: int, after_id: int = 0) -> ChatPageView:

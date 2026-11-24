@@ -81,7 +81,7 @@ def venue_detail(ctx: ServiceContext, actor: UserAccount, venue_id: int) -> Venu
                            .order_by(Slot.starts_at, Slot.id).limit(100))
     is_owner = venue.owner_id == actor.id
     return VenueDetailView(
-        venue=venue_summary(ctx, venue), is_owner=is_owner,
+        venue=venue_summary(ctx, venue), is_owner=is_owner, has_location=venue.latitude is not None,
         courts=[CourtView(id=c.id, name=c.name, sport_code=c.sport_code, surface=c.surface) for c in courts],
         slots=[slot_view(s, by_id[s.court_id]) for s in slots],
         pending_bookings=_bookings(ctx, venue.id, BookingStatus.PENDING.value) if is_owner else [],

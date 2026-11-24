@@ -72,6 +72,7 @@ class BookingOut(BaseModel):
 class VenueDetailOut(BaseModel):
     venue: VenueSummaryOut
     is_owner: bool
+    has_location: bool
     courts: list[CourtOut]
     slots: list[SlotOut]
     pending_bookings: list[BookingOut]

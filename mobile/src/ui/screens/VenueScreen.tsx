@@ -2,6 +2,7 @@
 
 import { StyleSheet, Text } from 'react-native';
 
+import type { VenueLocationController } from '../../controllers/useCheckIn';
 import type { VenueController } from '../../controllers/useVenues';
 import { formatLocal } from '../../domain/dateTime';
 import type { Sport } from '../../domain/models';
@@ -11,18 +12,20 @@ import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
+import { VenueLocationCard } from '../components/VenueLocationCard';
 import { VenueOwnerPanel } from '../components/VenueOwnerPanel';
 import { colors, font } from '../theme';
 
 interface Props {
   controller: VenueController;
+  location: VenueLocationController;
   sports: Sport[];
   match: MatchToBook | null;
   onBooked: () => void;
   onBack: () => void;
 }
 
-export function VenueScreen({ controller, sports, match, onBooked, onBack }: Props) {
+export function VenueScreen({ controller, location, sports, match, onBooked, onBack }: Props) {
   const busy = controller.action.busy;
   return (
     <Screen title="Establecimiento" onBack={onBack}>
@@ -79,7 +82,10 @@ export function VenueScreen({ controller, sports, match, onBooked, onBack }: Pro
                 ))}
               </Card>
               {detail.is_owner ? (
-                <VenueOwnerPanel detail={detail} sports={sports} controller={controller} />
+                <>
+                  <VenueLocationCard hasLocation={detail.has_location} controller={location} />
+                  <VenueOwnerPanel detail={detail} sports={sports} controller={controller} />
+                </>
               ) : null}
             </>
           );

@@ -5,6 +5,7 @@ import { PrimaryButton } from './PrimaryButton';
 
 export interface MatchdayHandlers {
   onChat: (contract: Contract) => void;
+  onCheckIn: (contract: Contract) => void;
   onCallUp: (contract: Contract) => void;
   onRate: (contract: Contract) => void;
   onLoan: (contract: Contract) => void;
@@ -23,6 +24,13 @@ export function MatchdayButtons({ contract, handlers }: Props) {
   return (
     <>
       {chat}
+      {contract.booking?.status === 'CONFIRMED' ? (
+        <PrimaryButton
+          label="Check-in en la cancha"
+          variant="secondary"
+          onPress={() => handlers.onCheckIn(contract)}
+        />
+      ) : null}
       <PrimaryButton label="Convocatoria" variant="secondary" onPress={() => handlers.onCallUp(contract)} />
       {contract.is_admin && !contract.result ? (
         <PrimaryButton

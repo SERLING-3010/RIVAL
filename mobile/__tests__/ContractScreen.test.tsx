@@ -5,7 +5,13 @@ import { Alert } from 'react-native';
 import { ContractScreen } from '../src/ui/screens/ContractScreen';
 import { contract, contractController, version } from './fixtures';
 
-const matchday = () => ({ onChat: jest.fn(), onCallUp: jest.fn(), onRate: jest.fn(), onLoan: jest.fn() });
+const matchday = () => ({
+  onChat: jest.fn(),
+  onCheckIn: jest.fn(),
+  onCallUp: jest.fn(),
+  onRate: jest.fn(),
+  onLoan: jest.fn(),
+});
 
 describe('ContractScreen', () => {
   test('el administrador que no ha firmado ve "Firmar" y la firma pide confirmación', async () => {

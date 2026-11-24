@@ -1,5 +1,6 @@
 // Composición del Sprint 6: mis establecimientos, registrar uno, detalle y reservar cancha para un partido.
 
+import { useVenueLocation } from '../controllers/useCheckIn';
 import { useCreateVenue } from '../controllers/useCreateVenue';
 import { useMyVenues, useVenue, useVenueSearch } from '../controllers/useVenues';
 import type { MatchToBook } from '../domain/venueModels';
@@ -53,9 +54,12 @@ export function VenueDetail({
   venueId,
   match,
 }: MatchCtx & { venueId: number; match: MatchToBook | null }) {
+  const controller = useVenue(token, venueId);
+  const location = useVenueLocation(token, venueId, controller.handleReload);
   return (
     <VenueScreen
-      controller={useVenue(token, venueId)}
+      controller={controller}
+      location={location}
       sports={sports}
       match={match}
       onBooked={() => {

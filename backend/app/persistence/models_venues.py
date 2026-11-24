@@ -28,6 +28,9 @@ class Venue(Base):
     city_key: Mapped[str] = mapped_column(String(60), index=True)
     neighborhood: Mapped[str] = mapped_column(String(60))
     reference_price: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True)
+    # Ubicación del negocio (no de personas) para el check-in (Sprint 15); la fija su dueño.
+    latitude: Mapped[float | None] = mapped_column(nullable=True)
+    longitude: Mapped[float | None] = mapped_column(nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="ACTIVE")
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
 

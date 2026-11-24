@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import select
 
 from app.domain.errors import DomainError, NotFoundError, PermissionDeniedError
+from app.domain.geo import validate_coordinates
 from app.domain.identity_rules import validate_place_name
 from app.domain.roles import UserRole
 from app.domain.text_keys import search_key
@@ -78,3 +79,14 @@ def add_slot(ctx: ServiceContext, actor: UserAccount, court_id: int, starts_at: 
                  after={"slot_id": slot.id, "court_id": court.id, "starts_at": starts_at.isoformat(),
                         "ends_at": ends_at.isoformat()})
     return slot
+
+
+def set_location(ctx: ServiceContext, actor: UserAccount, venue_id: int, latitude: float, longitude: float) -> Venue:
+    """El dueño fija la ubicación de su establecimiento (un negocio, no una persona) para el check-in."""
+    venue = owned_venue(ctx, actor, venue_id, lock=True)
+    validate_coordinates(latitude, longitude)
+    venue.latitude, venue.longitude = round(latitude, 6), round(longitude, 6)
+    ctx.db.flush()
+    record_event(ctx, action="VENUE_LOCATION_SET", entity="venue", entity_id=venue.id, initiated_by=actor.id,
+                 after={"latitude": venue.latitude, "longitude": venue.longitude})
+    return venue

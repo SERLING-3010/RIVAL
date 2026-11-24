@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { VenueController } from '../src/controllers/useVenues';
 import type { Booking, Slot, VenueDetail } from '../src/domain/venueModels';
 import { VenueScreen } from '../src/ui/screens/VenueScreen';
+
 import { idleAction } from './fixtures';
 
 const slot = (id: number, start: string, end: string): Slot => ({
@@ -40,6 +41,7 @@ function detail(overrides: Partial<VenueDetail> = {}): VenueDetail {
       sports: ['FOOTBALL'],
     },
     is_owner: false,
+    has_location: false,
     courts: [{ id: 1, name: 'Cancha 1', sport_code: 'FOOTBALL', surface: 'Sintética' }],
     slots: [
       slot(1, '2026-12-01T23:00:00Z', '2026-12-02T01:00:00Z'),
@@ -65,6 +67,8 @@ function controller(data: VenueDetail): VenueController {
 
 const sports = [{ code: 'FOOTBALL', name: 'Fútbol', modalities: [] }];
 
+const location = { action: idleAction(), handleSaveHere: jest.fn(async () => undefined) };
+
 describe('VenueScreen', () => {
   test('para un partido muestra solo las franjas que lo cubren y permite reservar', async () => {
     const c = controller(detail());
@@ -76,7 +80,14 @@ describe('VenueScreen', () => {
     };
     const onBooked = jest.fn();
     await render(
-      <VenueScreen controller={c} sports={sports} match={match} onBooked={onBooked} onBack={jest.fn()} />,
+      <VenueScreen
+        controller={c}
+        location={location}
+        sports={sports}
+        match={match}
+        onBooked={onBooked}
+        onBack={jest.fn()}
+      />,
     );
     expect(screen.getByText(/\$80\.000 por hora/)).toBeTruthy();
     expect(screen.getAllByText('Reservar esta franja')).toHaveLength(1);
@@ -88,7 +99,14 @@ describe('VenueScreen', () => {
   test('el dueño confirma reservas pendientes y ve sus herramientas', async () => {
     const c = controller(detail({ is_owner: true, pending_bookings: [booking] }));
     await render(
-      <VenueScreen controller={c} sports={sports} match={null} onBooked={jest.fn()} onBack={jest.fn()} />,
+      <VenueScreen
+        controller={c}
+        location={location}
+        sports={sports}
+        match={null}
+        onBooked={jest.fn()}
+        onBack={jest.fn()}
+      />,
     );
     expect(screen.getByText('Águilas vs Bravos')).toBeTruthy();
     await fireEvent.press(screen.getByText('Confirmar'));

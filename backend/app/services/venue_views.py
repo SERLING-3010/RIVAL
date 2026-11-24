@@ -77,6 +77,7 @@ class BookingView:
 class VenueDetailView:
     venue: VenueSummaryView
     is_owner: bool
+    has_location: bool  # para el check-in (Sprint 15)
     courts: list[CourtView]
     slots: list[SlotView]  # franjas futuras sin reserva confirmada
     pending_bookings: list[BookingView]  # solo para el dueño

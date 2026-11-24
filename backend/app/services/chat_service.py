@@ -1,7 +1,6 @@
 """Chat del partido (Sprint 14): escriben y leen solo quienes juegan o pitan ese partido.
 
-Participantes: miembros de los dos equipos, jugadores prestados activos para el partido y el árbitro
-asignado (pendiente o aceptado). Para cualquier otra persona el partido no existe (404).
+Participantes: ver `match_participants`. Para cualquier otra persona el partido no existe (404).
 """
 
 from dataclasses import dataclass
@@ -15,11 +14,11 @@ from app.domain.errors import ConflictError, NotFoundError, PermissionDeniedErro
 from app.persistence.models_chat import MatchChatMessage
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
-from app.persistence.models_league_matches import RefereeAssignment
 from app.services import loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
-from app.services.contract_queries import load_contract, side_teams
+from app.services.contract_queries import load_contract
+from app.services.match_participants import participant_contract, participants
 
 
 @dataclass(frozen=True)
@@ -38,26 +37,6 @@ class ChatPageView:
     contract_id: int
     writable: bool
     messages: list[ChatMessageView]
-
-
-def participants(ctx: ServiceContext, contract: MatchContract) -> set[int]:
-    ids: set[int] = set()
-    for team in side_teams(ctx, contract).values():
-        ids |= {m.user_id for m in team.memberships}
-        ids |= loan_service.active_players(ctx, contract.id, team.id)
-    referee = ctx.db.scalar(select(RefereeAssignment.referee_id).where(
-        RefereeAssignment.contract_id == contract.id, RefereeAssignment.status.in_(("PENDING", "ACCEPTED"))))
-    if referee is not None:
-        ids.add(referee)
-    return ids
-
-
-def _participant_contract(ctx: ServiceContext, actor: UserAccount, contract_id: int,
-                          lock: bool = False) -> MatchContract:
-    contract = load_contract(ctx, contract_id, lock=lock)
-    if actor.id not in participants(ctx, contract):
-        raise NotFoundError("CONTRACT_NOT_FOUND", "El contrato no existe.")
-    return contract
 
 
 def _closed(ctx: ServiceContext, contract: MatchContract) -> ConflictError | None:
@@ -79,13 +58,13 @@ def view_messages(ctx: ServiceContext, contract_id: int, viewer_id: int, after_i
 
 
 def read(ctx: ServiceContext, actor: UserAccount, contract_id: int, after_id: int = 0) -> ChatPageView:
-    contract = _participant_contract(ctx, actor, contract_id)
+    contract = participant_contract(ctx, actor, contract_id)
     return ChatPageView(contract_id=contract.id, writable=_closed(ctx, contract) is None,
                         messages=view_messages(ctx, contract.id, actor.id, after_id, show_deleted=False))
 
 
 def post(ctx: ServiceContext, actor: UserAccount, contract_id: int, text: str) -> MatchChatMessage:
-    contract = _participant_contract(ctx, actor, contract_id, lock=True)
+    contract = participant_contract(ctx, actor, contract_id, lock=True)
     closed = _closed(ctx, contract)
     if closed is not None:
         raise closed
