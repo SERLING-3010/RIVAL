@@ -1,0 +1,46 @@
+{
+  "version": "2026-11-23",
+  "sports": [
+    {
+      "code": "FOOTBALL",
+      "name": "Fútbol",
+      "modalities": [
+        {"code": "F5", "name": "Fútbol 5", "players_per_side": 5},
+        {"code": "F7", "name": "Fútbol 7", "players_per_side": 7},
+        {"code": "F8", "name": "Fútbol 8", "players_per_side": 8},
+        {"code": "F11", "name": "Fútbol 11", "players_per_side": 11}
+      ]
+    },
+    {
+      "code": "FUTSAL",
+      "name": "Microfútbol",
+      "modalities": [
+        {"code": "MICRO5", "name": "Microfútbol 5", "players_per_side": 5}
+      ]
+    },
+    {
+      "code": "BASKETBALL",
+      "name": "Baloncesto",
+      "modalities": [
+        {"code": "B3X3", "name": "Baloncesto 3x3", "players_per_side": 3},
+        {"code": "B5X5", "name": "Baloncesto 5x5", "players_per_side": 5}
+      ]
+    },
+    {
+      "code": "BASEBALL",
+      "name": "Béisbol",
+      "modalities": [
+        {"code": "BASEBALL9", "name": "Béisbol", "players_per_side": 9},
+        {"code": "SOFTBALL", "name": "Softbol", "players_per_side": 9}
+      ]
+    },
+    {
+      "code": "VOLLEYBALL",
+      "name": "Voleibol",
+      "modalities": [
+        {"code": "V6", "name": "Voleibol 6", "players_per_side": 6},
+        {"code": "BEACH2", "name": "Voleibol playa 2x2", "players_per_side": 2}
+      ]
+    }
+  ]
+}

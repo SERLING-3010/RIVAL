@@ -1,0 +1,64 @@
+"""Punto de entrada de la API de RIVAL.
+
+Desarrollo local:  uvicorn app.main:app --host 127.0.0.1 --port 8000
+"""
+
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api import routes_auth, routes_contracts, routes_matches, routes_scouting, routes_teams
+from app.api.dependencies import IpLimits
+from app.api.errors import install_error_handling
+from app.domain.sports_catalog import SportCatalog
+from app.persistence.database import create_schema, make_engine, make_session_factory
+from app.services.clock import SystemClock
+from app.services.ip_limiter import search_limiter
+from app.services.rate_limiter import LoginRateLimiter
+from app.settings import Settings
+
+
+def create_app(settings: Settings | None = None) -> FastAPI:
+    config = settings or Settings()
+    engine = make_engine(config.database_url)
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        create_schema(engine)
+        yield
+        engine.dispose()
+
+    app = FastAPI(
+        title="RIVAL API",
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url="/docs" if config.debug else None,
+        redoc_url=None,
+        openapi_url="/openapi.json" if config.debug else None,
+    )
+    app.state.settings = config
+    app.state.session_factory = make_session_factory(engine)
+    app.state.catalog = SportCatalog.load(config.catalog_path)
+    app.state.clock = SystemClock()
+    app.state.login_limiter = LoginRateLimiter()
+    app.state.ip_limits = IpLimits()
+    app.state.search_limiter = search_limiter()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=config.cors_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Authorization", "Content-Type"],
+    )
+    install_error_handling(app)
+    app.include_router(routes_auth.router)
+    app.include_router(routes_teams.router)
+    app.include_router(routes_scouting.router)
+    app.include_router(routes_matches.router)
+    app.include_router(routes_contracts.router)
+    return app
+
+
+app = create_app()
