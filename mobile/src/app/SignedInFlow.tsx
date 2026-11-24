@@ -38,6 +38,7 @@ function HomeContainer({ session, user, token, navigator }: Ctx) {
       onSearchTeam={() => navigator.push({ name: 'teamSearch' })}
       onCreateTeam={() => navigator.push({ name: 'createTeam' })}
       onFreeAgent={() => navigator.push({ name: 'freeAgentPanel' })}
+      onLeagues={() => navigator.push({ name: 'leagues' })}
       onOpenTeam={(teamId) => navigator.push({ name: 'team', teamId })}
       onLogout={() => void session.handleLogout()}
     />

@@ -25,7 +25,10 @@ export type Route =
   | { name: 'contracts'; teamId: number }
   | { name: 'contract'; contractId: number }
   | { name: 'proposeContract'; contract: Contract }
-  | { name: 'activity'; scope: 'contracts' | 'teams'; id: number; title: string };
+  | { name: 'activity'; scope: 'contracts' | 'teams'; id: number; title: string }
+  | { name: 'leagues' }
+  | { name: 'createLeague' }
+  | { name: 'league'; leagueId: number };
 
 export interface Navigator {
   current: Route;

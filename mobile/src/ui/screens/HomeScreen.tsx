@@ -18,6 +18,7 @@ interface Props {
   onSearchTeam: () => void;
   onCreateTeam: () => void;
   onFreeAgent: () => void;
+  onLeagues: () => void;
   onOpenTeam: (teamId: number) => void;
   onLogout: () => void;
 }
@@ -29,6 +30,7 @@ export function HomeScreen({
   onSearchTeam,
   onCreateTeam,
   onFreeAgent,
+  onLeagues,
   onOpenTeam,
   onLogout,
 }: Props) {
@@ -72,14 +74,21 @@ export function HomeScreen({
             subtitle="Deja que los DT te encuentren y responde invitaciones"
             onPress={onFreeAgent}
           />
-          {hasTeam ? <Card title="Ligas" subtitle="Buscar o crear liga · Próximamente (Sprint 3)" /> : null}
         </>
       ) : null}
-      {user.roles.includes('REFEREE') ? (
-        <Card title="Buscar liga" subtitle="Únete al cuerpo arbitral de una liga · Próximamente (Sprint 3)" />
+      {hasTeam || user.roles.includes('REFEREE') ? (
+        <Card
+          title="Ligas"
+          subtitle={
+            user.roles.includes('REFEREE')
+              ? 'Busca o crea ligas y únete a su cuerpo arbitral'
+              : 'Busca o crea ligas e inscribe a tu equipo'
+          }
+          onPress={onLeagues}
+        />
       ) : null}
       {user.roles.includes('VENUE_OWNER') ? (
-        <Card title="Mi establecimiento" subtitle="Registra canchas y horarios · Próximamente (Sprint 3)" />
+        <Card title="Mi establecimiento" subtitle="Registra canchas y horarios · Próximamente" />
       ) : null}
       <PrimaryButton label="Cerrar sesión" variant="secondary" onPress={onLogout} />
     </Screen>

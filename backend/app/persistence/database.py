@@ -60,6 +60,7 @@ def load_models() -> None:
         models_audit,
         models_contracts,
         models_identity,
+        models_leagues,
         models_matches,
         models_places,
         models_results,

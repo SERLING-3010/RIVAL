@@ -1,9 +1,10 @@
-// Elige la pantalla de los Sprints 2 y 3 según la ruta actual.
+// Elige la pantalla de partidos y ligas (Sprints 2 a 5) según la ruta actual.
 
 import type { ReactNode } from 'react';
 
 import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
+import { CreateLeague, LeagueDetail, Leagues } from './LeagueFlow';
 import type { MatchCtx } from './MatchFlow';
 import {
   CreateRequest,
@@ -51,6 +52,12 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <ProposeContract {...ctx} contract={route.contract} />;
     case 'activity':
       return <Activity {...ctx} scope={route.scope} id={route.id} title={route.title} />;
+    case 'leagues':
+      return <Leagues {...ctx} />;
+    case 'createLeague':
+      return <CreateLeague {...ctx} />;
+    case 'league':
+      return <LeagueDetail {...ctx} leagueId={route.leagueId} />;
     default:
       return null;
   }

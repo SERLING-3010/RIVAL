@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import routes_auth, routes_contracts, routes_matches, routes_scouting, routes_teams
+from app.api import routes_auth, routes_contracts, routes_leagues, routes_matches, routes_scouting, routes_teams
 from app.api.dependencies import IpLimits
 from app.api.errors import install_error_handling
 from app.domain.sports_catalog import SportCatalog
@@ -58,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(routes_scouting.router)
     app.include_router(routes_matches.router)
     app.include_router(routes_contracts.router)
+    app.include_router(routes_leagues.router)
     return app
 
 

@@ -36,6 +36,10 @@ const ACTION_LABEL: Record<string, string> = {
   RESULT_REPORTED: 'Reportó el marcador',
   RESULT_CONFIRMED: 'Reportó el marcador y quedó confirmado',
   RESULT_DISPUTED: 'Reportó un marcador distinto: partido en disputa',
+  LEAGUE_TEAM_REQUESTED: 'Pidió inscribir al equipo en una liga',
+  LEAGUE_TEAM_APPROVED: 'Aprobó la inscripción del equipo en la liga',
+  LEAGUE_TEAM_REJECTED: 'Rechazó la inscripción del equipo en la liga',
+  LEAGUE_TEAM_WITHDRAWN: 'Retiró al equipo de la liga',
 };
 
 const FIELD_LABEL: Record<string, string> = {
