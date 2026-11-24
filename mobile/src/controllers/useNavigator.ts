@@ -41,7 +41,10 @@ export type Route =
   | { name: 'transferOffers' }
   | { name: 'lineup'; contractId: number; teamId: number; teamScore: number }
   | { name: 'season'; leagueId: number; canManage: boolean; referees: RefereeEntry[] }
-  | { name: 'refereeMatches' };
+  | { name: 'refereeMatches' }
+  | { name: 'callup'; contractId: number; teamId: number; isAdmin: boolean }
+  | { name: 'rate'; contractId: number }
+  | { name: 'myCallups' };
 
 export interface Navigator {
   current: Route;

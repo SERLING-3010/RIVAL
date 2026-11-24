@@ -59,6 +59,10 @@ const ACTION_LABEL: Record<string, string> = {
   REFEREE_ACCEPTED: 'El árbitro aceptó el partido',
   REFEREE_DECLINED: 'El árbitro rechazó el partido',
   RESULT_SET_BY_REFEREE: 'El árbitro fijó el resultado',
+  TEAM_RATINGS_UPDATED: 'Se actualizó el nivel de los equipos',
+  CALLUP_SENT: 'Envió la convocatoria',
+  CALLUP_RESPONDED: 'Respondió a la convocatoria',
+  PLAYER_RATED: 'Valoró a un compañero',
 };
 
 const FIELD_LABEL: Record<string, string> = {

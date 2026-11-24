@@ -36,6 +36,8 @@ class PlayerCardOut(BaseModel):
     wins: int
     draws: int
     losses: int
+    rating_average: float | None
+    rating_votes: int
 
 
 class MarketItemOut(BaseModel):
@@ -79,6 +81,9 @@ class TeamManagerOut(BaseModel):
     team: TeamSummaryOut
     is_admin: bool
     balance: int
+    level: int | None
+    level_rd: int | None
+    level_matches: int
     history: list[CoinEntryOut]
     squad: list[SquadMemberOut]
     offers_received: list[TransferOfferOut]

@@ -6,6 +6,7 @@ import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
 import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
 import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
+import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
 import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
 import {
@@ -94,6 +95,12 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       );
     case 'refereeMatches':
       return <RefereeMatches {...ctx} />;
+    case 'callup':
+      return <CallUp {...ctx} contractId={route.contractId} teamId={route.teamId} isAdmin={route.isAdmin} />;
+    case 'rate':
+      return <RateTeammates {...ctx} contractId={route.contractId} />;
+    case 'myCallups':
+      return <MyCallUps {...ctx} />;
     default:
       return null;
   }

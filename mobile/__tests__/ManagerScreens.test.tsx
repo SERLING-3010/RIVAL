@@ -24,6 +24,9 @@ function manager(overrides: Partial<TeamManager> = {}): ManagerController {
     team: team(1, 'Águilas'),
     is_admin: true,
     balance: 1150,
+    level: 1612,
+    level_rd: 90,
+    level_matches: 3,
     history: [{ amount: 150, reason: 'MATCH_REWARD', reference: 'contract:1', created_at: '' }],
     squad: [
       {

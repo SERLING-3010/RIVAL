@@ -42,6 +42,7 @@ function HomeContainer({ session, user, token, navigator }: Ctx) {
       onMyVenues={() => navigator.push({ name: 'myVenues' })}
       onTransferOffers={() => navigator.push({ name: 'transferOffers' })}
       onRefereeMatches={() => navigator.push({ name: 'refereeMatches' })}
+      onMyCallUps={() => navigator.push({ name: 'myCallups' })}
       onOpenTeam={(teamId) => navigator.push({ name: 'team', teamId })}
       onLogout={() => void session.handleLogout()}
     />

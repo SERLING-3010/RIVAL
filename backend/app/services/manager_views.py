@@ -27,6 +27,8 @@ class PlayerCardView:
     wins: int
     draws: int
     losses: int
+    rating_average: float | None  # promedio de valoraciones de compañeros (Sprint 10)
+    rating_votes: int
 
 
 @dataclass(frozen=True)
@@ -75,6 +77,9 @@ class TeamManagerView:
     team: TeamSummaryView
     is_admin: bool
     balance: int
+    level: int | None  # nivel Glicko-2 (Sprint 10)
+    level_rd: int | None
+    level_matches: int
     history: list[CoinEntryView]
     squad: list[SquadMemberView]
     offers_received: list[TransferOfferView]  # por jugadores de este equipo (solo para el administrador)

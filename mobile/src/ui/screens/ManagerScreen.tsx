@@ -4,6 +4,7 @@ import { StyleSheet, Text } from 'react-native';
 
 import type { ManagerController } from '../../controllers/useManager';
 import { TEAM_ROLE_LABEL } from '../../domain/labels';
+import { levelText, RELIABLE_RD } from '../../domain/matchdayModels';
 import { canBeListed, coinReason, formatCoins, TRANSFER_STATUS_LABEL } from '../../domain/managerRules';
 import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -27,7 +28,7 @@ export function ManagerScreen({ controller, onOpenCard, onMarket, onBack }: Prop
           <>
             <Card
               title={`Presupuesto: ${formatCoins(m.balance)}`}
-              subtitle="Monedas virtuales: no se compran ni se venden"
+              subtitle={`${levelText(m.level, m.level_rd !== null && m.level_rd <= RELIABLE_RD)} · ${m.level_matches} partido(s) confirmado(s). Monedas virtuales: no se compran ni se venden`}
             >
               {m.history.slice(0, 5).map((e, i) => (
                 <Text key={`${e.created_at}-${i}`} style={styles.line}>

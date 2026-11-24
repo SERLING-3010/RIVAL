@@ -16,6 +16,8 @@ describe('ContractScreen', () => {
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
         onLineup={jest.fn()}
+        onCallUp={jest.fn()}
+        onRate={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -32,6 +34,8 @@ describe('ContractScreen', () => {
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
         onLineup={jest.fn()}
+        onCallUp={jest.fn()}
+        onRate={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -53,6 +57,8 @@ describe('ContractScreen', () => {
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
         onLineup={jest.fn()}
+        onCallUp={jest.fn()}
+        onRate={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -71,6 +77,8 @@ describe('ContractScreen', () => {
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
         onLineup={jest.fn()}
+        onCallUp={jest.fn()}
+        onRate={jest.fn()}
         onBack={jest.fn()}
       />,
     );

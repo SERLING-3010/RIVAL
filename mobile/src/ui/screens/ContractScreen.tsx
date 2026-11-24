@@ -5,6 +5,7 @@ import type { ContractController } from '../../controllers/useContracts';
 import type { Contract } from '../../domain/contractModels';
 import { CONTRACT_STATUS_LABEL, contractActions } from '../../domain/contractRules';
 import { BookingCard } from '../components/BookingCard';
+import { MatchdayButtons } from '../components/MatchdayButtons';
 import { ContractVersionCard as VersionCard } from '../components/ContractVersionCard';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ResultPanel } from '../components/ResultPanel';
@@ -19,10 +20,13 @@ interface Props {
   onActivity: (contractId: number) => void;
   onBookVenue: (contract: Contract) => void;
   onLineup: (contract: Contract) => void;
+  onCallUp: (contract: Contract) => void;
+  onRate: (contract: Contract) => void;
   onBack: () => void;
 }
 
-export function ContractScreen({ controller, onPropose, onActivity, onBookVenue, onLineup, onBack }: Props) {
+export function ContractScreen(props: Props) {
+  const { controller, onPropose, onActivity, onBookVenue, onLineup, onBack } = props;
   const [reason, setReason] = useState('');
   const busy = controller.action.busy;
   return (
@@ -107,6 +111,7 @@ export function ContractScreen({ controller, onPropose, onActivity, onBookVenue,
                   />
                 </>
               ) : null}
+              <MatchdayButtons contract={contract} onCallUp={props.onCallUp} onRate={props.onRate} />
               <PrimaryButton
                 label="Ver actividad"
                 variant="secondary"

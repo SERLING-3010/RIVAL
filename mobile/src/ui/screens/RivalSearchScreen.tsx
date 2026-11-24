@@ -1,6 +1,7 @@
 import { StyleSheet, Text } from 'react-native';
 
 import type { RivalSearchController } from '../../controllers/useScouting';
+import { levelText } from '../../domain/matchdayModels';
 import { SCOPE_LABEL, distanceText } from '../../domain/matchLabels';
 import type { SearchScope } from '../../domain/matchModels';
 import { Card } from '../components/Card';
@@ -48,7 +49,7 @@ export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBac
               <Card
                 key={rival.team.id}
                 title={rival.team.name}
-                subtitle={`${rival.team.neighborhood}, ${rival.team.city} ${distanceText(rival.distance_band)} · ${rival.team.member_count} jugador(es)`}
+                subtitle={`${rival.team.neighborhood}, ${rival.team.city} ${distanceText(rival.distance_band)} · ${rival.team.member_count} jugador(es) · ${levelText(rival.level, rival.level_reliable)}`}
                 badge={rival.team.has_coach ? 'Con DT' : 'Sin DT'}
               >
                 {canChallenge ? (

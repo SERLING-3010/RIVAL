@@ -16,6 +16,8 @@ export interface PlayerCard {
   wins: number;
   draws: number;
   losses: number;
+  rating_average: number | null;
+  rating_votes: number;
 }
 
 export interface MarketItem {
@@ -59,6 +61,9 @@ export interface TeamManager {
   team: TeamSummary;
   is_admin: boolean;
   balance: number;
+  level: number | null;
+  level_rd: number | null;
+  level_matches: number;
   history: CoinEntry[];
   squad: SquadMember[];
   offers_received: TransferOffer[];

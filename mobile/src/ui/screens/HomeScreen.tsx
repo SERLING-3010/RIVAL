@@ -22,6 +22,7 @@ interface Props {
   onMyVenues: () => void;
   onTransferOffers: () => void;
   onRefereeMatches: () => void;
+  onMyCallUps: () => void;
   onOpenTeam: (teamId: number) => void;
   onLogout: () => void;
 }
@@ -37,6 +38,7 @@ export function HomeScreen({
   onMyVenues,
   onTransferOffers,
   onRefereeMatches,
+  onMyCallUps,
   onOpenTeam,
   onLogout,
 }: Props) {
@@ -75,6 +77,11 @@ export function HomeScreen({
           </StateView>
           <PrimaryButton label="Buscar equipo" variant="secondary" onPress={onSearchTeam} />
           <PrimaryButton label="Crear equipo" onPress={onCreateTeam} />
+          <Card
+            title="Mis convocatorias"
+            subtitle="Partidos a los que te convocaron: responde si vas"
+            onPress={onMyCallUps}
+          />
           <Card
             title="Ofertas de traspaso"
             subtitle="Equipos que quieren ficharte: tú decides si te vas"

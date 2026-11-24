@@ -9,6 +9,8 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+
+import app.persistence.database  # noqa: F401  (tipo UtcDateTime en migraciones generadas)
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.

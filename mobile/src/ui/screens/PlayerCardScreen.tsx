@@ -30,6 +30,12 @@ export function PlayerCardScreen({ controller, onBack }: Props) {
               <Text style={styles.line}>
                 Ganados {card.wins} · Empatados {card.draws} · Perdidos {card.losses}
               </Text>
+              <Text style={styles.line}>
+                Valoración de compañeros:{' '}
+                {card.rating_average === null
+                  ? 'sin votos aún'
+                  : `${card.rating_average} (${card.rating_votes} voto${card.rating_votes === 1 ? '' : 's'})`}
+              </Text>
             </Card>
             <Text style={styles.meta}>
               Solo cuentan partidos con resultado confirmado por ambos equipos y con el jugador en la

@@ -10,7 +10,7 @@ from app.domain.result_rules import ResultStatus, check_can_report, resolve_resu
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_results import MatchResult, MatchResultReport
-from app.services import coin_service
+from app.services import settlement_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import admin_side, get_version, load_contract, terms_of
@@ -58,7 +58,7 @@ def report(ctx: ServiceContext, actor: UserAccount, contract_id: int, host_score
     result.confirmed_at = now if status == ResultStatus.CONFIRMED else None
     ctx.db.flush()
     if status == ResultStatus.CONFIRMED and score:
-        coin_service.reward_result(ctx, contract.id, contract.host_team_id, contract.guest_team_id, *score)
+        settlement_service.settle(ctx, contract.id, contract.host_team_id, contract.guest_team_id, *score)
     record_event(ctx, action=_ACTION[status], entity="match_contract", entity_id=contract.id, initiated_by=actor.id,
                  before=before, after={"team_id": team.id, "host_score": host_score, "guest_score": guest_score,
                                        "result_status": status.value})

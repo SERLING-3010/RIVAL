@@ -14,7 +14,7 @@ from app.persistence.models_identity import UserAccount
 from app.persistence.models_manager import MatchAppearance, TransferListing, TransferOffer
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
-from app.services import coin_service
+from app.services import coin_service, player_rating_service, settlement_service
 from app.services.context import ServiceContext
 from app.services.manager_views import (
     CoinEntryView, MarketItemView, PlayerCardView, PlayerStats, SquadMemberView, TeamManagerView, TransferOfferView,
@@ -47,9 +47,11 @@ def player_card(ctx: ServiceContext, _actor: UserAccount, user_id: int) -> Playe
         raise NotFoundError("PLAYER_NOT_FOUND", "Ese jugador no existe.")
     teams = ctx.db.scalars(select(Team).where(Team.status == "ACTIVE", Team.memberships.any(user_id=user_id)))
     s = stats_for(ctx, [user_id])[user_id]
+    average, votes = player_rating_service.summary(ctx, user_id)
     return PlayerCardView(user_id=user.id, display_name=user.display_name, position=user.position,
                           sports=sorted(x.sport_code for x in user.sports), teams=[summary(t) for t in teams],
-                          matches=s.matches, goals=s.goals, wins=s.wins, draws=s.draws, losses=s.losses)
+                          matches=s.matches, goals=s.goals, wins=s.wins, draws=s.draws, losses=s.losses,
+                          rating_average=average, rating_votes=votes)
 
 
 def market(ctx: ServiceContext, _actor: UserAccount, sport: str, city: str | None) -> list[MarketItemView]:
@@ -108,7 +110,10 @@ def team_manager(ctx: ServiceContext, actor: UserAccount, team_id: int) -> TeamM
             column == team.id, TransferOffer.status.in_(ACTIVE_TRANSFERS)).order_by(TransferOffer.id.desc())))
     history = [CoinEntryView(amount=e.amount, reason=e.reason, reference=e.reference, created_at=e.created_at)
                for e in coin_service.history(ctx, team.id)]
+    rating = settlement_service.ratings_for(ctx, [team.id]).get(team.id)
     return TeamManagerView(team=summary(team), is_admin=is_admin, balance=coin_service.balance(ctx, team.id),
+                           level=round(rating.rating) if rating else None, level_rd=round(rating.rd) if rating else None,
+                           level_matches=rating.matches if rating else 0,
                            history=history, squad=squad, offers_received=offers(TransferOffer.from_team_id),
                            offers_sent=offers(TransferOffer.to_team_id))
 

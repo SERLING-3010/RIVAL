@@ -17,7 +17,7 @@ from app.persistence.models_league_matches import RefereeAssignment
 from app.persistence.models_leagues import League, LeagueReferee
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
-from app.services import coin_service
+from app.services import settlement_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import get_version, load_contract, terms_of
@@ -100,7 +100,7 @@ def report_result(ctx: ServiceContext, actor: UserAccount, contract_id: int, hos
     result.status, result.host_score, result.guest_score = ResultStatus.CONFIRMED.value, host_score, guest_score
     result.referee_id, result.confirmed_at, result.updated_at = actor.id, now, now
     ctx.db.flush()
-    coin_service.reward_result(ctx, contract.id, contract.host_team_id, contract.guest_team_id, host_score, guest_score)
+    settlement_service.settle(ctx, contract.id, contract.host_team_id, contract.guest_team_id, host_score, guest_score)
     record_event(ctx, action="RESULT_SET_BY_REFEREE", entity="match_contract", entity_id=contract.id,
                  initiated_by=actor.id, before={"result_status": before},
                  after={"host_score": host_score, "guest_score": guest_score, "result_status": result.status})
