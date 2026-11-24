@@ -9,6 +9,7 @@ from app.domain.team_rules import MemberView, initial_team_role, resolve_admin
 from app.domain.text_keys import search_key
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import JoinRequest, Team, TeamMembership
+from app.services import coin_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.inputs import CreateTeamInput, TeamSearchInput
@@ -86,6 +87,7 @@ def create_team(ctx: ServiceContext, actor: UserAccount, data: CreateTeamInput) 
         ctx, action="TEAM_CREATED", entity="team", entity_id=team.id, initiated_by=actor.id,
         after={"name": team.name, "sport": team.sport_code, "modality": team.modality_code, "creator_role": role.value},
     )
+    coin_service.grant_initial(ctx, team.id, actor.id)  # presupuesto del modo manager (Sprint 7)
     return team
 
 

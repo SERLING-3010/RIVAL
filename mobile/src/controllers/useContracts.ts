@@ -6,6 +6,7 @@ import { termsFromForm } from '../domain/contractForm';
 import type { ContractForm } from '../domain/contractForm';
 import type { Contract, ContractSummary } from '../domain/contractModels';
 import { contractApi } from '../services/contractApi';
+import { venueApi } from '../services/venueApi';
 import type { Action } from './useAction';
 import { useAction } from './useAction';
 import type { Loader } from './useLoader';
@@ -26,6 +27,7 @@ export interface ContractController extends Loader<Contract> {
   handleRejectAmendment: (version: number) => Promise<void>;
   handleCancel: (reason: string) => Promise<void>;
   handleReport: (hostScore: number, guestScore: number) => Promise<void>;
+  handleCancelBooking: (bookingId: number) => Promise<void>;
 }
 
 export function useContract(token: string, contractId: number): ContractController {
@@ -65,7 +67,20 @@ export function useContract(token: string, contractId: number): ContractControll
       ),
     [action, contractId, handleReload, token],
   );
-  return { ...loader, action, handleSign, handleRejectAmendment, handleCancel, handleReport };
+  const handleCancelBooking = useCallback(
+    (bookingId: number) =>
+      action.run(() => venueApi.cancelBooking(token, bookingId), 'Reserva cancelada.', handleReload),
+    [action, handleReload, token],
+  );
+  return {
+    ...loader,
+    action,
+    handleSign,
+    handleRejectAmendment,
+    handleCancel,
+    handleReport,
+    handleCancelBooking,
+  };
 }
 
 export interface ProposalController {

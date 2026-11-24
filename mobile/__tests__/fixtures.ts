@@ -58,6 +58,8 @@ export function contract(overrides: Partial<Contract> = {}): Contract {
     versions: [current],
     cancel_reason: null,
     result: null,
+    booking: null,
+    ready_to_play: false,
     ...overrides,
   };
 }
@@ -73,5 +75,6 @@ export function contractController(data: Contract): ContractController {
     handleRejectAmendment: jest.fn(async () => undefined),
     handleCancel: jest.fn(async () => undefined),
     handleReport: jest.fn(async () => undefined),
+    handleCancelBooking: jest.fn(async () => undefined),
   };
 }

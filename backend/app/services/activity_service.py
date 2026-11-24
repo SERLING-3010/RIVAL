@@ -15,6 +15,7 @@ from app.persistence.models_audit import AuditEvent
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_leagues import LeagueTeam
+from app.persistence.models_manager import TransferOffer
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import JoinRequest
 from app.services.context import ServiceContext
@@ -70,6 +71,8 @@ def team_activity(ctx: ServiceContext, actor: UserAccount, team_id: int) -> list
         "match_request": requests,
         "match_offer": offers,
         "league_team": _ids(ctx, select(LeagueTeam.id).where(LeagueTeam.team_id == team.id)),
+        "transfer_offer": _ids(ctx, select(TransferOffer.id).where(
+            or_(TransferOffer.from_team_id == team.id, TransferOffer.to_team_id == team.id))),
         "match_contract": _ids(ctx, select(MatchContract.id).where(
             or_(MatchContract.host_team_id == team.id, MatchContract.guest_team_id == team.id))),
     })

@@ -14,6 +14,8 @@ describe('ContractScreen', () => {
         controller={controller}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
+        onBookVenue={jest.fn()}
+        onLineup={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -28,6 +30,8 @@ describe('ContractScreen', () => {
         controller={contractController(contract({ is_admin: false }))}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
+        onBookVenue={jest.fn()}
+        onLineup={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -47,6 +51,8 @@ describe('ContractScreen', () => {
         controller={controller}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
+        onBookVenue={jest.fn()}
+        onLineup={jest.fn()}
         onBack={jest.fn()}
       />,
     );
@@ -63,6 +69,8 @@ describe('ContractScreen', () => {
         controller={controller}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
+        onBookVenue={jest.fn()}
+        onLineup={jest.fn()}
         onBack={jest.fn()}
       />,
     );

@@ -26,6 +26,26 @@ export function ContractDetail({ token, navigator, contractId }: MatchCtx & { co
     <ContractScreen
       controller={useContract(token, contractId)}
       onPropose={(contract) => navigator.push({ name: 'proposeContract', contract })}
+      onBookVenue={(contract) => {
+        const terms = (contract.signed ?? contract.current).terms;
+        const match = {
+          contractId: contract.id,
+          kickoffAt: terms.kickoff_at,
+          durationMinutes: terms.duration_minutes,
+          sportCode: contract.host.sport_code,
+        };
+        navigator.push({ name: 'bookVenue', match, city: contract.host.city });
+      }}
+      onLineup={(contract) => {
+        const host = contract.my_side === 'HOST';
+        const score = (host ? contract.result?.host_score : contract.result?.guest_score) ?? 0;
+        navigator.push({
+          name: 'lineup',
+          contractId: contract.id,
+          teamId: host ? contract.host.id : contract.guest.id,
+          teamScore: score,
+        });
+      }}
       onActivity={(id) =>
         navigator.push({ name: 'activity', scope: 'contracts', id, title: 'Actividad del partido' })
       }

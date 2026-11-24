@@ -5,6 +5,7 @@ from datetime import datetime
 
 from app.domain.contract_rules import ContractTerms
 from app.services.team_views import TeamSummaryView
+from app.services.venue_views import BookingView
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,8 @@ class ContractView:
     versions: list[VersionView]
     cancel_reason: str | None
     result: ResultView | None
+    booking: BookingView | None  # la reserva más reciente de cancha, si el lugar es un establecimiento
+    ready_to_play: bool  # firmado y, si es en establecimiento, con la franja confirmada
 
 
 @dataclass(frozen=True)

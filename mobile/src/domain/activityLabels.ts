@@ -40,6 +40,20 @@ const ACTION_LABEL: Record<string, string> = {
   LEAGUE_TEAM_APPROVED: 'Aprobó la inscripción del equipo en la liga',
   LEAGUE_TEAM_REJECTED: 'Rechazó la inscripción del equipo en la liga',
   LEAGUE_TEAM_WITHDRAWN: 'Retiró al equipo de la liga',
+  BOOKING_REQUESTED: 'Pidió reservar la cancha',
+  BOOKING_CONFIRMED: 'El establecimiento confirmó la cancha',
+  BOOKING_REJECTED: 'El establecimiento rechazó la reserva',
+  BOOKING_CANCELLED: 'Canceló la reserva de cancha',
+  LINEUP_RECORDED: 'Registró la planilla del partido',
+  COINS_MOVED: 'Movimiento de monedas RIVAL',
+  TRANSFER_LISTED: 'Puso a un jugador en el mercado',
+  TRANSFER_UNLISTED: 'Quitó a un jugador del mercado',
+  TRANSFER_OFFERED: 'Hizo una oferta de traspaso',
+  TRANSFER_OWNER_ACCEPTED: 'El DT dueño aceptó la oferta de traspaso',
+  TRANSFER_OWNER_REJECTED: 'El DT dueño rechazó la oferta de traspaso',
+  TRANSFER_PLAYER_REJECTED: 'El jugador rechazó su traspaso',
+  TRANSFER_WITHDRAWN: 'Retiró la oferta de traspaso',
+  TRANSFER_COMPLETED: 'Traspaso completado con la aceptación del jugador',
 };
 
 const FIELD_LABEL: Record<string, string> = {
@@ -57,6 +71,8 @@ const FIELD_LABEL: Record<string, string> = {
   host_score: 'goles local',
   guest_score: 'goles visitante',
   reason: 'motivo',
+  balance: 'saldo',
+  amount: 'monedas',
   status: 'estado',
 };
 

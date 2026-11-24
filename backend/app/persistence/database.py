@@ -61,11 +61,13 @@ def load_models() -> None:
         models_contracts,
         models_identity,
         models_leagues,
+        models_manager,
         models_matches,
         models_places,
         models_results,
         models_scouting,
         models_teams,
+        models_venues,
     )
 
 

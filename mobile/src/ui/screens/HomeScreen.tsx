@@ -19,6 +19,8 @@ interface Props {
   onCreateTeam: () => void;
   onFreeAgent: () => void;
   onLeagues: () => void;
+  onMyVenues: () => void;
+  onTransferOffers: () => void;
   onOpenTeam: (teamId: number) => void;
   onLogout: () => void;
 }
@@ -31,6 +33,8 @@ export function HomeScreen({
   onCreateTeam,
   onFreeAgent,
   onLeagues,
+  onMyVenues,
+  onTransferOffers,
   onOpenTeam,
   onLogout,
 }: Props) {
@@ -70,6 +74,11 @@ export function HomeScreen({
           <PrimaryButton label="Buscar equipo" variant="secondary" onPress={onSearchTeam} />
           <PrimaryButton label="Crear equipo" onPress={onCreateTeam} />
           <Card
+            title="Ofertas de traspaso"
+            subtitle="Equipos que quieren ficharte: tú decides si te vas"
+            onPress={onTransferOffers}
+          />
+          <Card
             title="Agente libre e invitaciones"
             subtitle="Deja que los DT te encuentren y responde invitaciones"
             onPress={onFreeAgent}
@@ -88,7 +97,11 @@ export function HomeScreen({
         />
       ) : null}
       {user.roles.includes('VENUE_OWNER') ? (
-        <Card title="Mi establecimiento" subtitle="Registra canchas y horarios · Próximamente" />
+        <Card
+          title="Mi establecimiento"
+          subtitle="Registra canchas, publica franjas y confirma reservas"
+          onPress={onMyVenues}
+        />
       ) : null}
       <PrimaryButton label="Cerrar sesión" variant="secondary" onPress={onLogout} />
     </Screen>

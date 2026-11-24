@@ -1,6 +1,7 @@
 """Centro de salud del sistema: invariantes deterministas (Sprint 0, sección 7.6).
 
 Cada chequeo busca un estado que nunca debería existir. Severidad: S0 crítico, S1 alto, S3 bajo.
+Incluye reservas de cancha (Sprint 6) y modo manager (Sprint 7): saldo negativo, traspaso sin el jugador.
 """
 
 from dataclasses import dataclass
@@ -9,13 +10,17 @@ from datetime import timedelta
 from sqlalchemy import func, select
 
 from app.domain.contract_rules import ContractStatus
+from app.domain.manager_rules import TransferStatus
 from app.domain.match_rules import RequestStatus
 from app.domain.result_rules import ResultStatus
 from app.domain.team_rules import resolve_admin
+from app.domain.venue_rules import BookingStatus
 from app.persistence.models_contracts import MatchContract, MatchContractSignature
+from app.persistence.models_manager import CoinEntry, TransferOffer
 from app.persistence.models_matches import MatchRequest
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
+from app.persistence.models_venues import Booking, Slot
 from app.services.audit_service import verify_chain
 from app.services.context import ServiceContext
 from app.services.contract_queries import get_version, terms_of
@@ -74,6 +79,38 @@ def _requests(ctx: ServiceContext) -> list[HealthFinding]:
                           "Búsqueda con rival aceptado pero sin contrato.") for rid in orphans]
 
 
+def _bookings(ctx: ServiceContext) -> list[HealthFinding]:
+    confirmed = BookingStatus.CONFIRMED.value
+    doubles = ctx.db.scalars(select(Booking.slot_id).where(Booking.status == confirmed)
+                             .group_by(Booking.slot_id).having(func.count() > 1))
+    findings = [HealthFinding("S0", "SLOT_DOUBLE_BOOKED", "slot", sid, "Franja con dos reservas confirmadas.")
+                for sid in doubles]
+    for booking, slot in ctx.db.execute(select(Booking, Slot).join(Slot, Slot.id == Booking.slot_id)
+                                        .where(Booking.status == confirmed)):
+        contract = ctx.db.get(MatchContract, booking.contract_id)
+        if contract is None or contract.signed_version_id is None or contract.status == ContractStatus.CANCELLED:
+            covered = False
+        else:
+            terms = terms_of(get_version(ctx, contract.signed_version_id))
+            covered = slot.starts_at <= terms.kickoff_at and                 terms.kickoff_at + timedelta(minutes=terms.duration_minutes) <= slot.ends_at
+        if not covered:
+            findings.append(HealthFinding("S1", "BOOKING_OUT_OF_SYNC", "booking", booking.id,
+                                          "Reserva confirmada que ya no corresponde al partido firmado."))
+    return findings
+
+
+def _manager(ctx: ServiceContext) -> list[HealthFinding]:
+    negative = ctx.db.scalars(select(CoinEntry.team_id).group_by(CoinEntry.team_id)
+                              .having(func.sum(CoinEntry.amount) < 0))
+    findings = [HealthFinding("S0", "NEGATIVE_COIN_BALANCE", "team", tid, "Equipo con saldo de monedas negativo.")
+                for tid in negative]
+    unconsented = ctx.db.scalars(select(TransferOffer.id).where(
+        TransferOffer.status == TransferStatus.COMPLETED, TransferOffer.player_decided_at.is_(None)))
+    findings += [HealthFinding("S0", "TRANSFER_WITHOUT_PLAYER_CONSENT", "transfer_offer", oid,
+                               "Traspaso completado sin la aceptación del jugador.") for oid in unconsented]
+    return findings
+
+
 def run_checks(ctx: ServiceContext) -> list[HealthFinding]:
-    findings = _audit(ctx) + _teams(ctx) + _contracts(ctx) + _requests(ctx)
+    findings = _audit(ctx) + _teams(ctx) + _contracts(ctx) + _requests(ctx) + _bookings(ctx) + _manager(ctx)
     return sorted(findings, key=lambda f: (f.severity, f.code, f.entity_id or 0))

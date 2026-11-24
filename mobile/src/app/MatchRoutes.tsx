@@ -1,11 +1,13 @@
-// Elige la pantalla de partidos y ligas (Sprints 2 a 5) según la ruta actual.
+// Elige la pantalla de partidos, ligas, establecimientos y modo manager (Sprints 2 a 7) según la ruta.
 
 import type { ReactNode } from 'react';
 
 import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
 import { CreateLeague, LeagueDetail, Leagues } from './LeagueFlow';
+import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
 import type { MatchCtx } from './MatchFlow';
+import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
 import {
   CreateRequest,
   Feed,
@@ -58,6 +60,34 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <CreateLeague {...ctx} />;
     case 'league':
       return <LeagueDetail {...ctx} leagueId={route.leagueId} />;
+    case 'myVenues':
+      return <MyVenues {...ctx} />;
+    case 'createVenue':
+      return <CreateVenue {...ctx} />;
+    case 'venue':
+      return <VenueDetail {...ctx} venueId={route.venueId} match={route.match} />;
+    case 'bookVenue':
+      return <BookVenue {...ctx} match={route.match} city={route.city} />;
+    case 'manager':
+      return <Manager {...ctx} teamId={route.teamId} />;
+    case 'market':
+      return (
+        <Market
+          {...ctx}
+          teamId={route.teamId}
+          sport={route.sport}
+          city={route.city}
+          balance={route.balance}
+        />
+      );
+    case 'playerCard':
+      return <PlayerCardRoute {...ctx} userId={route.userId} />;
+    case 'transferOffers':
+      return <TransferOffers {...ctx} />;
+    case 'lineup':
+      return (
+        <Lineup {...ctx} contractId={route.contractId} teamId={route.teamId} teamScore={route.teamScore} />
+      );
     default:
       return null;
   }

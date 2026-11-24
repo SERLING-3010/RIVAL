@@ -2,6 +2,7 @@
 
 import type { PlaceKind, RefereeMode } from './matchModels';
 import type { TeamSummary } from './models';
+import type { Booking } from './venueModels';
 
 export type ContractStatus = 'NEGOTIATING' | 'SIGNED' | 'CANCELLED';
 export type CostSplit = 'HALF' | 'HOST' | 'GUEST';
@@ -61,6 +62,8 @@ export interface Contract {
   versions: ContractVersion[];
   cancel_reason: string | null;
   result: MatchResult | null;
+  booking: Booking | null;
+  ready_to_play: boolean;
 }
 
 export interface ContractSummary {

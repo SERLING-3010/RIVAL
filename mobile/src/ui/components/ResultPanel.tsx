@@ -15,11 +15,13 @@ interface Props {
   canReport: boolean;
   busy: boolean;
   onReport: (hostScore: number, guestScore: number) => void;
+  /** Solo para el administrador con resultado confirmado: abre la planilla del partido. */
+  onLineup?: () => void;
 }
 
 const score = (text: string): number | null => (/^\d{1,3}$/.test(text.trim()) ? Number(text) : null);
 
-export function ResultPanel({ contract, canReport, busy, onReport }: Props) {
+export function ResultPanel({ contract, canReport, busy, onReport, onLineup }: Props) {
   const [host, setHost] = useState('');
   const [guest, setGuest] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,9 @@ export function ResultPanel({ contract, canReport, busy, onReport }: Props) {
           {name(r.side)} reportó: {contract.host.name} {r.host_score} – {r.guest_score} {contract.guest.name}
         </Text>
       ))}
+      {confirmed && onLineup ? (
+        <PrimaryButton label="Registrar planilla" variant="secondary" onPress={onLineup} />
+      ) : null}
       {canReport ? (
         <>
           <TextField

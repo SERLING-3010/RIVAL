@@ -4,6 +4,7 @@ import { Alert, StyleSheet, Text } from 'react-native';
 import type { ContractController } from '../../controllers/useContracts';
 import type { Contract } from '../../domain/contractModels';
 import { CONTRACT_STATUS_LABEL, contractActions } from '../../domain/contractRules';
+import { BookingCard } from '../components/BookingCard';
 import { ContractVersionCard as VersionCard } from '../components/ContractVersionCard';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ResultPanel } from '../components/ResultPanel';
@@ -16,10 +17,12 @@ interface Props {
   controller: ContractController;
   onPropose: (contract: Contract) => void;
   onActivity: (contractId: number) => void;
+  onBookVenue: (contract: Contract) => void;
+  onLineup: (contract: Contract) => void;
   onBack: () => void;
 }
 
-export function ContractScreen({ controller, onPropose, onActivity, onBack }: Props) {
+export function ContractScreen({ controller, onPropose, onActivity, onBookVenue, onLineup, onBack }: Props) {
   const [reason, setReason] = useState('');
   const busy = controller.action.busy;
   return (
@@ -39,6 +42,7 @@ export function ContractScreen({ controller, onPropose, onActivity, onBack }: Pr
                 {contract.host.name} (local) vs {contract.guest.name} (visitante)
               </Text>
               <Text style={styles.status} accessibilityLiveRegion="polite">
+                {contract.ready_to_play ? 'Listo para jugar. ' : ''}
                 {CONTRACT_STATUS_LABEL[contract.status]}. {can.status}
               </Text>
               {contract.cancel_reason ? (
@@ -52,11 +56,18 @@ export function ContractScreen({ controller, onPropose, onActivity, onBack }: Pr
               {amendment && contract.signed ? (
                 <VersionCard contract={contract} version={contract.signed} title="Versión firmada vigente" />
               ) : null}
+              <BookingCard
+                contract={contract}
+                busy={busy}
+                onBook={() => onBookVenue(contract)}
+                onCancel={(id) => void controller.handleCancelBooking(id)}
+              />
               <ResultPanel
                 contract={contract}
                 canReport={can.canReportResult}
                 busy={busy}
                 onReport={(h, g) => void controller.handleReport(h, g)}
+                onLineup={contract.is_admin ? () => onLineup(contract) : undefined}
               />
               {can.canSign ? <PrimaryButton label="Firmar" disabled={busy} onPress={confirmSign} /> : null}
               {can.canRejectAmendment ? (

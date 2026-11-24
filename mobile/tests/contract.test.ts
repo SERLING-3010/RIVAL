@@ -51,6 +51,8 @@ function contract(overrides: Partial<Contract>): Contract {
     versions: [version],
     cancel_reason: null,
     result: null,
+    booking: null,
+    ready_to_play: false,
     ...overrides,
   };
 }

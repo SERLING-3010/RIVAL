@@ -6,6 +6,7 @@ from pydantic import AwareDatetime, BaseModel, Field
 
 from app.api.schemas_auth import StrictModel
 from app.api.schemas_teams import TeamSummaryOut
+from app.api.schemas_venues import BookingOut
 from app.domain.contract_rules import CostSplit
 from app.domain.match_rules import PlaceKind, RefereeMode
 
@@ -97,6 +98,8 @@ class ContractOut(BaseModel):
     versions: list[VersionOut]
     cancel_reason: str | None
     result: ResultOut | None
+    booking: BookingOut | None
+    ready_to_play: bool
 
 
 class ContractSummaryOut(BaseModel):

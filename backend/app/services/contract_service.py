@@ -9,16 +9,17 @@ from sqlalchemy import func, select
 from app.domain.contract_rules import (
     ContractStatus, ContractTerms, default_terms, diff_terms, terms_to_dict, validate_terms,
 )
-from app.domain.errors import ConflictError, DomainError, PermissionDeniedError
+from app.domain.errors import ConflictError, DomainError
 from app.domain.match_rules import PlaceKind, RefereeMode
 from app.persistence.models_contracts import MatchContract, MatchContractSignature, MatchContractVersion
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import Team
+from app.services import booking_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import (
-    get_version, is_admin_of, load_contract, member_side, require_not_started, side_teams, signed_sides, terms_of,
+    admin_side, get_version, load_contract, require_not_started, signed_sides, terms_of,
 )
 
 _ENTITY = "match_contract"
@@ -53,17 +54,6 @@ def _insert_version(ctx: ServiceContext, contract: MatchContract, terms: Contrac
     ctx.db.add(version)
     ctx.db.flush()
     return version
-
-
-def admin_side(ctx: ServiceContext, contract: MatchContract, actor: UserAccount) -> tuple[str, Team]:
-    teams = side_teams(ctx, contract)
-    member_side(teams, actor)  # 404 si no pertenece a ninguno de los dos equipos
-    sides = [side for side, team in teams.items() if is_admin_of(team, actor)]
-    if len(sides) == 2:
-        raise ConflictError("SAME_ADMIN_BOTH_TEAMS", "No puedes firmar por los dos equipos del mismo partido.")
-    if not sides:
-        raise PermissionDeniedError("ADMIN_ONLY", "Solo el administrador del equipo (DT o capitán) puede hacer esto.")
-    return sides[0], teams[sides[0]]
 
 
 def _open_for_changes(
@@ -142,6 +132,7 @@ def cancel(ctx: ServiceContext, actor: UserAccount, contract_id: int, reason: st
     require_not_started(ctx, contract)
     before = contract.status
     contract.status, contract.cancel_reason, contract.cancelled_by = ContractStatus.CANCELLED.value, clean, actor.id
+    booking_service.cancel_for_contract(ctx, contract.id, actor.id)
     contract.updated_at = ctx.clock.now()
     ctx.db.flush()
     record_event(ctx, action="CONTRACT_CANCELLED", entity=_ENTITY, entity_id=contract.id, initiated_by=actor.id,

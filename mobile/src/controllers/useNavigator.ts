@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 
 import type { Contract } from '../domain/contractModels';
 import type { MatchRequest } from '../domain/matchModels';
+import type { MatchToBook } from '../domain/venueModels';
 import type { TeamSummary, UserRole } from '../domain/models';
 
 export type Route =
@@ -28,7 +29,16 @@ export type Route =
   | { name: 'activity'; scope: 'contracts' | 'teams'; id: number; title: string }
   | { name: 'leagues' }
   | { name: 'createLeague' }
-  | { name: 'league'; leagueId: number };
+  | { name: 'league'; leagueId: number }
+  | { name: 'myVenues' }
+  | { name: 'createVenue' }
+  | { name: 'venue'; venueId: number; match: MatchToBook | null }
+  | { name: 'bookVenue'; match: MatchToBook; city: string }
+  | { name: 'manager'; teamId: number }
+  | { name: 'market'; teamId: number; sport: string; city: string; balance: number }
+  | { name: 'playerCard'; userId: number }
+  | { name: 'transferOffers' }
+  | { name: 'lineup'; contractId: number; teamId: number; teamScore: number };
 
 export interface Navigator {
   current: Route;
