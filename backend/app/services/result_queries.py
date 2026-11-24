@@ -27,4 +27,4 @@ def result_view(ctx: ServiceContext, contract: MatchContract) -> ResultView | No
         for r in reports_of(ctx, contract.id)
     ]
     return ResultView(status=result.status, host_score=result.host_score, guest_score=result.guest_score,
-                      reports=reports)
+                      reports=reports, by_referee=result.referee_id is not None)

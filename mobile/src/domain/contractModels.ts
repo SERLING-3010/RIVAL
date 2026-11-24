@@ -47,11 +47,13 @@ export interface MatchResult {
   host_score: number | null;
   guest_score: number | null;
   reports: ResultReport[];
+  by_referee: boolean;
 }
 
 export interface Contract {
   id: number;
-  request_id: number;
+  request_id: number | null;
+  league_id: number | null;
   host: TeamSummary;
   guest: TeamSummary;
   status: ContractStatus;
@@ -64,6 +66,12 @@ export interface Contract {
   result: MatchResult | null;
   booking: Booking | null;
   ready_to_play: boolean;
+  referee: {
+    assignment_id: number;
+    referee_id: number;
+    display_name: string;
+    status: 'PENDING' | 'ACCEPTED';
+  } | null;
 }
 
 export interface ContractSummary {

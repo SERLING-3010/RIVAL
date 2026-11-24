@@ -1,4 +1,4 @@
-"""Contrato del partido: nace al aceptar una oferta; se firma cuando ambos firman la misma versión.
+"""Contrato del partido: nace de una oferta aceptada o del calendario de una liga; se firma cuando ambos firman la misma versión.
 
 Toda acción bloquea la fila del contrato (FOR UPDATE). Proponer crea una versión nueva firmada por
 quien propone; la versión firmada sigue vigente hasta que el rival firme el cambio.
@@ -26,21 +26,25 @@ _ENTITY = "match_contract"
 
 
 def create_from_offer(ctx: ServiceContext, request: MatchRequest, offer: MatchOffer, actor_id: int) -> MatchContract:
-    now = ctx.clock.now()
-    contract = MatchContract(
-        request_id=request.id, offer_id=offer.id, host_team_id=request.team_id, guest_team_id=offer.team_id,
-        sport_code=request.sport_code, modality_code=request.modality_code,
-        status=ContractStatus.NEGOTIATING.value, created_at=now, updated_at=now,
-    )
-    ctx.db.add(contract)
-    ctx.db.flush()
     terms = default_terms(offer.proposed_start, RefereeMode(offer.referee_mode), PlaceKind(offer.place_kind),
                           offer.place_note)
+    return create_contract(ctx, MatchContract(request_id=request.id, offer_id=offer.id, host_team_id=request.team_id,
+                                              guest_team_id=offer.team_id, sport_code=request.sport_code,
+                                              modality_code=request.modality_code), terms, actor_id)
+
+
+def create_contract(ctx: ServiceContext, contract: MatchContract, terms: ContractTerms, actor_id: int) -> MatchContract:
+    """Guarda un contrato nuevo (de una oferta o del calendario de una liga) con su versión 1 sin firmas."""
+    contract.status, contract.created_at = ContractStatus.NEGOTIATING.value, ctx.clock.now()
+    contract.updated_at = contract.created_at
+    ctx.db.add(contract)
+    ctx.db.flush()
     version = _insert_version(ctx, contract, terms, team_id=None, actor_id=None, note=None)
     contract.current_version_id = version.id
     ctx.db.flush()
     record_event(ctx, action="CONTRACT_CREATED", entity=_ENTITY, entity_id=contract.id, initiated_by=actor_id,
-                 actor_type="SYSTEM_RULE", after={"offer_id": offer.id, "terms": terms_to_dict(terms)})
+                 actor_type="SYSTEM_RULE", after={"offer_id": contract.offer_id, "league_id": contract.league_id,
+                                                  "terms": terms_to_dict(terms)})
     return contract
 
 

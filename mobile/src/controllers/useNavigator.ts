@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 
 import type { Contract } from '../domain/contractModels';
+import type { RefereeEntry } from '../domain/leagueModels';
 import type { MatchRequest } from '../domain/matchModels';
 import type { MatchToBook } from '../domain/venueModels';
 import type { TeamSummary, UserRole } from '../domain/models';
@@ -38,7 +39,9 @@ export type Route =
   | { name: 'market'; teamId: number; sport: string; city: string; balance: number }
   | { name: 'playerCard'; userId: number }
   | { name: 'transferOffers' }
-  | { name: 'lineup'; contractId: number; teamId: number; teamScore: number };
+  | { name: 'lineup'; contractId: number; teamId: number; teamScore: number }
+  | { name: 'season'; leagueId: number; canManage: boolean; referees: RefereeEntry[] }
+  | { name: 'refereeMatches' };
 
 export interface Navigator {
   current: Route;

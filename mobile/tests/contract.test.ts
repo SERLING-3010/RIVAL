@@ -53,6 +53,8 @@ function contract(overrides: Partial<Contract>): Contract {
     result: null,
     booking: null,
     ready_to_play: false,
+    referee: null,
+    league_id: null,
     ...overrides,
   };
 }
@@ -108,7 +110,13 @@ test('después de la hora: no se cambia ni se cancela; se reporta si estaba firm
   assert.deepEqual([actions.canPropose, actions.canCancel, actions.canReportResult], [false, false, true]);
   assert.equal(contractActions(signed, now).canReportResult, false);
   assert.equal(contractActions(contract({}), later).canReportResult, false);
-  const done = { status: 'CONFIRMED' as const, host_score: 1, guest_score: 0, reports: [] };
+  const done = {
+    status: 'CONFIRMED' as const,
+    host_score: 1,
+    guest_score: 0,
+    reports: [],
+    by_referee: false,
+  };
   assert.equal(contractActions({ ...signed, result: done }, later).canReportResult, false);
 });
 

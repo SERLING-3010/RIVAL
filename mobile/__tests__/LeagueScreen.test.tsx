@@ -59,7 +59,9 @@ const myTeam = { team: team(1, 'Águilas'), my_role: 'COACH' as const, is_admin:
 describe('LeagueScreen', () => {
   test('el DT ve su equipo elegible y puede pedir inscripción', async () => {
     const c = controller(detail());
-    await render(<LeagueScreen controller={c} user={user} myTeams={[myTeam]} onBack={jest.fn()} />);
+    await render(
+      <LeagueScreen controller={c} user={user} myTeams={[myTeam]} onSeason={jest.fn()} onBack={jest.fn()} />,
+    );
     expect(screen.getByText('Bravos · El Prado')).toBeTruthy();
     await fireEvent.press(screen.getByText('Inscribir a Águilas'));
     expect(c.handleRequestTeam).toHaveBeenCalledWith(1);
@@ -74,7 +76,9 @@ describe('LeagueScreen', () => {
         pending_referees: [{ id: 21, user_id: 5, display_name: 'Ana Ruiz', status: 'PENDING' }],
       }),
     );
-    await render(<LeagueScreen controller={c} user={user} myTeams={[]} onBack={jest.fn()} />);
+    await render(
+      <LeagueScreen controller={c} user={user} myTeams={[]} onSeason={jest.fn()} onBack={jest.fn()} />,
+    );
     expect(screen.getByText('Solicitudes por revisar (2)')).toBeTruthy();
     await fireEvent.press(screen.getAllByText('Aprobar')[1]!);
     expect(c.handleDecide).toHaveBeenCalledWith('referee', 21, 'approve');
@@ -84,7 +88,9 @@ describe('LeagueScreen', () => {
     const c = controller(
       detail({ my_team_requests: [{ id: 10, team: team(1, 'Águilas'), status: 'APPROVED' }] }),
     );
-    await render(<LeagueScreen controller={c} user={user} myTeams={[myTeam]} onBack={jest.fn()} />);
+    await render(
+      <LeagueScreen controller={c} user={user} myTeams={[myTeam]} onSeason={jest.fn()} onBack={jest.fn()} />,
+    );
     expect(screen.queryByText('Inscribir a Águilas')).toBeNull();
     await fireEvent.press(screen.getByText('Salir de la liga'));
     expect(c.handleDecide).toHaveBeenCalledWith('team', 10, 'withdraw');

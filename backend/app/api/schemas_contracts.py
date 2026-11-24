@@ -83,11 +83,20 @@ class ResultOut(BaseModel):
     host_score: int | None
     guest_score: int | None
     reports: list[ResultReportOut]
+    by_referee: bool
+
+
+class RefereeOut(BaseModel):
+    assignment_id: int
+    referee_id: int
+    display_name: str
+    status: str
 
 
 class ContractOut(BaseModel):
     id: int
-    request_id: int
+    request_id: int | None
+    league_id: int | None
     host: TeamSummaryOut
     guest: TeamSummaryOut
     status: str
@@ -100,6 +109,7 @@ class ContractOut(BaseModel):
     result: ResultOut | None
     booking: BookingOut | None
     ready_to_play: bool
+    referee: RefereeOut | None
 
 
 class ContractSummaryOut(BaseModel):

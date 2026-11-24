@@ -83,6 +83,6 @@ def contract_activity(ctx: ServiceContext, actor: UserAccount, contract_id: int)
     member_side(side_teams(ctx, contract), actor)  # 404 si no pertenece a ninguno de los dos equipos
     return _load(ctx, {
         "match_contract": [str(contract.id)],
-        "match_offer": [str(contract.offer_id)],
-        "match_request": [str(contract.request_id)],
+        "match_offer": [str(contract.offer_id)] if contract.offer_id else [],
+        "match_request": [str(contract.request_id)] if contract.request_id else [],
     })

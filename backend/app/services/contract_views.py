@@ -32,12 +32,22 @@ class ResultView:
     host_score: int | None
     guest_score: int | None
     reports: list[ResultReportView]
+    by_referee: bool  # True si lo fijó el árbitro asignado (vale aunque los equipos no coincidan)
+
+
+@dataclass(frozen=True)
+class RefereeView:
+    assignment_id: int
+    referee_id: int
+    display_name: str
+    status: str  # PENDING, ACCEPTED
 
 
 @dataclass(frozen=True)
 class ContractView:
     id: int
-    request_id: int
+    request_id: int | None
+    league_id: int | None
     host: TeamSummaryView
     guest: TeamSummaryView
     status: str
@@ -50,6 +60,7 @@ class ContractView:
     result: ResultView | None
     booking: BookingView | None  # la reserva más reciente de cancha, si el lugar es un establecimiento
     ready_to_play: bool  # firmado y, si es en establecimiento, con la franja confirmada
+    referee: RefereeView | None  # árbitro asignado por la liga (pendiente o aceptado)
 
 
 @dataclass(frozen=True)

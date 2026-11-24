@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
-import { CreateLeague, LeagueDetail, Leagues } from './LeagueFlow';
+import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
 import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
 import type { MatchCtx } from './MatchFlow';
 import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
@@ -88,6 +88,12 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return (
         <Lineup {...ctx} contractId={route.contractId} teamId={route.teamId} teamScore={route.teamScore} />
       );
+    case 'season':
+      return (
+        <Season {...ctx} leagueId={route.leagueId} canManage={route.canManage} referees={route.referees} />
+      );
+    case 'refereeMatches':
+      return <RefereeMatches {...ctx} />;
     default:
       return null;
   }

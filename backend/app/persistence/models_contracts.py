@@ -16,8 +16,10 @@ class MatchContract(Base):
     __tablename__ = "match_contract"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    request_id: Mapped[int] = mapped_column(ForeignKey("match_request.id"), unique=True)
-    offer_id: Mapped[int] = mapped_column(ForeignKey("match_offer.id"), unique=True)
+    # Un contrato nace de una oferta aceptada (Sprint 3) o del calendario de una liga (Sprint 8).
+    request_id: Mapped[int | None] = mapped_column(ForeignKey("match_request.id"), unique=True, nullable=True)
+    offer_id: Mapped[int | None] = mapped_column(ForeignKey("match_offer.id"), unique=True, nullable=True)
+    league_id: Mapped[int | None] = mapped_column(ForeignKey("league.id"), index=True, nullable=True)
     host_team_id: Mapped[int] = mapped_column(ForeignKey("team.id"), index=True)
     guest_team_id: Mapped[int] = mapped_column(ForeignKey("team.id"), index=True)
     sport_code: Mapped[str] = mapped_column(String(30))

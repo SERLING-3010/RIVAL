@@ -60,6 +60,8 @@ export function contract(overrides: Partial<Contract> = {}): Contract {
     result: null,
     booking: null,
     ready_to_play: false,
+    referee: null,
+    league_id: null,
     ...overrides,
   };
 }

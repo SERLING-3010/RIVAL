@@ -14,10 +14,11 @@ interface Props {
   controller: LeagueController;
   user: User;
   myTeams: MyTeam[];
+  onSeason: (canManage: boolean) => void;
   onBack: () => void;
 }
 
-export function LeagueScreen({ controller, user, myTeams, onBack }: Props) {
+export function LeagueScreen({ controller, user, myTeams, onSeason, onBack }: Props) {
   const busy = controller.action.busy;
   return (
     <Screen title="Liga" onBack={onBack}>
@@ -48,6 +49,7 @@ export function LeagueScreen({ controller, user, myTeams, onBack }: Props) {
                   </Text>
                 ))}
               </Card>
+              <PrimaryButton label="Calendario y tabla" onPress={() => onSeason(can.canDecideTeams)} />
               <Card title="Personal">
                 {detail.staff.map((m) => (
                   <Text key={m.user_id} style={styles.line}>

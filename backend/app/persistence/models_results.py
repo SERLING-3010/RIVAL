@@ -21,6 +21,7 @@ class MatchResult(Base):
     host_score: Mapped[int | None] = mapped_column(nullable=True)
     guest_score: Mapped[int | None] = mapped_column(nullable=True)
     confirmed_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
+    referee_id: Mapped[int | None] = mapped_column(ForeignKey("user_account.id"), nullable=True)  # si lo fijó el árbitro
     updated_at: Mapped[datetime] = mapped_column(UtcDateTime)
 
 

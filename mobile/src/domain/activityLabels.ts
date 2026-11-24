@@ -54,6 +54,11 @@ const ACTION_LABEL: Record<string, string> = {
   TRANSFER_PLAYER_REJECTED: 'El jugador rechazó su traspaso',
   TRANSFER_WITHDRAWN: 'Retiró la oferta de traspaso',
   TRANSFER_COMPLETED: 'Traspaso completado con la aceptación del jugador',
+  LEAGUE_FIXTURE_GENERATED: 'Armó el calendario de la liga',
+  REFEREE_ASSIGNED: 'Asignó árbitro al partido',
+  REFEREE_ACCEPTED: 'El árbitro aceptó el partido',
+  REFEREE_DECLINED: 'El árbitro rechazó el partido',
+  RESULT_SET_BY_REFEREE: 'El árbitro fijó el resultado',
 };
 
 const FIELD_LABEL: Record<string, string> = {

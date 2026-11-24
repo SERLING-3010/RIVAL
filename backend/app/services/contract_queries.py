@@ -15,6 +15,7 @@ from app.services.contract_views import ContractSummaryView, ContractView, Versi
 from app.services.result_queries import get_result, result_view
 from app.services.rival_service import require_member
 from app.services.team_service import get_active_team, member_views, summary
+from app.services.referee_queries import referee_view
 from app.services.venue_queries import booking_view
 
 HOST, GUEST = "HOST", "GUEST"
@@ -98,11 +99,13 @@ def get_contract(ctx: ServiceContext, actor: UserAccount, contract_id: int) -> C
     signed = by_id.get(contract.signed_version_id) if contract.signed_version_id is not None else None
     booking = ctx.db.scalar(select(Booking).where(Booking.contract_id == contract.id).order_by(Booking.id.desc()))
     return ContractView(
-        id=contract.id, request_id=contract.request_id, host=summary(teams[HOST]), guest=summary(teams[GUEST]),
+        id=contract.id, request_id=contract.request_id, league_id=contract.league_id,
+        host=summary(teams[HOST]), guest=summary(teams[GUEST]),
         status=contract.status, my_side=side, is_admin=is_admin_of(teams[side], actor),
         current=by_id[contract.current_version_id or 0], signed=signed, versions=list(by_id.values()),
         cancel_reason=contract.cancel_reason, result=result_view(ctx, contract),
         booking=booking_view(ctx, booking) if booking else None, ready_to_play=_ready(contract, signed, booking),
+        referee=referee_view(ctx, contract.id),
     )
 
 

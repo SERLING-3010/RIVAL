@@ -45,6 +45,12 @@ export function ContractScreen({ controller, onPropose, onActivity, onBookVenue,
                 {contract.ready_to_play ? 'Listo para jugar. ' : ''}
                 {CONTRACT_STATUS_LABEL[contract.status]}. {can.status}
               </Text>
+              {contract.referee ? (
+                <Text style={styles.line}>
+                  Árbitro: {contract.referee.display_name}
+                  {contract.referee.status === 'PENDING' ? ' (por aceptar)' : ''}
+                </Text>
+              ) : null}
               {contract.cancel_reason ? (
                 <Text style={styles.line}>Motivo: {contract.cancel_reason}</Text>
               ) : null}

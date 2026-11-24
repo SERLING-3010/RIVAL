@@ -21,6 +21,7 @@ interface Props {
   onLeagues: () => void;
   onMyVenues: () => void;
   onTransferOffers: () => void;
+  onRefereeMatches: () => void;
   onOpenTeam: (teamId: number) => void;
   onLogout: () => void;
 }
@@ -35,6 +36,7 @@ export function HomeScreen({
   onLeagues,
   onMyVenues,
   onTransferOffers,
+  onRefereeMatches,
   onOpenTeam,
   onLogout,
 }: Props) {
@@ -94,6 +96,13 @@ export function HomeScreen({
               : 'Busca o crea ligas e inscribe a tu equipo'
           }
           onPress={onLeagues}
+        />
+      ) : null}
+      {user.roles.includes('REFEREE') ? (
+        <Card
+          title="Mis partidos como árbitro"
+          subtitle="Acepta partidos de tus ligas y fija el resultado"
+          onPress={onRefereeMatches}
         />
       ) : null}
       {user.roles.includes('VENUE_OWNER') ? (

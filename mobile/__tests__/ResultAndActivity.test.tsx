@@ -27,6 +27,7 @@ describe('ResultPanel', () => {
         { side: 'HOST' as const, host_score: 2, guest_score: 1, reported_at: '' },
         { side: 'GUEST' as const, host_score: 1, guest_score: 1, reported_at: '' },
       ],
+      by_referee: false,
     };
     await render(
       <ResultPanel contract={contract({ result })} canReport={false} busy={false} onReport={jest.fn()} />,
@@ -37,7 +38,13 @@ describe('ResultPanel', () => {
   });
 
   test('confirmado muestra el marcador final', async () => {
-    const result = { status: 'CONFIRMED' as const, host_score: 4, guest_score: 2, reports: [] };
+    const result = {
+      status: 'CONFIRMED' as const,
+      host_score: 4,
+      guest_score: 2,
+      reports: [],
+      by_referee: false,
+    };
     await render(
       <ResultPanel contract={contract({ result })} canReport={false} busy={false} onReport={jest.fn()} />,
     );

@@ -1,12 +1,16 @@
-// Composición del Sprint 5: ligas, crear liga y detalle con inscripción y cuerpo arbitral.
+// Composición de los Sprints 5 y 8: ligas, crear liga, detalle, calendario y tabla, y partidos del árbitro.
 
 import { useCreateLeague } from '../controllers/useCreateLeague';
 import { useLeague, useLeagueHome } from '../controllers/useLeagues';
 import { useMyTeams } from '../controllers/useMyTeams';
+import { useRefereeMatches, useSeason } from '../controllers/useSeason';
+import type { RefereeEntry } from '../domain/leagueModels';
 import type { MyTeam } from '../domain/models';
 import { CreateLeagueScreen } from '../ui/screens/CreateLeagueScreen';
 import { LeagueScreen } from '../ui/screens/LeagueScreen';
 import { LeaguesScreen } from '../ui/screens/LeaguesScreen';
+import { RefereeMatchesScreen } from '../ui/screens/RefereeMatchesScreen';
+import { SeasonScreen } from '../ui/screens/SeasonScreen';
 import type { MatchCtx } from './MatchFlow';
 
 function useTeamsOrEmpty(token: string): MyTeam[] {
@@ -36,12 +40,42 @@ export function CreateLeague({ token, navigator, user, sports }: MatchCtx) {
 }
 
 export function LeagueDetail({ token, navigator, user, leagueId }: MatchCtx & { leagueId: number }) {
+  const controller = useLeague(token, leagueId);
   return (
     <LeagueScreen
-      controller={useLeague(token, leagueId)}
+      controller={controller}
       user={user}
       myTeams={useTeamsOrEmpty(token)}
+      onSeason={(canManage) =>
+        navigator.push({
+          name: 'season',
+          leagueId,
+          canManage,
+          referees: controller.state.kind === 'success' ? controller.state.data.referees : [],
+        })
+      }
       onBack={navigator.goBack}
     />
   );
+}
+
+export function Season({
+  token,
+  navigator,
+  leagueId,
+  canManage,
+  referees,
+}: MatchCtx & { leagueId: number; canManage: boolean; referees: RefereeEntry[] }) {
+  return (
+    <SeasonScreen
+      controller={useSeason(token, leagueId)}
+      canManage={canManage}
+      referees={referees}
+      onBack={navigator.goBack}
+    />
+  );
+}
+
+export function RefereeMatches({ token, navigator }: MatchCtx) {
+  return <RefereeMatchesScreen controller={useRefereeMatches(token)} onBack={navigator.goBack} />;
 }
