@@ -1,0 +1,96 @@
+# Integración continua de RIVAL (Sprint 9).
+# Corre las pruebas del backend en SQLite y en PostgreSQL 16 (incluidas las de concurrencia real),
+# las de la app y la regla de 150 líneas por archivo. No despliega nada ni usa secretos.
+
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (${{ matrix.database }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: rival
+          POSTGRES_PASSWORD: rival_ci
+          POSTGRES_DB: rival_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U rival -d rival_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Migraciones de Alembic (suben y coinciden con los modelos)
+        if: matrix.database == 'postgres'
+        env:
+          RIVAL_DATABASE_URL: postgresql+psycopg://rival:rival_ci@localhost:5432/rival_test
+        run: |
+          python -m alembic upgrade head
+          python -m alembic check
+          python -m alembic downgrade base
+      - name: pytest
+        env:
+          # Credenciales de un PostgreSQL desechable que solo existe durante este trabajo de CI.
+          RIVAL_TEST_DATABASE_URL: ${{ matrix.database == 'postgres' && 'postgresql+psycopg://rival:rival_ci@localhost:5432/rival_test' || 'sqlite:///:memory:' }}
+        run: python -m pytest -q -rs
+
+  mobile:
+    name: App móvil
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+
+  rules:
+    name: Reglas del proyecto
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Máximo 150 líneas por archivo de código
+        run: |
+          long=$(find backend/app backend/tests mobile/src mobile/__tests__ mobile/tests \
+            \( -name '*.py' -o -name '*.ts' -o -name '*.tsx' \) -not -path '*/__pycache__/*' \
+            -exec awk 'END { if (NR > 150) print FILENAME ": " NR " líneas" }' {} \;)
+          if [ -n "$long" ]; then echo "$long"; exit 1; fi
+      - name: Sin any en TypeScript
+        run: |
+          if grep -rnE ':\s*any\b|<any>|as any\b' mobile/src mobile/__tests__ mobile/tests; then exit 1; fi

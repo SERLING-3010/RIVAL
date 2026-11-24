@@ -21,6 +21,7 @@ from app.persistence.models_matches import MatchRequest
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
 from app.persistence.models_venues import Booking, Slot
+from app.services import security_service
 from app.services.audit_service import verify_chain
 from app.services.context import ServiceContext
 from app.services.contract_queries import get_version, terms_of
@@ -111,6 +112,13 @@ def _manager(ctx: ServiceContext) -> list[HealthFinding]:
     return findings
 
 
+def _security(ctx: ServiceContext) -> list[HealthFinding]:
+    return [HealthFinding("S1", "LOGIN_FAILURE_SPIKE", "auth", None,
+                          f"Muchos inicios de sesión fallidos en la última hora (clave {key[:8]}…).")
+            for key in security_service.failure_spikes(ctx)]
+
+
 def run_checks(ctx: ServiceContext) -> list[HealthFinding]:
     findings = _audit(ctx) + _teams(ctx) + _contracts(ctx) + _requests(ctx) + _bookings(ctx) + _manager(ctx)
+    findings += _security(ctx)
     return sorted(findings, key=lambda f: (f.severity, f.code, f.entity_id or 0))

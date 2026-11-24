@@ -26,7 +26,11 @@ Metodología: prompt unificado FIIN adaptado a RIVAL (documento del Sprint 0: ht
 ```
 cd backend
 python -m pytest -v
+python -m alembic revision --autogenerate -m "..."   # si cambia un modelo (luego revisarla)
 
 cd mobile
 npx tsc --noEmit
+npm test
 ```
+
+Las pruebas de concurrencia solo corren en PostgreSQL: en el CI, o en local con `dev_tools/local_pg.py` (ver `backend/README.md`).

@@ -37,9 +37,38 @@ La búsqueda "Cerca de mí" necesita el centro de cada barrio. Se importa desde 
 
 Fuente prevista para Barranquilla: "Mapa de Barrios de Barranquilla Según el POT" en datos.gov.co [POR VERIFICAR: convertir los polígonos a centroides]. Sin catálogo, la búsqueda por barrio y por ciudad funciona igual.
 
-## Base de datos de desarrollo
+## Base de datos y migraciones (Sprint 9)
 
-El Sprint 2 agrega tablas y columnas. Como aún no hay migraciones versionadas (llegan antes del piloto), borra `backend\rival_dev.db` para que se cree de nuevo. Solo afecta datos de prueba.
+- **Desarrollo y pruebas:** la API crea las tablas sola al arrancar (`create_schema`). Si tu `rival_dev.db` es de un Sprint anterior, bórrala para que se cree de nuevo.
+- **Cualquier base con datos que importen (piloto, producción):** usa las migraciones de Alembic. Toman la URL de `RIVAL_DATABASE_URL`.
+
+```powershell
+$env:RIVAL_DATABASE_URL = "postgresql+psycopg://usuario:clave@servidor/rival"
+.\venv\Scripts\python.exe -m alembic upgrade head
+```
+
+- **Si cambias un modelo**, genera la migración y revísala a mano antes de confirmarla. `tests/test_migrations.py` falla en el CI si un modelo cambia sin migración.
+
+```powershell
+.\venv\Scripts\python.exe -m alembic revision --autogenerate -m "describe el cambio"
+```
+
+## Pruebas con PostgreSQL local (sin instalar PostgreSQL ni Docker)
+
+Las pruebas de concurrencia solo corren contra PostgreSQL. El CI de GitHub Actions las corre en cada push; para correrlas en tu equipo:
+
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements-pg-local.txt
+$env:RIVAL_TEST_DATABASE_URL = (.\venv\Scripts\python.exe dev_tools\local_pg.py)
+.\venv\Scripts\python.exe -m pytest -q
+```
+
+## Mantenimiento
+
+```powershell
+.\venv\Scripts\python.exe -m app.tools.purge_sessions   # borra sesiones vencidas (tarea diaria)
+.\venv\Scripts\python.exe -m app.tools.health_check     # centro de salud: incluye picos de inicios de sesión fallidos
+```
 
 ## Endpoints del Sprint 2
 

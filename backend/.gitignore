@@ -6,3 +6,4 @@ __pycache__/
 rival_dev.db
 *.db
 .env
+.pgdata/
