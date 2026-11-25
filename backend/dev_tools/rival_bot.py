@@ -5,6 +5,7 @@ Usa al usuario de `seed_test_rival.py` y, cada 10 segundos:
 - firma la versión vigente de cada contrato de su equipo;
 - contesta una vez cada mensaje nuevo del chat;
 - si el otro equipo ya reportó el resultado, reporta el mismo marcador;
+- confirma los goles con tipo (chilena, olímpico…) que el otro equipo marcó en su planilla;
 - como dueño del establecimiento de `seed_test_venue.py`, confirma las reservas pendientes.
 
 Uso (con el backend corriendo):  python dev_tools/rival_bot.py
@@ -69,6 +70,7 @@ def handle_contracts(team_id: int, replied: set[int]) -> None:
                 log(f"No pude firmar el contrato {cid}: {error.read().decode()[:160]}")
         reply_chat(cid, replied)
         mirror_result(cid, contract)  # type: ignore[arg-type]
+        confirm_goal_claims(cid, contract)  # type: ignore[arg-type]
 
 
 def reply_chat(cid: int, replied: set[int]) -> None:
@@ -94,6 +96,17 @@ def mirror_result(cid: int, contract: dict[str, object]) -> None:
         score = {"host_score": first["host_score"], "guest_score": first["guest_score"]}
         call("POST", f"/contracts/{cid}/result", score)
         log(f"Reporté el mismo marcador en el contrato {cid}: {first['host_score']} - {first['guest_score']}")
+
+
+def confirm_goal_claims(cid: int, contract: dict[str, object]) -> None:
+    """Como rival, confirma los goles con tipo pendientes (Sprint 23); solo con resultado confirmado."""
+    result = contract.get("result")
+    if not isinstance(result, dict) or result["status"] != "CONFIRMED":
+        return
+    for claim in call("GET", f"/contracts/{cid}/goal-claims"):  # type: ignore[union-attr]
+        if claim["can_decide"]:
+            call("POST", f"/goal-claims/{claim['id']}/decision", {"accept": True})
+            log(f"Confirmé el gol de tipo {claim['kind']} de {claim['display_name']} (contrato {cid})")
 
 
 def confirm_bookings() -> None:
