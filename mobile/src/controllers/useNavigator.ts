@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 
+import type { BadgeOwner } from '../domain/badgeModels';
 import type { Contract } from '../domain/contractModels';
 import type { RefereeEntry } from '../domain/leagueModels';
 import type { MatchRequest } from '../domain/matchModels';
@@ -54,7 +55,9 @@ export type Route =
   | { name: 'loanRequest'; contractId: number; teamId: number; rivalId: number }
   | { name: 'loans' }
   | { name: 'chat'; contractId: number }
-  | { name: 'checkIn'; contractId: number };
+  | { name: 'checkIn'; contractId: number }
+  | { name: 'cup'; leagueId: number; canManage: boolean }
+  | { name: 'badges'; owner: BadgeOwner; id: number; title: string };
 
 export interface Navigator {
   current: Route;

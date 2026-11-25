@@ -13,10 +13,11 @@ import { colors, font } from '../theme';
 interface Props {
   controller: Loader<PlayerCard>;
   onReport: (userId: number, name: string) => void;
+  onBadges: (userId: number, name: string) => void;
   onBack: () => void;
 }
 
-export function PlayerCardScreen({ controller, onReport, onBack }: Props) {
+export function PlayerCardScreen({ controller, onReport, onBadges, onBack }: Props) {
   return (
     <Screen title="Ficha del jugador" onBack={onBack}>
       <StateView state={controller.state} onRetry={controller.handleReload}>
@@ -43,6 +44,7 @@ export function PlayerCardScreen({ controller, onReport, onBack }: Props) {
               Solo cuentan partidos con resultado confirmado por ambos equipos y con el jugador en la
               planilla.
             </Text>
+            <PrimaryButton label="Insignias" onPress={() => onBadges(card.user_id, card.display_name)} />
             <PrimaryButton
               label="Reportar jugador"
               variant="secondary"

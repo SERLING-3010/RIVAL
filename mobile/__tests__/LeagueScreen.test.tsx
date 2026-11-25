@@ -73,6 +73,7 @@ describe('LeagueScreen', () => {
         user={user}
         myTeams={[myTeam]}
         onSeason={jest.fn()}
+        onCup={jest.fn()}
         windowController={windowCtl}
         onBack={jest.fn()}
       />,
@@ -97,6 +98,7 @@ describe('LeagueScreen', () => {
         user={user}
         myTeams={[]}
         onSeason={jest.fn()}
+        onCup={jest.fn()}
         windowController={windowCtl}
         onBack={jest.fn()}
       />,
@@ -116,6 +118,7 @@ describe('LeagueScreen', () => {
         user={user}
         myTeams={[myTeam]}
         onSeason={jest.fn()}
+        onCup={jest.fn()}
         windowController={windowCtl}
         onBack={jest.fn()}
       />,

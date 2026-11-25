@@ -1,5 +1,6 @@
 // Composición del Sprint 7: modo manager, mercado, ficha, ofertas del jugador y planilla.
 
+import { useBadges } from '../controllers/useBadges';
 import { useLineup } from '../controllers/useLineup';
 import { useMarket, useMyTransferOffers, usePlayerCard, useTeamManager } from '../controllers/useManager';
 import type { SquadMember } from '../domain/managerModels';
@@ -9,6 +10,8 @@ import { ManagerScreen } from '../ui/screens/ManagerScreen';
 import { MarketScreen } from '../ui/screens/MarketScreen';
 import { PlayerCardScreen } from '../ui/screens/PlayerCardScreen';
 import { TransferOffersScreen } from '../ui/screens/TransferOffersScreen';
+import type { BadgeOwner } from '../domain/badgeModels';
+import { BadgesScreen } from '../ui/screens/BadgesScreen';
 import type { MatchCtx } from './MatchFlow';
 
 export function Manager({ token, navigator, teamId }: MatchCtx & { teamId: number }) {
@@ -49,6 +52,9 @@ export function PlayerCardRoute({ token, navigator, userId }: MatchCtx & { userI
     <PlayerCardScreen
       controller={usePlayerCard(token, userId)}
       onReport={(id, name) => navigator.push({ name: 'report', target: { kind: 'user', id, name } })}
+      onBadges={(id, name) =>
+        navigator.push({ name: 'badges', owner: 'player', id, title: `Insignias de ${name}` })
+      }
       onBack={navigator.goBack}
     />
   );
@@ -77,4 +83,14 @@ export function Lineup({
       onBack={navigator.goBack}
     />
   );
+}
+
+export function Badges({
+  token,
+  navigator,
+  owner,
+  id,
+  title,
+}: MatchCtx & { owner: BadgeOwner; id: number; title: string }) {
+  return <BadgesScreen title={title} controller={useBadges(token, owner, id)} onBack={navigator.goBack} />;
 }

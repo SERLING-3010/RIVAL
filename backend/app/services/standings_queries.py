@@ -54,8 +54,9 @@ def table(ctx: ServiceContext, league_id: int) -> list[StandingRow]:
     team_ids = list(ctx.db.scalars(select(LeagueTeam.team_id).where(
         LeagueTeam.league_id == league.id, LeagueTeam.status == "APPROVED")))
     names = {t.id: t.name for t in ctx.db.scalars(select(Team).where(Team.id.in_(team_ids)))}
-    rows = ctx.db.execute(select(MatchContract, MatchResult).join(MatchResult, MatchResult.contract_id ==
-                                                                  MatchContract.id)
-                          .where(MatchContract.league_id == league.id, MatchResult.status == ResultStatus.CONFIRMED))
+    rows = ctx.db.execute(select(MatchContract, MatchResult)  # solo el calendario cuenta; la copa no suma a la tabla
+                          .join(MatchResult, MatchResult.contract_id == MatchContract.id)
+                          .join(LeagueFixture, LeagueFixture.contract_id == MatchContract.id)
+                          .where(LeagueFixture.league_id == league.id, MatchResult.status == ResultStatus.CONFIRMED))
     scores = [MatchScore(c.host_team_id, c.guest_team_id, r.host_score or 0, r.guest_score or 0) for c, r in rows]
     return standings(names, scores)

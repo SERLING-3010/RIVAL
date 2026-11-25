@@ -23,6 +23,13 @@ export function TeamActions({ team, isAdmin, navigator }: Props) {
         onPress={() => navigator.push({ name: 'manager', teamId: team.id })}
       />
       <PrimaryButton
+        label="Insignias del equipo"
+        variant="secondary"
+        onPress={() =>
+          navigator.push({ name: 'badges', owner: 'team', id: team.id, title: `Insignias de ${team.name}` })
+        }
+      />
+      <PrimaryButton
         label="Partidos pactados"
         variant="secondary"
         onPress={() => navigator.push({ name: 'contracts', teamId: team.id })}

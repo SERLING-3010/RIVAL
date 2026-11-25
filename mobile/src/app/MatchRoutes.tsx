@@ -4,8 +4,8 @@ import type { ReactNode } from 'react';
 
 import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
-import { CreateLeague, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
-import { Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
+import { CreateLeague, CupRoute, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
+import { Badges, Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
 import { CheckIn, LoanRequest, MatchChat, MyLoans } from './LoansFlow';
 import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
@@ -116,6 +116,10 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <MatchChat {...ctx} contractId={route.contractId} />;
     case 'checkIn':
       return <CheckIn {...ctx} contractId={route.contractId} />;
+    case 'badges':
+      return <Badges {...ctx} owner={route.owner} id={route.id} title={route.title} />;
+    case 'cup':
+      return <CupRoute {...ctx} leagueId={route.leagueId} canManage={route.canManage} />;
     default:
       return null;
   }

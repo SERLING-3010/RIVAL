@@ -17,11 +17,20 @@ interface Props {
   user: User;
   myTeams: MyTeam[];
   onSeason: (canManage: boolean) => void;
+  onCup: (canManage: boolean) => void;
   windowController: TransferWindowController;
   onBack: () => void;
 }
 
-export function LeagueScreen({ controller, user, myTeams, onSeason, windowController, onBack }: Props) {
+export function LeagueScreen({
+  controller,
+  user,
+  myTeams,
+  onSeason,
+  onCup,
+  windowController,
+  onBack,
+}: Props) {
   const busy = controller.action.busy;
   return (
     <Screen title="Liga" onBack={onBack}>
@@ -53,6 +62,11 @@ export function LeagueScreen({ controller, user, myTeams, onSeason, windowContro
                 ))}
               </Card>
               <PrimaryButton label="Calendario y tabla" onPress={() => onSeason(can.canDecideTeams)} />
+              <PrimaryButton
+                label="Copa eliminatoria"
+                variant="secondary"
+                onPress={() => onCup(can.canDecideTeams)}
+              />
               <TransferWindowCard
                 start={detail.transfer_window_start}
                 end={detail.transfer_window_end}

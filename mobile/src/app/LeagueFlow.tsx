@@ -1,6 +1,7 @@
 // Composición de los Sprints 5 y 8: ligas, crear liga, detalle, calendario y tabla, y partidos del árbitro.
 
 import { useCreateLeague } from '../controllers/useCreateLeague';
+import { useCup } from '../controllers/useCup';
 import { useLeague, useLeagueHome } from '../controllers/useLeagues';
 import { useMyTeams } from '../controllers/useMyTeams';
 import { useRefereeMatches, useSeason } from '../controllers/useSeason';
@@ -8,6 +9,7 @@ import { useTransferWindow } from '../controllers/useTransferWindow';
 import type { RefereeEntry } from '../domain/leagueModels';
 import type { MyTeam } from '../domain/models';
 import { CreateLeagueScreen } from '../ui/screens/CreateLeagueScreen';
+import { CupScreen } from '../ui/screens/CupScreen';
 import { LeagueScreen } from '../ui/screens/LeagueScreen';
 import { LeaguesScreen } from '../ui/screens/LeaguesScreen';
 import { RefereeMatchesScreen } from '../ui/screens/RefereeMatchesScreen';
@@ -48,6 +50,7 @@ export function LeagueDetail({ token, navigator, user, leagueId }: MatchCtx & { 
       controller={controller}
       user={user}
       myTeams={useTeamsOrEmpty(token)}
+      onCup={(canManage) => navigator.push({ name: 'cup', leagueId, canManage })}
       onSeason={(canManage) =>
         navigator.push({
           name: 'season',
@@ -84,6 +87,22 @@ export function RefereeMatches({ token, navigator }: MatchCtx) {
     <RefereeMatchesScreen
       controller={useRefereeMatches(token)}
       onChat={(contractId) => navigator.push({ name: 'chat', contractId })}
+      onBack={navigator.goBack}
+    />
+  );
+}
+
+export function CupRoute({
+  token,
+  navigator,
+  leagueId,
+  canManage,
+}: MatchCtx & { leagueId: number; canManage: boolean }) {
+  return (
+    <CupScreen
+      controller={useCup(token, leagueId)}
+      canManage={canManage}
+      onOpenContract={(contractId) => navigator.push({ name: 'contract', contractId })}
       onBack={navigator.goBack}
     />
   );

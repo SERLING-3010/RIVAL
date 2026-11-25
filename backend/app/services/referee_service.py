@@ -17,7 +17,7 @@ from app.persistence.models_league_matches import RefereeAssignment
 from app.persistence.models_leagues import League, LeagueReferee
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
-from app.services import settlement_service
+from app.services import cup_advance, settlement_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import get_version, load_contract, terms_of
@@ -104,6 +104,7 @@ def report_result(ctx: ServiceContext, actor: UserAccount, contract_id: int, hos
     record_event(ctx, action="RESULT_SET_BY_REFEREE", entity="match_contract", entity_id=contract.id,
                  initiated_by=actor.id, before={"result_status": before},
                  after={"host_score": host_score, "guest_score": guest_score, "result_status": result.status})
+    cup_advance.on_result(ctx, contract.id, host_score, guest_score)  # si es de copa, avanza el ganador
     return result
 
 

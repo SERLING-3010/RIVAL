@@ -74,6 +74,10 @@ const ACTION_LABEL: Record<string, string> = {
   TRANSFER_WINDOW_SET: 'Cambió la ventana de traspasos de la liga',
   CHAT_MESSAGE_DELETED: 'Borró un mensaje del chat',
   CHECKED_IN: 'Hizo check-in en la cancha',
+  CUP_CREATED: 'Armó la copa de la liga',
+  CUP_TEAM_ADVANCED: 'Un equipo pasó de ronda en la copa',
+  CUP_TIEBREAK_SET: 'Definió un empate de copa por penales',
+  CUP_CHAMPION: 'Hay campeón de la copa',
   VENUE_LOCATION_SET: 'Guardó la ubicación del establecimiento',
   CHAT_READ_BY_MODERATOR: 'Una persona moderadora revisó el chat por un reporte',
 };
