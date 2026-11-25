@@ -98,6 +98,14 @@
   - La C o DT va pequeña dentro de la carta, en la esquina superior derecha.
   - «GOLES/PARTIDO» ahora dice «G/P».
 
+## Pantalla «¡Nueva carta!» (25/11/2026)
+
+- **Cuándo aparece:** al abrir tu propia ficha o la plantilla de tu equipo, si hay una especial ganada que todavía no se te mostró. En la ficha de otro jugador no aparece.
+- **Cómo es:** un sobre sellado con el símbolo de RIVAL sobre rayos que giran del color de la carta. Al tocarlo, la carta se voltea y crece hasta quedar de frente, con «¡NUEVA CARTA: RUBÍ!», la rareza y «Es tuya para siempre». Si el teléfono pide reducir movimiento, los rayos se quedan quietos.
+- **Sin azar:** siempre sale la carta que se ganó jugando.
+- **Varias a la vez:** si se ganaron varias juntas, se revela solo la más difícil y todas quedan como vistas.
+- **Memoria de lo visto:** se guarda en el almacenamiento seguro del teléfono (`seenCardsStore`), por persona y por dueño de la carta; no hace falta cambiar el backend. Si se borra la app, vuelve a celebrar las que ya se tenían: es un riesgo aceptado.
+
 ## Loop 4 — Verificación (salidas reales del 25/11/2026)
 
 | Verificación | Resultado |
@@ -106,8 +114,8 @@
 | `pytest` completo en PostgreSQL 16 local | 367 aprobadas, 0 omitidas (versión final). Una corrida anterior con el código a medias tuvo 1 falla que no se repitió: intermitente [POR VERIFICAR], igual que la del CI de c92707e |
 | Migraciones `0009`, `0010` y `0011` en PostgreSQL vacío | `upgrade head`, `alembic check` sin diferencias, bajar y volver a subir cada una, todo bien |
 | `tsc --noEmit` | 0 errores |
-| Pruebas de reglas de la app (`node --test`) | 60 aprobadas |
-| Pruebas de componentes (`jest`) | 77 aprobadas (22 suites) |
+| Pruebas de reglas de la app (`node --test`) | 62 aprobadas |
+| Pruebas de componentes (`jest`) | 79 aprobadas (23 suites) |
 | Líneas por archivo / `any` | Ninguno pasa de 150; sin `any` |
 | En el iPhone | Cartas, ficha y plantilla revisadas por el dueño; los arreglos que pidió quedaron aplicados. La barra del equipo y el cierre de temporada todavía no se han revisado en el teléfono |
 
@@ -115,7 +123,6 @@
 
 | Impacto | Tema | Plan |
 | --- | --- | --- |
-| MEDIO | La pantalla «¡Nueva carta!» no está en la app | Ya existe `earned_at`: mostrarla cuando haya una especial ganada después de la última visita |
 | MEDIO | Élite calcula la media de todos los jugadores de la ciudad (solo si el jugador ya tiene 92) | Si la ciudad crece, guardar un ranking calculado |
 | MEDIO | La carta especial se otorga al leer la ficha | Si se necesita que aparezca sin que nadie abra la ficha, otorgarla al confirmar el resultado o el gol |
 | BAJO | No se ha medido el rendimiento de muchas cartas animadas en un teléfono real | Probarlo en el iPhone |

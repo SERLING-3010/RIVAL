@@ -28,7 +28,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/validation.test.ts tests/dateTime.test.ts tests/contract.test.ts tests/league.test.ts tests/venue.test.ts tests/manager.test.ts tests/season.test.ts tests/matchday.test.ts tests/pending.test.ts tests/moderation.test.ts tests/loan.test.ts tests/chat.test.ts tests/checkin.test.ts tests/cup.test.ts tests/badges.test.ts tests/suggestions.test.ts tests/tactics.test.ts tests/card.test.ts tests/squad.test.ts && jest"
+    "test": "node --experimental-strip-types --test tests/validation.test.ts tests/dateTime.test.ts tests/contract.test.ts tests/league.test.ts tests/venue.test.ts tests/manager.test.ts tests/season.test.ts tests/matchday.test.ts tests/pending.test.ts tests/moderation.test.ts tests/loan.test.ts tests/chat.test.ts tests/checkin.test.ts tests/cup.test.ts tests/badges.test.ts tests/suggestions.test.ts tests/tactics.test.ts tests/card.test.ts tests/squad.test.ts tests/newCards.test.ts && jest"
   },
   "private": true,
   "jest": {

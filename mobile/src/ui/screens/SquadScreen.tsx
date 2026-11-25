@@ -4,8 +4,10 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import type { NewCardController } from '../../controllers/useNewCard';
 import type { SquadController } from '../../controllers/useSquad';
 import { CompareView } from '../components/CompareView';
+import { NewCardReveal } from '../components/NewCardReveal';
 import { PitchView } from '../components/PitchView';
 import { Screen } from '../components/Screen';
 import { SquadGrid } from '../components/SquadGrid';
@@ -13,6 +15,7 @@ import { SquadHeader } from '../components/SquadHeader';
 import { StateView } from '../components/StateView';
 import { TeamAlbum } from '../components/TeamAlbum';
 import { TeamLookSheets } from '../components/TeamLookSheets';
+import { TeamNewCard } from '../components/TeamNewCard';
 import { MIN_TOUCH } from '../theme';
 
 type Tab = 'pitch' | 'players' | 'compare';
@@ -21,9 +24,10 @@ interface Props {
   controller: SquadController;
   onOpenCard: (userId: number) => void;
   onBack: () => void;
+  newCard: NewCardController; // Sprint 23: el equipo ganó una especial
 }
 
-export function SquadScreen({ controller, onOpenCard, onBack }: Props) {
+export function SquadScreen({ controller, onOpenCard, onBack, newCard }: Props) {
   const [tab, setTab] = useState<Tab>('pitch');
   const [album, setAlbum] = useState(false);
   const [sheet, setSheet] = useState<'crest' | 'design' | null>(null);
@@ -38,6 +42,20 @@ export function SquadScreen({ controller, onOpenCard, onBack }: Props) {
           ];
           return (
             <>
+              {newCard.reveal ? (
+                <NewCardReveal
+                  tier={newCard.reveal}
+                  owner={`de ${squad.team.name}`}
+                  onDone={newCard.handleDone}
+                >
+                  <TeamNewCard
+                    tier={newCard.reveal}
+                    teamName={squad.team.name}
+                    crest={squad.crest}
+                    media={squad.media}
+                  />
+                </NewCardReveal>
+              ) : null}
               <SquadHeader
                 squad={squad}
                 onToggleAlbum={() => setAlbum((a) => !a)}

@@ -54,6 +54,7 @@ describe('PlayerCardScreen', () => {
         onReport={jest.fn()}
         onBadges={onBadges}
         onBack={jest.fn()}
+        newCard={{ reveal: null, handleDone: jest.fn() }}
       />,
     );
     expect(screen.getByText('77')).toBeTruthy();

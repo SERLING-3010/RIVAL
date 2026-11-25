@@ -1,7 +1,9 @@
 // Composición del Sprint 7: modo manager, mercado, ficha, ofertas del jugador y planilla.
 
 import { useBadges } from '../controllers/useBadges';
+import { useNewCard } from '../controllers/useNewCard';
 import { useSquad } from '../controllers/useSquad';
+import { seenKey } from '../domain/newCards';
 import { useLineup } from '../controllers/useLineup';
 import { useMarket, useMyTransferOffers, usePlayerCard, useTeamManager } from '../controllers/useManager';
 import type { SquadMember } from '../domain/managerModels';
@@ -49,10 +51,15 @@ export function Market({
   );
 }
 
-export function PlayerCardRoute({ token, navigator, userId }: MatchCtx & { userId: number }) {
+export function PlayerCardRoute({ token, navigator, userId, user }: MatchCtx & { userId: number }) {
+  const controller = usePlayerCard(token, userId);
+  const own = userId === user.id; // la celebración es solo para la carta propia
+  const specials = controller.state.kind === 'success' ? controller.state.data.card.specials : null;
+  const newCard = useNewCard(own ? seenKey('player', userId, user.id) : null, specials);
   return (
     <PlayerCardScreen
-      controller={usePlayerCard(token, userId)}
+      controller={controller}
+      newCard={newCard}
       onReport={(id, name) => navigator.push({ name: 'report', target: { kind: 'user', id, name } })}
       onBadges={(id, name) =>
         navigator.push({ name: 'badges', owner: 'player', id, title: `Insignias de ${name}` })
@@ -97,10 +104,15 @@ export function Badges({
   return <BadgesScreen title={title} controller={useBadges(token, owner, id)} onBack={navigator.goBack} />;
 }
 
-export function SquadRoute({ token, navigator, teamId }: MatchCtx & { teamId: number }) {
+export function SquadRoute({ token, navigator, teamId, user }: MatchCtx & { teamId: number }) {
+  const controller = useSquad(token, teamId);
+  const specials =
+    controller.state.kind === 'success' ? (controller.state.data.card?.specials ?? null) : null;
+  const newCard = useNewCard(seenKey('team', teamId, user.id), specials);
   return (
     <SquadScreen
-      controller={useSquad(token, teamId)}
+      controller={controller}
+      newCard={newCard}
       onOpenCard={(userId) => navigator.push({ name: 'playerCard', userId })}
       onBack={navigator.goBack}
     />
