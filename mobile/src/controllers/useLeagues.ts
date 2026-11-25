@@ -41,6 +41,7 @@ export interface LeagueController extends Loader<LeagueDetail> {
   action: Action;
   handleRequestTeam: (teamId: number) => Promise<void>;
   handleJoinAsReferee: () => Promise<void>;
+  handleCloseSeason: () => Promise<void>; // Sprint 23
   handleDecide: (
     kind: EntryKind,
     entryId: number,
@@ -90,5 +91,14 @@ export function useLeague(token: string, leagueId: number): LeagueController {
       ),
     [action, handleReload, token],
   );
-  return { ...loader, action, handleRequestTeam, handleJoinAsReferee, handleDecide };
+  const handleCloseSeason = useCallback(
+    () =>
+      action.run(
+        () => leagueApi.closeSeason(token, leagueId),
+        'Temporada cerrada. ¡Ya hay campeón!',
+        handleReload,
+      ),
+    [action, handleReload, leagueId, token],
+  );
+  return { ...loader, action, handleRequestTeam, handleJoinAsReferee, handleDecide, handleCloseSeason };
 }

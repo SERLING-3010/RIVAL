@@ -19,18 +19,36 @@ class TransferOfferBody(StrictModel):
 class LineupEntry(StrictModel):
     user_id: int
     goals: int = Field(ge=0, le=999)
+    kinds: list[str] = Field(default_factory=list, max_length=999)  # tipos de gol (Sprint 23)
 
 
 class LineupBody(StrictModel):
     players: list[LineupEntry] = Field(min_length=1, max_length=40)
 
 
+class FeatGoalOut(BaseModel):
+    label: str
+    current: int
+    target: int
+
+
+class SpecialCardOut(BaseModel):
+    code: str
+    min_media: int
+    earned_at: AwareDatetime | None
+    goals: list[FeatGoalOut]
+
+
 class CardFaceOut(BaseModel):
     media: int
     tier: str
     next_tier: str | None
-    matches_to_next: int
+    media_to_next: int
+    display_tier: str
+    market_value: int
+    specials: list[SpecialCardOut]
     hat_tricks: int
+    check_ins: int
     recent: list[str]
     badges: list[str]
 

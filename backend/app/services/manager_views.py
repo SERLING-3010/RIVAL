@@ -16,14 +16,33 @@ class PlayerStats:
 
 
 @dataclass(frozen=True)
+class FeatGoalView:
+    label: str  # "10 goles", "Gol de chilena"…
+    current: int
+    target: int
+
+
+@dataclass(frozen=True)
+class SpecialCardView:
+    code: str  # uno de special_cards.CODES
+    min_media: int
+    earned_at: datetime | None  # None mientras no la gana
+    goals: list[FeatGoalView]
+
+
+@dataclass(frozen=True)
 class CardFaceView:
-    """Lo que muestra la carta del jugador (Sprint 20); se calcula en `card_queries`."""
+    """Lo que muestra la carta del jugador (Sprints 20 y 23); se calcula en `card_queries`."""
 
     media: int
-    tier: str  # BRONCE, PLATA, ORO, ELITE
+    tier: str  # carta básica: BRONCE, PLATA, ORO u ORO_BRILLANTE
     next_tier: str | None
-    matches_to_next: int
+    media_to_next: int  # media que falta para la siguiente básica
+    display_tier: str  # la que se dibuja: la especial más difícil que tiene, o su básica
+    market_value: int  # monedas RIVAL virtuales; no se compran ni se venden
+    specials: list[SpecialCardView]  # las quince, ganadas o no, con su avance
     hat_tricks: int
+    check_ins: int  # partidos con check-in en la cancha (Sprint 22)
     recent: list[str]  # W, D o L, del más reciente al más antiguo
     badges: list[str]  # nombres de las insignias ganadas
 

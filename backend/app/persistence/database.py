@@ -58,6 +58,7 @@ def load_models() -> None:
     """Registra todas las tablas en Base.metadata."""
     from app.persistence import (  # noqa: F401
         models_audit,
+        models_cards,
         models_chat,
         models_contracts,
         models_cup,

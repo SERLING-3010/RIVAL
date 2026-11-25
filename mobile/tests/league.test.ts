@@ -59,6 +59,8 @@ function detail(overrides: Partial<LeagueDetail> = {}): LeagueDetail {
     pending_referees: [],
     my_team_requests: [],
     my_referee_request: null,
+    champion: null,
+    closed_at: null,
     ...overrides,
   };
 }

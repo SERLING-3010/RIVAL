@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Alert, StyleSheet, Text } from 'react-native';
 
 import type { ContractController } from '../../controllers/useContracts';
+import type { GoalClaimsController } from '../../controllers/useGoalClaims';
 import type { Contract } from '../../domain/contractModels';
 import { CONTRACT_STATUS_LABEL, contractActions } from '../../domain/contractRules';
 import { BookingCard } from '../components/BookingCard';
 import type { MatchdayHandlers } from '../components/MatchdayButtons';
 import { MatchdayButtons } from '../components/MatchdayButtons';
 import { ContractVersionCard as VersionCard } from '../components/ContractVersionCard';
+import { GoalClaimsPanel } from '../components/GoalClaimsPanel';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ResultPanel } from '../components/ResultPanel';
 import { Screen } from '../components/Screen';
@@ -17,6 +19,7 @@ import { colors, font } from '../theme';
 
 interface Props {
   controller: ContractController;
+  goalClaims: GoalClaimsController;
   onPropose: (contract: Contract) => void;
   onActivity: (contractId: number) => void;
   onBookVenue: (contract: Contract) => void;
@@ -79,6 +82,7 @@ export function ContractScreen(props: Props) {
                 onReport={(h, g) => void controller.handleReport(h, g)}
                 onLineup={contract.is_staff ? () => onLineup(contract) : undefined}
               />
+              <GoalClaimsPanel controller={props.goalClaims} />
               {can.canSign ? <PrimaryButton label="Firmar" disabled={busy} onPress={confirmSign} /> : null}
               {can.canRejectAmendment ? (
                 <PrimaryButton

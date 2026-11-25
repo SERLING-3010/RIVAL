@@ -17,7 +17,10 @@ def test_card_face_comes_from_real_matches(ctx, clock):
     play(ctx, clock, ctx.db.get(MatchContract, final.contract_id), [a_owner, c_owner], 3, 1)
     lineup_service.record(ctx, a_owner, final.contract_id, [(a_owner.id, 3)])
     card = manager_queries.player_card(ctx, c_owner, a_owner.id).card
-    assert (card.media, card.tier, card.next_tier, card.matches_to_next) == (71, "BRONCE", "PLATA", 9)
+    assert (card.media, card.tier, card.next_tier, card.media_to_next, card.display_tier) ==         (71, "PLATA", "ORO", 4, "PLATA")
+    assert card.market_value == 390  # 71 × 5 + 25 por Plata + 10 por la victoria = 390
+    assert len(card.specials) == 15 and all(sp.earned_at is None for sp in card.specials)
+    assert [(g.current, g.target) for g in card.specials[0].goals] == [(3, 10)]  # Rubí: 3 de 10 goles
     assert (card.hat_tricks, card.recent) == (1, ["W"])
     assert {"Debut", "Triplete", "Campeón de copa"} <= set(card.badges)
     empty = manager_queries.player_card(ctx, a_owner, s["referee"].id).card

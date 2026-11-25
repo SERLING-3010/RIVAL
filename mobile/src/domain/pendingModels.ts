@@ -11,7 +11,14 @@ export interface PendingItem {
   due_at: string | null;
 }
 
-const URGENT = new Set(['SIGN_CONTRACT', 'REPORT_RESULT', 'RESULT_DISPUTED', 'CALLUP', 'REFEREE_RESULT']);
+const URGENT = new Set([
+  'SIGN_CONTRACT',
+  'REPORT_RESULT',
+  'RESULT_DISPUTED',
+  'CALLUP',
+  'REFEREE_RESULT',
+  'CONFIRM_GOAL_KINDS', // Sprint 23: vence a las 72 horas
+]);
 
 /** Insignia corta: "Urgente" si tiene hora en las próximas 24 h o es de un partido ya jugado. */
 export function urgency(item: PendingItem, now: Date): string | undefined {

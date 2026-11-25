@@ -79,5 +79,6 @@ def decide(
 
 @router.post("/contracts/{contract_id}/lineup")
 def record_lineup(contract_id: int, body: LineupBody, ctx: CtxDep, user: UserDep) -> dict[str, object]:
-    lineup_service.record(ctx, user, contract_id, [(p.user_id, p.goals) for p in body.players])
+    lineup_service.record(ctx, user, contract_id, [(p.user_id, p.goals) for p in body.players],
+                          {p.user_id: p.kinds for p in body.players if p.kinds})
     return {"contract_id": contract_id, "players": len(body.players)}

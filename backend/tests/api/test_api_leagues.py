@@ -30,6 +30,12 @@ def test_create_search_enroll_and_approve(client):
     assert [t["team"]["name"] for t in approved.json()["teams"]] == ["Bravos"]
     mine = client.get("/api/v1/me/leagues", headers=auth(dt["token"])).json()
     assert [(m["league"]["id"], m["relation"]) for m in mine] == [(league_id, "TEAM")]
+    # Cierre de temporada (Sprint 23): solo el organizador, y no sin partidos jugados.
+    not_org = client.post(f"/api/v1/leagues/{league_id}/close-season", headers=auth(dt["token"]))
+    assert not_org.status_code == 403
+    empty = client.post(f"/api/v1/leagues/{league_id}/close-season", headers=auth(org["token"]))
+    assert (empty.status_code, empty.json()["code"]) == (409, "NO_MATCHES_PLAYED")
+    assert approved.json()["champion"] is None and approved.json()["closed_at"] is None
 
 
 def test_referee_request_and_rules(client):

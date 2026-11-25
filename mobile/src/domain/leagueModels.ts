@@ -56,6 +56,8 @@ export interface LeagueDetail {
   pending_referees: RefereeEntry[];
   my_team_requests: TeamEntry[];
   my_referee_request: RefereeEntry | null;
+  champion: TeamSummary | null; // Sprint 23: al cerrar la temporada
+  closed_at: string | null;
 }
 
 export interface MyLeague {

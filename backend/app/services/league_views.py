@@ -73,6 +73,8 @@ class LeagueDetailView:
     pending_referees: list[RefereeEntryView]  # solo para el personal
     my_team_requests: list[TeamEntryView]  # pendientes o aprobadas de equipos que administro
     my_referee_request: RefereeEntryView | None  # mi solicitud al cuerpo arbitral, si es pendiente o aprobada
+    champion: TeamSummaryView | None = None  # Sprint 23: campeón al cerrar la temporada
+    closed_at: datetime | None = None
 
 
 @dataclass(frozen=True)

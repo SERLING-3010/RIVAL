@@ -3,6 +3,7 @@
 import type { ActivityScope } from '../controllers/useActivity';
 import { useActivity } from '../controllers/useActivity';
 import { useContract, useContractProposal, useTeamContracts } from '../controllers/useContracts';
+import { useGoalClaims } from '../controllers/useGoalClaims';
 import { formFromTerms } from '../domain/contractForm';
 import type { Contract } from '../domain/contractModels';
 import { ActivityScreen } from '../ui/screens/ActivityScreen';
@@ -26,6 +27,7 @@ export function ContractDetail({ token, navigator, contractId }: MatchCtx & { co
   return (
     <ContractScreen
       controller={useContract(token, contractId)}
+      goalClaims={useGoalClaims(token, contractId)}
       onPropose={(contract) => navigator.push({ name: 'proposeContract', contract })}
       onBookVenue={(contract) => {
         const terms = (contract.signed ?? contract.current).terms;

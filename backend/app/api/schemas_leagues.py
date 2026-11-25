@@ -75,6 +75,8 @@ class LeagueDetailOut(BaseModel):
     pending_referees: list[RefereeEntryOut]
     my_team_requests: list[TeamEntryOut]
     my_referee_request: RefereeEntryOut | None
+    champion: TeamSummaryOut | None = None
+    closed_at: AwareDatetime | None = None
 
 
 class MyLeagueOut(BaseModel):

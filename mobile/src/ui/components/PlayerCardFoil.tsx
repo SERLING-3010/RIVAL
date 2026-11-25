@@ -1,8 +1,9 @@
 // La carta del jugador: se voltea al tocarla (giro 3D) para mostrar la ficha completa.
 
 import { useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet } from 'react-native';
 
+import { faceFromPlayer } from '../../domain/cardModels';
 import type { PlayerCard } from '../../domain/managerModels';
 import { CardBack } from './CardBack';
 import { CardFront } from './CardFront';
@@ -11,10 +12,11 @@ export function PlayerCardFoil({ player }: { player: PlayerCard }) {
   const turn = useRef(new Animated.Value(0)).current;
   const [flipped, setFlipped] = useState(false);
   const flip = () => {
-    Animated.spring(turn, {
+    // Sin rebote: termina justo en su lugar y el texto queda nítido al instante.
+    Animated.timing(turn, {
       toValue: flipped ? 0 : 1,
-      friction: 8,
-      tension: 40,
+      duration: 450,
+      easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
     setFlipped(!flipped);
@@ -33,7 +35,7 @@ export function PlayerCardFoil({ player }: { player: PlayerCard }) {
       style={styles.card}
     >
       <Animated.View style={[styles.side, { transform: [{ perspective: 1200 }, { rotateY: front }] }]}>
-        <CardFront player={player} />
+        <CardFront face={faceFromPlayer(player)} />
       </Animated.View>
       <Animated.View style={[styles.side, { transform: [{ perspective: 1200 }, { rotateY: back }] }]}>
         <CardBack player={player} />

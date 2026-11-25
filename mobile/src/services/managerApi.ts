@@ -1,4 +1,5 @@
 import type { MarketItem, PlayerCard, TeamManager, TransferOffer } from '../domain/managerModels';
+import type { LineupPlayer } from '../domain/managerRules';
 import { request } from './httpClient';
 
 export type OfferDecision = 'owner-accept' | 'owner-reject' | 'player-accept' | 'player-reject' | 'withdraw';
@@ -30,7 +31,7 @@ export const managerApi = {
   card: (token: string, userId: number) =>
     request<PlayerCard>('GET', `/api/v1/players/${userId}/card`, { token }),
 
-  lineup: (token: string, contractId: number, players: { user_id: number; goals: number }[]) =>
+  lineup: (token: string, contractId: number, players: LineupPlayer[]) =>
     request<{ contract_id: number }>('POST', `/api/v1/contracts/${contractId}/lineup`, {
       token,
       body: { players },

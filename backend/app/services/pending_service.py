@@ -9,10 +9,10 @@ from datetime import datetime
 
 from sqlalchemy import select
 
-from app.domain.team_rules import resolve_admin
+from app.domain.team_rules import is_matchday_staff, resolve_admin
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team, TeamMembership
-from app.services import loan_queries
+from app.services import goal_claim_service, loan_queries
 from app.services import pending_sources as sources
 from app.services.context import ServiceContext
 from app.services.team_service import member_views
@@ -20,7 +20,7 @@ from app.services.team_service import member_views
 
 @dataclass(frozen=True)
 class PendingItem:
-    kind: str  # SIGN_CONTRACT, REPORT_RESULT, RESULT_DISPUTED, CALLUP, TRANSFER_PLAYER, TRANSFER_OWNER, ...
+    kind: str  # SIGN_CONTRACT, REPORT_RESULT, RESULT_DISPUTED, CALLUP, CONFIRM_GOAL_KINDS, TRANSFER_PLAYER, ...
     title: str
     detail: str
     target: str  # contract, team, league, venue, transfers, referee, loans
@@ -36,6 +36,7 @@ def _my_teams(ctx: ServiceContext, actor: UserAccount) -> tuple[list[Team], list
 
 def pending(ctx: ServiceContext, actor: UserAccount) -> list[PendingItem]:
     member_teams, admin_teams = _my_teams(ctx, actor)
+    staff = [t.id for t in member_teams if is_matchday_staff(member_views(t), actor.id)]
     raw = (
         sources.contracts(ctx, admin_teams)
         + sources.callups(ctx, actor)
@@ -45,6 +46,7 @@ def pending(ctx: ServiceContext, actor: UserAccount) -> list[PendingItem]:
         + sources.bookings(ctx, actor)
         + sources.leagues(ctx, actor)
         + sources.ratings(ctx, actor, member_teams)
+        + goal_claim_service.awaiting(ctx, staff)  # Sprint 23
         + [("LOAN_PLAYER" if loan.status == "PENDING_PLAYER" else "LOAN_OWNER",
             f"Préstamo: {loan.player_name} para {loan.to_team}", "Acepta o rechaza el préstamo para un partido.",
             "loans", loan.id, loan.kickoff_at) for loan in loan_queries.awaiting_me(ctx, actor)]

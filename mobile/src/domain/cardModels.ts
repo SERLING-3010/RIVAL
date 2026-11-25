@@ -1,34 +1,41 @@
-// Carta del jugador (Sprint 20): lámina metálica por nivel y datos reales; nunca se compra.
+// Carta del jugador (Sprints 20 y 23): lámina por nivel y datos reales; nunca se compra.
 
 import type { PlayerCard } from './managerModels.ts';
 
-export type CardTier = 'BRONCE' | 'PLATA' | 'ORO' | 'ELITE';
+import type { BaseTier, CardTier, SpecialTier } from './cardTiers.ts';
+import { TIER_LABEL } from './cardTiers.ts';
+
+export type { BaseTier, CardTier, SpecialTier } from './cardTiers.ts';
+export { TIER_LABEL } from './cardTiers.ts';
 export type RecentResult = 'W' | 'D' | 'L';
+
+export interface FeatGoal {
+  label: string; // "10 goles", "Gol de chilena"…
+  current: number;
+  target: number;
+}
+
+/** Una carta especial (Sprint 23): media mínima + hazañas; earned_at no es null si ya la ganó. */
+export interface SpecialCard {
+  code: SpecialTier;
+  min_media: number;
+  earned_at: string | null;
+  goals: FeatGoal[];
+}
 
 export interface CardFace {
   media: number;
-  tier: CardTier;
-  next_tier: CardTier | null;
-  matches_to_next: number;
+  tier: BaseTier; // carta básica, sale de la media
+  next_tier: BaseTier | null;
+  media_to_next: number;
+  display_tier: CardTier; // la que se dibuja: su mejor especial o su básica
+  market_value: number; // monedas RIVAL virtuales
+  specials: SpecialCard[];
   hat_tricks: number;
+  check_ins: number; // Sprint 22
   recent: RecentResult[];
   badges: string[];
 }
-
-export const TIER_LABEL: Record<CardTier, string> = {
-  BRONCE: 'Bronce',
-  PLATA: 'Plata',
-  ORO: 'Oro',
-  ELITE: 'Élite',
-};
-
-/** Paradas del degradado metálico (claro, oscuro, brillo, oscuro, claro). */
-export const TIER_FOIL: Record<CardTier, [string, string, string, string, string]> = {
-  BRONCE: ['#F3CFA9', '#B07945', '#F0C493', '#8A5A35', '#D9A374'],
-  PLATA: ['#FFFFFF', '#A9B3BA', '#F2F5F7', '#8C979E', '#DDE3E7'],
-  ORO: ['#FFF3C4', '#C99A35', '#FBE7A1', '#A87A22', '#F1D27A'],
-  ELITE: ['#E6FFF0', '#2BD46B', '#C9F5DA', '#179C4C', '#9BEBBE'],
-};
 
 export const RESULT_LABEL: Record<RecentResult, string> = { W: 'G', D: 'E', L: 'P' };
 
@@ -38,23 +45,90 @@ export function initials(name: string): string {
   return letters.filter(Boolean).join('').toUpperCase() || '?';
 }
 
-/** Las seis estadísticas del frente, en el orden de la carta (dos columnas). */
-export function frontStats(p: PlayerCard): { value: string; label: string }[] {
+export interface Stat {
+  value: string;
+  label: string;
+}
+
+/** Lo que dibuja el frente de la carta; igual en la ficha y en la plantilla (Sprint 22). */
+export interface CardFaceData {
+  media: number;
+  position: string;
+  crest: string;
+  tier: CardTier;
+  name: string;
+  stats: Stat[];
+}
+
+interface StatSource {
+  matches: number;
+  wins: number;
+  goals: number;
+  rating: number | null;
+  hatTricks: number;
+  badges: number;
+}
+
+function sixStats(s: StatSource): Stat[] {
   return [
-    { value: String(p.matches), label: 'PJ' },
-    { value: String(p.wins), label: 'VIC' },
-    { value: String(p.goals), label: 'GOL' },
-    { value: p.rating_average === null ? '–' : p.rating_average.toFixed(1).replace('.', ','), label: 'VAL' },
-    { value: String(p.card.hat_tricks), label: 'TRI' },
-    { value: String(p.card.badges.length), label: 'INS' },
+    { value: String(s.matches), label: 'PJ' },
+    { value: String(s.wins), label: 'VIC' },
+    { value: String(s.goals), label: 'GOL' },
+    { value: s.rating === null ? '–' : s.rating.toFixed(1).replace('.', ','), label: 'VAL' },
+    { value: String(s.hatTricks), label: 'TRI' },
+    { value: String(s.badges), label: 'INS' },
   ];
 }
 
-/** "Faltan 6 partidos para Élite" o "Nivel máximo". */
+/** Las seis estadísticas del frente, en el orden de la carta (dos columnas). */
+export function frontStats(p: PlayerCard): Stat[] {
+  return sixStats({
+    matches: p.matches,
+    wins: p.wins,
+    goals: p.goals,
+    rating: p.rating_average,
+    hatTricks: p.card.hat_tricks,
+    badges: p.card.badges.length,
+  });
+}
+
+const shortPosition = (position: string | null) => (position ?? '—').slice(0, 3).toUpperCase();
+
+export function faceFromPlayer(p: PlayerCard): CardFaceData {
+  const team = p.teams[0];
+  return {
+    media: p.card.media,
+    position: shortPosition(p.position),
+    crest: team ? initials(team.name) : '—',
+    tier: p.card.display_tier,
+    name: p.display_name,
+    stats: frontStats(p),
+  };
+}
+
+export interface SquadStatSource extends StatSource {
+  media: number;
+  position: string | null;
+  tier: CardTier;
+  name: string;
+}
+
+export function faceFromSquad(c: SquadStatSource, teamName: string): CardFaceData {
+  return {
+    media: c.media,
+    position: shortPosition(c.position),
+    crest: initials(teamName),
+    tier: c.tier,
+    name: c.name,
+    stats: sixStats(c),
+  };
+}
+
+/** "Faltan 4 de media para Oro común" o "Carta básica máxima: Oro brillante". */
 export function nextTierText(c: CardFace): string {
-  if (c.next_tier === null) return 'Nivel máximo: Élite';
-  const one = c.matches_to_next === 1;
-  return `${one ? 'Falta' : 'Faltan'} ${c.matches_to_next} ${one ? 'partido' : 'partidos'} para ${TIER_LABEL[c.next_tier]}`;
+  if (c.next_tier === null) return `Carta básica máxima: ${TIER_LABEL[c.tier]}`;
+  const verb = c.media_to_next === 1 ? 'Falta' : 'Faltan';
+  return `${verb} ${c.media_to_next} de media para ${TIER_LABEL[c.next_tier]}`;
 }
 
 export function goalsPerMatch(p: PlayerCard): string {

@@ -1,4 +1,4 @@
-// Planilla del partido: marcar quién jugó y los goles de cada uno.
+// Planilla del partido: marcar quién jugó, los goles de cada uno y su tipo (Sprint 23).
 
 import { StyleSheet, Text } from 'react-native';
 
@@ -7,6 +7,7 @@ import type { SquadMember } from '../../domain/managerModels';
 import type { ViewState } from '../../domain/viewState';
 import { Card } from '../components/Card';
 import { ChoiceChips } from '../components/ChoiceChips';
+import { GoalKindPicker } from '../components/GoalKindPicker';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
@@ -22,7 +23,7 @@ interface Props {
 }
 
 export function LineupScreen({ controller, squad, teamScore, onRetry, onBack }: Props) {
-  const { played, goals, action } = controller;
+  const { played, goals, kinds, action } = controller;
   return (
     <Screen title="Planilla del partido" onBack={onBack}>
       <Text style={styles.meta}>
@@ -47,6 +48,13 @@ export function LineupScreen({ controller, squad, teamScore, onRetry, onBack }: 
                     value={goals[m.user_id] ?? ''}
                     placeholder="0"
                     onChangeText={(v) => controller.handleGoals(m.user_id, v)}
+                  />
+                  <GoalKindPicker
+                    name={m.display_name}
+                    goals={Number(goals[m.user_id] ?? '') || 0}
+                    marked={kinds[m.user_id] ?? []}
+                    onAdd={(kind) => controller.handleAddKind(m.user_id, kind)}
+                    onRemove={(i) => controller.handleRemoveKind(m.user_id, i)}
                   />
                 </Card>
               ))}

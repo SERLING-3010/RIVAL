@@ -33,4 +33,7 @@ export const leagueApi = {
 
   decide: (token: string, kind: EntryKind, entryId: number, decision: 'approve' | 'reject' | 'withdraw') =>
     request<LeagueDetail>('POST', `/api/v1/league-requests/${kind}/${entryId}/${decision}`, { token }),
+
+  closeSeason: (token: string, leagueId: number) =>
+    request<LeagueDetail>('POST', `/api/v1/leagues/${leagueId}/close-season`, { token }),
 };

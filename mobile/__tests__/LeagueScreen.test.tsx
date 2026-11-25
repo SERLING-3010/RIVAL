@@ -1,5 +1,6 @@
 import { describe, expect, jest, test } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 import type { LeagueController } from '../src/controllers/useLeagues';
 import type { LeagueDetail } from '../src/domain/leagueModels';
@@ -41,6 +42,8 @@ function detail(overrides: Partial<LeagueDetail> = {}): LeagueDetail {
     pending_referees: [],
     my_team_requests: [],
     my_referee_request: null,
+    champion: null,
+    closed_at: null,
     ...overrides,
   };
 }
@@ -53,6 +56,7 @@ function controller(data: LeagueDetail): LeagueController {
     handleRequestTeam: jest.fn(async () => undefined),
     handleJoinAsReferee: jest.fn(async () => undefined),
     handleDecide: jest.fn(async () => undefined),
+    handleCloseSeason: jest.fn(async () => undefined),
   };
 }
 
@@ -126,5 +130,18 @@ describe('LeagueScreen', () => {
     expect(screen.queryByText('Inscribir a Águilas')).toBeNull();
     await fireEvent.press(screen.getByText('Salir de la liga'));
     expect(c.handleDecide).toHaveBeenCalledWith('team', 10, 'withdraw');
+  });
+
+  test('el organizador cierra la temporada con confirmación y luego se ve el campeón', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    const c = controller(detail({ my_role: 'ORGANIZER' }));
+    const props = { user, myTeams: [], onSeason: jest.fn(), onCup: jest.fn(), windowController: windowCtl };
+    const view = await render(<LeagueScreen controller={c} {...props} onBack={jest.fn()} />);
+    await fireEvent.press(screen.getByText('Cerrar temporada'));
+    expect(alert).toHaveBeenCalledWith('¿Cerrar la temporada?', expect.any(String), expect.any(Array));
+    const closed = controller(detail({ champion: team(2, 'Bravos'), closed_at: '2026-11-25T12:00:00Z' }));
+    await view.rerender(<LeagueScreen controller={closed} {...props} onBack={jest.fn()} />);
+    expect(screen.getByText('🏆 Bravos')).toBeTruthy();
+    expect(screen.queryByText('Cerrar temporada')).toBeNull();
   });
 });

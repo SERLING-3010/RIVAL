@@ -23,6 +23,9 @@ class Team(Base):
     status: Mapped[str] = mapped_column(String(20), default="ACTIVE")
     created_by: Mapped[int] = mapped_column(ForeignKey("user_account.id"))
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    # Sprint 23: escudo armado con piezas de RIVAL y diseño elegido para el cuadro de la media.
+    crest: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    card_choice: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     memberships: Mapped[list["TeamMembership"]] = relationship(
         back_populates="team", cascade="all, delete-orphan", lazy="selectin", order_by="TeamMembership.id"

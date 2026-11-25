@@ -79,6 +79,7 @@ def league_detail(ctx: ServiceContext, actor: UserAccount, league_id: int) -> Le
     active_teams = _team_entries(ctx, league.id, ACTIVE_STATUSES)
     mine = [e for e in active_teams if _admin_of(ctx, e.team.id) == actor.id]
     my_ref = next((r for r in _referee_entries(ctx, league.id, ACTIVE_STATUSES) if r.user_id == actor.id), None)
+    champion = ctx.db.get(Team, league.champion_team_id) if league.champion_team_id else None  # Sprint 23
     return LeagueDetailView(
         league=league_summary(ctx, league), description=league.description, my_role=role.value if role else None,
         transfer_window_start=league.transfer_window_start, transfer_window_end=league.transfer_window_end,
@@ -87,6 +88,8 @@ def league_detail(ctx: ServiceContext, actor: UserAccount, league_id: int) -> Le
         pending_teams=_team_entries(ctx, league.id, pending) if role else [],
         pending_referees=_referee_entries(ctx, league.id, pending) if role else [],
         my_team_requests=mine, my_referee_request=my_ref,
+        champion=summary(champion) if champion else None,
+        closed_at=league.closed_at,
     )
 
 

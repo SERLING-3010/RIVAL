@@ -32,6 +32,9 @@ class League(Base):
     # Ventana de traspasos (Sprint 13). Sin ventana, los traspasos están abiertos.
     transfer_window_start: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
     transfer_window_end: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
+    # Cierre de temporada (Sprint 23): el organizador la cierra y gana el primero de la tabla.
+    champion_team_id: Mapped[int | None] = mapped_column(ForeignKey("team.id"), nullable=True)
+    closed_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
 
 
 class LeagueStaff(Base):

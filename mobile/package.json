@@ -10,7 +10,8 @@
     "expo-status-bar": "~58.0.5",
     "react": "19.3.0",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "~5.11.1"
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-svg": "15.16.0"
   },
   "devDependencies": {
     "@testing-library/react-native": "^14.1.0",
@@ -27,7 +28,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/validation.test.ts tests/dateTime.test.ts tests/contract.test.ts tests/league.test.ts tests/venue.test.ts tests/manager.test.ts tests/season.test.ts tests/matchday.test.ts tests/pending.test.ts tests/moderation.test.ts tests/loan.test.ts tests/chat.test.ts tests/checkin.test.ts tests/cup.test.ts tests/badges.test.ts tests/suggestions.test.ts tests/tactics.test.ts tests/card.test.ts && jest"
+    "test": "node --experimental-strip-types --test tests/validation.test.ts tests/dateTime.test.ts tests/contract.test.ts tests/league.test.ts tests/venue.test.ts tests/manager.test.ts tests/season.test.ts tests/matchday.test.ts tests/pending.test.ts tests/moderation.test.ts tests/loan.test.ts tests/chat.test.ts tests/checkin.test.ts tests/cup.test.ts tests/badges.test.ts tests/suggestions.test.ts tests/tactics.test.ts tests/card.test.ts tests/squad.test.ts && jest"
   },
   "private": true,
   "jest": {

@@ -5,6 +5,13 @@ import { Alert } from 'react-native';
 import { ContractScreen } from '../src/ui/screens/ContractScreen';
 import { contract, contractController, version } from './fixtures';
 
+const noClaims = () => ({
+  state: { kind: 'empty' as const, message: '' },
+  handleReload: jest.fn(),
+  action: { busy: false, message: null, run: jest.fn(async () => undefined) },
+  handleDecide: jest.fn(async () => undefined),
+});
+
 const matchday = () => ({
   onChat: jest.fn(),
   onCheckIn: jest.fn(),
@@ -21,6 +28,7 @@ describe('ContractScreen', () => {
     await render(
       <ContractScreen
         controller={controller}
+        goalClaims={noClaims()}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
@@ -38,6 +46,7 @@ describe('ContractScreen', () => {
     await render(
       <ContractScreen
         controller={contractController(contract({ is_admin: false }))}
+        goalClaims={noClaims()}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
@@ -60,6 +69,7 @@ describe('ContractScreen', () => {
     await render(
       <ContractScreen
         controller={controller}
+        goalClaims={noClaims()}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}
@@ -79,6 +89,7 @@ describe('ContractScreen', () => {
     await render(
       <ContractScreen
         controller={controller}
+        goalClaims={noClaims()}
         onPropose={jest.fn()}
         onActivity={jest.fn()}
         onBookVenue={jest.fn()}

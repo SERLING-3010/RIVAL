@@ -8,6 +8,7 @@ import { Card } from '../components/Card';
 import { PendingRequests } from '../components/PendingRequests';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
+import { SeasonCloseCard } from '../components/SeasonCloseCard';
 import { StateView } from '../components/StateView';
 import { TransferWindowCard } from '../components/TransferWindowCard';
 import { colors, font } from '../theme';
@@ -61,6 +62,11 @@ export function LeagueScreen({
                   </Text>
                 ))}
               </Card>
+              <SeasonCloseCard
+                detail={detail}
+                busy={busy}
+                onClose={() => void controller.handleCloseSeason()}
+              />
               <PrimaryButton label="Calendario y tabla" onPress={() => onSeason(can.canDecideTeams)} />
               <PrimaryButton
                 label="Copa eliminatoria"

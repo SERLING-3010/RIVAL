@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import type { Route } from '../controllers/useNavigator';
 import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
 import { CreateLeague, CupRoute, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
-import { Badges, Lineup, Manager, Market, PlayerCardRoute, TransferOffers } from './ManagerFlow';
+import { Badges, Lineup, Manager, Market, PlayerCardRoute, SquadRoute, TransferOffers } from './ManagerFlow';
 import { CheckIn, LoanRequest, MatchChat, MyLoans, Tactics } from './LoansFlow';
 import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
@@ -116,6 +116,8 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <MatchChat {...ctx} contractId={route.contractId} />;
     case 'checkIn':
       return <CheckIn {...ctx} contractId={route.contractId} />;
+    case 'squad':
+      return <SquadRoute {...ctx} teamId={route.teamId} />;
     case 'tactics':
       return <Tactics {...ctx} contractId={route.contractId} />;
     case 'suggestions':

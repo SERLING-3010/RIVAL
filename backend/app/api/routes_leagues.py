@@ -11,7 +11,7 @@ from app.api.schemas_leagues import (
 )
 from app.domain.league_rules import EnrollmentKind
 from app.persistence.models_identity import UserAccount
-from app.services import league_enrollment_service, league_queries, league_service
+from app.services import league_enrollment_service, league_queries, league_service, season_service
 from app.services.context import ServiceContext
 from app.services.league_views import LeagueInput, LeagueSearchInput
 
@@ -48,6 +48,12 @@ def my_leagues(ctx: CtxDep, user: UserDep) -> list[MyLeagueOut]:
 
 @router.get("/leagues/{league_id}")
 def league_detail(league_id: int, ctx: CtxDep, user: UserDep) -> LeagueDetailOut:
+    return _detail(ctx, user, league_id)
+
+
+@router.post("/leagues/{league_id}/close-season")
+def close_season(league_id: int, ctx: CtxDep, user: UserDep) -> LeagueDetailOut:
+    season_service.close(ctx, user, league_id)
     return _detail(ctx, user, league_id)
 
 

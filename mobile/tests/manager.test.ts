@@ -37,9 +37,15 @@ test('planilla: al menos un jugador, goles válidos y sin superar el marcador', 
   assert.deepEqual(lineupFromForm([1, 2], { 1: '2' }, 2), {
     ok: true,
     players: [
-      { user_id: 1, goals: 2 },
-      { user_id: 2, goals: 0 },
+      { user_id: 1, goals: 2, kinds: [] },
+      { user_id: 2, goals: 0, kinds: [] },
     ],
+  });
+  const withKind = lineupFromForm([1], { 1: '2' }, 2, { 1: ['CHILENA'] });
+  assert.deepEqual(withKind.ok && withKind.players[0]?.kinds, ['CHILENA']);
+  assert.deepEqual(lineupFromForm([1], { 1: '1' }, 2, { 1: ['CHILENA', 'PENAL'] }), {
+    ok: false,
+    error: 'Marcaste más goles con tipo que goles del jugador.',
   });
   assert.equal(lineupFromForm([], {}, 0).ok, false);
   assert.equal(lineupFromForm([1], { 1: 'x' }, 3).ok, false);
