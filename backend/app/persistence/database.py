@@ -71,6 +71,7 @@ def load_models() -> None:
         models_places,
         models_results,
         models_scouting,
+        models_tactics,
         models_teams,
         models_venues,
     )

@@ -12,7 +12,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import (
     routes_achievements, routes_auth, routes_chat, routes_checkin, routes_contracts, routes_cup,
     routes_league_matches, routes_leagues, routes_loans, routes_manager, routes_matchday, routes_matches,
-    routes_moderation, routes_pending, routes_scouting, routes_suggestions, routes_teams, routes_venues,
+    routes_moderation, routes_pending, routes_scouting, routes_suggestions, routes_tactics, routes_teams,
+    routes_venues,
 )
 from app.api.dependencies import IpLimits
 from app.api.errors import install_error_handling
@@ -62,6 +63,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(routes_teams.router)
     app.include_router(routes_scouting.router)
     app.include_router(routes_suggestions.router)
+    app.include_router(routes_tactics.router)
     app.include_router(routes_matches.router)
     app.include_router(routes_contracts.router)
     app.include_router(routes_leagues.router)

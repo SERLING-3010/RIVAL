@@ -8,6 +8,7 @@ import { contract, contractController, version } from './fixtures';
 const matchday = () => ({
   onChat: jest.fn(),
   onCheckIn: jest.fn(),
+  onTactics: jest.fn(),
   onCallUp: jest.fn(),
   onRate: jest.fn(),
   onLoan: jest.fn(),

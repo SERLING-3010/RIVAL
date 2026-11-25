@@ -74,6 +74,7 @@ const ACTION_LABEL: Record<string, string> = {
   TRANSFER_WINDOW_SET: 'Cambió la ventana de traspasos de la liga',
   CHAT_MESSAGE_DELETED: 'Borró un mensaje del chat',
   CHECKED_IN: 'Hizo check-in en la cancha',
+  TACTICS_SET: 'Un equipo guardó su alineación táctica',
   CUP_CREATED: 'Armó la copa de la liga',
   CUP_TEAM_ADVANCED: 'Un equipo pasó de ronda en la copa',
   CUP_TIEBREAK_SET: 'Definió un empate de copa por penales',

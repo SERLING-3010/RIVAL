@@ -39,6 +39,12 @@ class SportCatalog:
     def has_sport(self, code: str) -> bool:
         return any(s.code == code for s in self.sports)
 
+    def players_per_side(self, sport_code: str, modality_code: str) -> int | None:
+        for sport in self.sports:
+            if sport.code == sport_code:
+                return next((m.players_per_side for m in sport.modalities if m.code == modality_code), None)
+        return None
+
     def has_modality(self, sport_code: str, modality_code: str) -> bool:
         for sport in self.sports:
             if sport.code == sport_code:

@@ -6,6 +6,7 @@ import { PrimaryButton } from './PrimaryButton';
 export interface MatchdayHandlers {
   onChat: (contract: Contract) => void;
   onCheckIn: (contract: Contract) => void;
+  onTactics: (contract: Contract) => void;
   onCallUp: (contract: Contract) => void;
   onRate: (contract: Contract) => void;
   onLoan: (contract: Contract) => void;
@@ -29,6 +30,13 @@ export function MatchdayButtons({ contract, handlers }: Props) {
           label="Check-in en la cancha"
           variant="secondary"
           onPress={() => handlers.onCheckIn(contract)}
+        />
+      ) : null}
+      {!contract.result ? (
+        <PrimaryButton
+          label="Alineación táctica"
+          variant="secondary"
+          onPress={() => handlers.onTactics(contract)}
         />
       ) : null}
       <PrimaryButton label="Convocatoria" variant="secondary" onPress={() => handlers.onCallUp(contract)} />

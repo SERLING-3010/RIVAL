@@ -58,7 +58,8 @@ export type Route =
   | { name: 'checkIn'; contractId: number }
   | { name: 'cup'; leagueId: number; canManage: boolean }
   | { name: 'badges'; owner: BadgeOwner; id: number; title: string }
-  | { name: 'suggestions'; teamId: number; isAdmin: boolean };
+  | { name: 'suggestions'; teamId: number; isAdmin: boolean }
+  | { name: 'tactics'; contractId: number };
 
 export interface Navigator {
   current: Route;
