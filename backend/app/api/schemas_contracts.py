@@ -102,6 +102,7 @@ class ContractOut(BaseModel):
     status: str
     my_side: str
     is_admin: bool
+    is_staff: bool
     current: VersionOut
     signed: VersionOut | None
     versions: list[VersionOut]

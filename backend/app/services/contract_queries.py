@@ -5,7 +5,7 @@ from sqlalchemy import or_, select
 from app.domain.contract_rules import ContractStatus, ContractTerms, terms_from_dict
 from app.domain.errors import ConflictError, NotFoundError, PermissionDeniedError
 from app.domain.match_rules import PlaceKind
-from app.domain.team_rules import resolve_admin
+from app.domain.team_rules import is_matchday_staff, resolve_admin
 from app.persistence.models_contracts import MatchContract, MatchContractSignature, MatchContractVersion
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team
@@ -102,6 +102,7 @@ def get_contract(ctx: ServiceContext, actor: UserAccount, contract_id: int) -> C
         id=contract.id, request_id=contract.request_id, league_id=contract.league_id,
         host=summary(teams[HOST]), guest=summary(teams[GUEST]),
         status=contract.status, my_side=side, is_admin=is_admin_of(teams[side], actor),
+        is_staff=is_matchday_staff(member_views(teams[side]), actor.id),
         current=by_id[contract.current_version_id or 0], signed=signed, versions=list(by_id.values()),
         cancel_reason=contract.cancel_reason, result=result_view(ctx, contract),
         booking=booking_view(ctx, booking) if booking else None, ready_to_play=_ready(contract, signed, booking),

@@ -59,6 +59,7 @@ export interface Contract {
   status: ContractStatus;
   my_side: Side;
   is_admin: boolean;
+  is_staff: boolean; // DT o capitán: convocatoria, alineación, planilla y resultado (Sprint 21)
   current: ContractVersion;
   signed: ContractVersion | null;
   versions: ContractVersion[];

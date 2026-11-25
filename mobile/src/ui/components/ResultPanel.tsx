@@ -15,7 +15,7 @@ interface Props {
   canReport: boolean;
   busy: boolean;
   onReport: (hostScore: number, guestScore: number) => void;
-  /** Solo para el administrador con resultado confirmado: abre la planilla del partido. */
+  /** Solo para el DT o el capitán con resultado confirmado: abre la planilla del partido. */
   onLineup?: () => void;
 }
 

@@ -53,6 +53,7 @@ export function contract(overrides: Partial<Contract> = {}): Contract {
     status: 'NEGOTIATING',
     my_side: 'HOST',
     is_admin: true,
+    is_staff: true,
     current,
     signed: null,
     versions: [current],

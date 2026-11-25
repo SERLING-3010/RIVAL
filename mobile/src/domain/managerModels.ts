@@ -1,5 +1,6 @@
 // Modo manager (Sprint 7): fichas, monedas RIVAL y mercado de fichajes.
 
+import type { CardFace } from './cardModels.ts';
 import type { TeamSummary } from './models';
 
 export type TransferStatus =
@@ -18,6 +19,7 @@ export interface PlayerCard {
   losses: number;
   rating_average: number | null;
   rating_votes: number;
+  card: CardFace; // Sprint 20
 }
 
 export interface MarketItem {

@@ -12,6 +12,7 @@ from app.domain import tactics_rules
 from app.domain.contract_rules import ContractStatus
 from app.domain.errors import ConflictError, NotFoundError
 from app.domain.matchday_rules import CallUpStatus, check_before_kickoff
+from app.domain.team_rules import is_matchday_staff
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matchday import CallUp
@@ -20,7 +21,9 @@ from app.persistence.models_teams import Team
 from app.services import loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
-from app.services.contract_queries import admin_side, is_admin_of, load_contract, side_teams
+from app.services.contract_queries import load_contract, side_teams
+from app.services.matchday_staff import staff_side
+from app.services.team_service import member_views
 
 
 @dataclass(frozen=True)
@@ -89,13 +92,13 @@ def view(ctx: ServiceContext, actor: UserAccount, contract_id: int) -> TacticVie
         formation=tactic.formation if tactic else None,
         starters=[slot(s) for s in slots if s.starter], subs=[slot(s) for s in slots if not s.starter],
         eligible=[SlotView(u, n, None, True) for u, n in sorted(going.items(), key=lambda x: x[1]) if u not in placed],
-        can_edit=is_admin_of(team, actor) and contract.status != ContractStatus.CANCELLED)
+        can_edit=is_matchday_staff(member_views(team), actor.id) and contract.status != ContractStatus.CANCELLED)
 
 
 def save(ctx: ServiceContext, actor: UserAccount, contract_id: int, formation: str | None,
          starters: list[tuple[int, str]], subs: list[int]) -> TacticView:
     contract = load_contract(ctx, contract_id, lock=True)
-    _side, team = admin_side(ctx, contract, actor)
+    _side, team = staff_side(ctx, contract, actor)
     if contract.status == ContractStatus.CANCELLED:
         raise ConflictError("CONTRACT_CANCELLED", "Este partido fue cancelado.")
     check_before_kickoff(loan_service.kickoff_of(ctx, contract), ctx.clock.now())

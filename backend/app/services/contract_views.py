@@ -53,6 +53,7 @@ class ContractView:
     status: str
     my_side: str
     is_admin: bool
+    is_staff: bool  # administrador o capitán: convocatoria, alineación y resultado (Sprint 21)
     current: VersionView
     signed: VersionView | None
     versions: list[VersionView]

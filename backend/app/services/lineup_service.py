@@ -14,13 +14,14 @@ from app.persistence.models_manager import MatchAppearance
 from app.services import loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
-from app.services.contract_queries import admin_side, load_contract
+from app.services.contract_queries import load_contract
+from app.services.matchday_staff import staff_side
 from app.services.result_queries import get_result
 
 
 def record(ctx: ServiceContext, actor: UserAccount, contract_id: int, entries: list[tuple[int, int]]) -> None:
     contract = load_contract(ctx, contract_id, lock=True)
-    side, team = admin_side(ctx, contract, actor)
+    side, team = staff_side(ctx, contract, actor)
     result = get_result(ctx, contract.id)
     if result is None or result.status != ResultStatus.CONFIRMED or result.host_score is None:
         raise ConflictError("RESULT_NOT_CONFIRMED", "La planilla se registra cuando el resultado está confirmado.")

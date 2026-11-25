@@ -1,7 +1,6 @@
 // Pruebas de las reglas locales del contrato. Ejecutar: node --experimental-strip-types --test tests/
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-
 import { formFromTerms, termsFromForm } from '../src/domain/contractForm.ts';
 import type { Contract, ContractTerms } from '../src/domain/contractModels.ts';
 import { actionLabel, actorText, changeLines } from '../src/domain/activityLabels.ts';
@@ -46,6 +45,7 @@ function contract(overrides: Partial<Contract>): Contract {
     status: 'NEGOTIATING',
     my_side: 'HOST',
     is_admin: true,
+    is_staff: true,
     current: version,
     signed: null,
     versions: [version],
@@ -90,6 +90,15 @@ test('quién puede firmar: solo el administrador que aún no firmó', () => {
   assert.equal(contractActions(contract({ is_admin: false }), now).canSign, false);
   const cancelled = contractActions(contract({ status: 'CANCELLED' }), now);
   assert.equal(cancelled.canCancel || cancelled.canPropose, false);
+});
+
+test('el capitán (con DT) reporta el resultado pero no firma (Sprint 21)', () => {
+  const signed: Contract['current'] = { ...contract({}).current, signed_by: ['HOST', 'GUEST'] };
+  const played = new Date(Date.parse(terms.kickoff_at) + 3_600_000);
+  const role = (is_staff: boolean) => contract({ is_admin: false, is_staff, status: 'SIGNED', signed });
+  assert.equal(contractActions(role(true), played).canReportResult, true);
+  assert.equal(contractActions(role(false), played).canReportResult, false);
+  assert.equal(contractActions(contract({ is_admin: false, is_staff: true }), now).canSign, false);
 });
 
 test('un cambio sobre un contrato firmado se puede rechazar y avisa que vale la versión firmada', () => {

@@ -13,7 +13,7 @@ export function matchdayHandlers(navigator: Navigator): MatchdayHandlers {
     onCheckIn: (c) => navigator.push({ name: 'checkIn', contractId: c.id }),
     onTactics: (c) => navigator.push({ name: 'tactics', contractId: c.id }),
     onCallUp: (c) =>
-      navigator.push({ name: 'callup', contractId: c.id, teamId: myTeamId(c), isAdmin: c.is_admin }),
+      navigator.push({ name: 'callup', contractId: c.id, teamId: myTeamId(c), isAdmin: c.is_staff }),
     onRate: (c) => navigator.push({ name: 'rate', contractId: c.id }),
     onLoan: (c) =>
       navigator.push({ name: 'loanRequest', contractId: c.id, teamId: myTeamId(c), rivalId: rivalTeamId(c) }),

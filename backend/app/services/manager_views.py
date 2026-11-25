@@ -16,6 +16,19 @@ class PlayerStats:
 
 
 @dataclass(frozen=True)
+class CardFaceView:
+    """Lo que muestra la carta del jugador (Sprint 20); se calcula en `card_queries`."""
+
+    media: int
+    tier: str  # BRONCE, PLATA, ORO, ELITE
+    next_tier: str | None
+    matches_to_next: int
+    hat_tricks: int
+    recent: list[str]  # W, D o L, del más reciente al más antiguo
+    badges: list[str]  # nombres de las insignias ganadas
+
+
+@dataclass(frozen=True)
 class PlayerCardView:
     user_id: int
     display_name: str
@@ -29,6 +42,7 @@ class PlayerCardView:
     losses: int
     rating_average: float | None  # promedio de valoraciones de compañeros (Sprint 10)
     rating_votes: int
+    card: CardFaceView
 
 
 @dataclass(frozen=True)

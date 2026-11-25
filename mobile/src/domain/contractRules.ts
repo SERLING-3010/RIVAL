@@ -50,6 +50,7 @@ export function contractActions(contract: Contract, now: Date = new Date()): Con
   const open = contract.status !== 'CANCELLED';
   const started = now.getTime() >= effectiveKickoff(contract);
   const admin = contract.is_admin && open;
+  const staff = contract.is_staff && open; // el capitán también, si hay DT
   const changeable = admin && !started;
   const iSigned = contract.current.signed_by.includes(contract.my_side);
   const negotiating = contract.status === 'NEGOTIATING';
@@ -66,7 +67,7 @@ export function contractActions(contract: Contract, now: Date = new Date()): Con
     canPropose: changeable,
     canRejectAmendment: admin && amendment,
     canCancel: changeable,
-    canReportResult: admin && started && contract.signed !== null && contract.result?.status !== 'CONFIRMED',
+    canReportResult: staff && started && contract.signed !== null && contract.result?.status !== 'CONFIRMED',
     status,
   };
 }

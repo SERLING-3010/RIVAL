@@ -77,7 +77,7 @@ export function ContractScreen(props: Props) {
                 canReport={can.canReportResult}
                 busy={busy}
                 onReport={(h, g) => void controller.handleReport(h, g)}
-                onLineup={contract.is_admin ? () => onLineup(contract) : undefined}
+                onLineup={contract.is_staff ? () => onLineup(contract) : undefined}
               />
               {can.canSign ? <PrimaryButton label="Firmar" disabled={busy} onPress={confirmSign} /> : null}
               {can.canRejectAmendment ? (

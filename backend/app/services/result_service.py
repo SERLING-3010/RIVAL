@@ -13,7 +13,8 @@ from app.persistence.models_results import MatchResult, MatchResultReport
 from app.services import cup_advance, settlement_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
-from app.services.contract_queries import admin_side, get_version, load_contract, terms_of
+from app.services.contract_queries import get_version, load_contract, terms_of
+from app.services.matchday_staff import staff_side
 from app.services.result_queries import get_result, reports_of
 
 _ACTION = {
@@ -33,7 +34,7 @@ def _require_played(ctx: ServiceContext, contract: MatchContract) -> None:
 
 def report(ctx: ServiceContext, actor: UserAccount, contract_id: int, host_score: int, guest_score: int) -> MatchResult:
     contract = load_contract(ctx, contract_id, lock=True)
-    _side, team = admin_side(ctx, contract, actor)
+    _side, team = staff_side(ctx, contract, actor)
     _require_played(ctx, contract)
     validate_score(host_score, guest_score)
     now = ctx.clock.now()

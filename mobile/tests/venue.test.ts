@@ -91,6 +91,7 @@ function contract(overrides: Partial<Contract>): Contract {
     status: 'SIGNED',
     my_side: 'HOST',
     is_admin: true,
+    is_staff: true,
     current: version('VENUE'),
     signed: version('VENUE'),
     versions: [],

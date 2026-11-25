@@ -1,14 +1,16 @@
-// Ficha del jugador: estadísticas reales de partidos con resultado confirmado y planilla.
+// Ficha del jugador como carta (Sprint 20): lámina metálica que se voltea para ver la ficha completa.
+// Todo sale de partidos con resultado confirmado y planilla; la carta no se compra.
 
-import { StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 import type { Loader } from '../../controllers/useLoader';
+import { nextTierText } from '../../domain/cardModels';
 import type { PlayerCard } from '../../domain/managerModels';
-import { Card } from '../components/Card';
+import { PlayerCardFoil } from '../components/PlayerCardFoil';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
-import { colors, font } from '../theme';
+import { font, MIN_TOUCH } from '../theme';
 
 interface Props {
   controller: Loader<PlayerCard>;
@@ -19,37 +21,21 @@ interface Props {
 
 export function PlayerCardScreen({ controller, onReport, onBadges, onBack }: Props) {
   return (
-    <Screen title="Ficha del jugador" onBack={onBack}>
+    <Screen title="Ficha del jugador" tone="dark" onBack={onBack}>
       <StateView state={controller.state} onRetry={controller.handleReload}>
         {(card) => (
           <>
-            <Text style={styles.title}>{card.display_name}</Text>
-            <Text style={styles.meta}>
-              {card.position ?? 'Sin posición'} · {card.teams.map((t) => t.name).join(', ') || 'Sin equipo'}
-            </Text>
-            <Card title="Estadísticas reales">
-              <Text style={styles.line}>Partidos jugados: {card.matches}</Text>
-              <Text style={styles.line}>Goles: {card.goals}</Text>
-              <Text style={styles.line}>
-                Ganados {card.wins} · Empatados {card.draws} · Perdidos {card.losses}
-              </Text>
-              <Text style={styles.line}>
-                Valoración de compañeros:{' '}
-                {card.rating_average === null
-                  ? 'sin votos aún'
-                  : `${card.rating_average} (${card.rating_votes} voto${card.rating_votes === 1 ? '' : 's'})`}
-              </Text>
-            </Card>
-            <Text style={styles.meta}>
-              Solo cuentan partidos con resultado confirmado por ambos equipos y con el jugador en la
-              planilla.
-            </Text>
+            <PlayerCardFoil player={card} />
+            <Text style={styles.hint}>Toca la carta para ver la ficha completa.</Text>
+            <Text style={styles.meta}>{nextTierText(card.card)}</Text>
             <PrimaryButton label="Insignias" onPress={() => onBadges(card.user_id, card.display_name)} />
-            <PrimaryButton
-              label="Reportar jugador"
-              variant="secondary"
+            <Pressable
               onPress={() => onReport(card.user_id, card.display_name)}
-            />
+              accessibilityRole="button"
+              style={styles.report}
+            >
+              <Text style={styles.reportText}>Reportar jugador</Text>
+            </Pressable>
           </>
         )}
       </StateView>
@@ -58,7 +44,8 @@ export function PlayerCardScreen({ controller, onReport, onBadges, onBack }: Pro
 }
 
 const styles = StyleSheet.create({
-  title: { color: colors.text, fontSize: font.heading, fontWeight: '700' },
-  line: { color: colors.text, fontSize: font.body },
-  meta: { color: colors.textMuted, fontSize: font.small },
+  hint: { color: '#EAF5EE', fontSize: font.small, textAlign: 'center' },
+  meta: { color: '#9DB8A8', fontSize: font.small, textAlign: 'center' },
+  report: { minHeight: MIN_TOUCH, alignItems: 'center', justifyContent: 'center' },
+  reportText: { color: '#FFB48A', fontSize: font.body, fontWeight: '600' },
 });

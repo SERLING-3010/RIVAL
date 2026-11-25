@@ -14,7 +14,7 @@ from app.persistence.models_identity import UserAccount
 from app.persistence.models_manager import MatchAppearance, TransferListing, TransferOffer
 from app.persistence.models_results import MatchResult
 from app.persistence.models_teams import Team
-from app.services import coin_service, player_rating_service, settlement_service
+from app.services import card_queries, coin_service, player_rating_service, settlement_service
 from app.services.context import ServiceContext
 from app.services.manager_views import (
     CoinEntryView, MarketItemView, PlayerCardView, PlayerStats, SquadMemberView, TeamManagerView, TransferOfferView,
@@ -51,7 +51,8 @@ def player_card(ctx: ServiceContext, _actor: UserAccount, user_id: int) -> Playe
     return PlayerCardView(user_id=user.id, display_name=user.display_name, position=user.position,
                           sports=sorted(x.sport_code for x in user.sports), teams=[summary(t) for t in teams],
                           matches=s.matches, goals=s.goals, wins=s.wins, draws=s.draws, losses=s.losses,
-                          rating_average=average, rating_votes=votes)
+                          rating_average=average, rating_votes=votes,
+                          card=card_queries.face(ctx, user.id, s, average, votes))
 
 
 def market(ctx: ServiceContext, _actor: UserAccount, sport: str, city: str | None) -> list[MarketItemView]:

@@ -25,6 +25,16 @@ class LineupBody(StrictModel):
     players: list[LineupEntry] = Field(min_length=1, max_length=40)
 
 
+class CardFaceOut(BaseModel):
+    media: int
+    tier: str
+    next_tier: str | None
+    matches_to_next: int
+    hat_tricks: int
+    recent: list[str]
+    badges: list[str]
+
+
 class PlayerCardOut(BaseModel):
     user_id: int
     display_name: str
@@ -38,6 +48,7 @@ class PlayerCardOut(BaseModel):
     losses: int
     rating_average: float | None
     rating_votes: int
+    card: CardFaceOut
 
 
 class MarketItemOut(BaseModel):

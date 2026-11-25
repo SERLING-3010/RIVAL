@@ -18,7 +18,8 @@ from app.persistence.models_teams import Team
 from app.services import loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
-from app.services.contract_queries import admin_side, get_version, load_contract, member_side, side_teams, terms_of
+from app.services.contract_queries import get_version, load_contract, member_side, side_teams, terms_of
+from app.services.matchday_staff import staff_side
 
 
 @dataclass(frozen=True)
@@ -52,7 +53,7 @@ def _kickoff(ctx: ServiceContext, contract: MatchContract) -> datetime:
 
 def call_up(ctx: ServiceContext, actor: UserAccount, contract_id: int, user_ids: list[int]) -> None:
     contract = load_contract(ctx, contract_id, lock=True)
-    _side, team = admin_side(ctx, contract, actor)
+    _side, team = staff_side(ctx, contract, actor)
     if contract.status == ContractStatus.CANCELLED:
         raise ConflictError("CONTRACT_CANCELLED", "Este partido fue cancelado.")
     check_before_kickoff(_kickoff(ctx, contract), ctx.clock.now())
