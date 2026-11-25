@@ -13,7 +13,7 @@ import { BlockedTeams, Moderation, MySanctions, Report } from './ModerationFlow'
 import { Pending } from './PendingFlow';
 import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
 import { CreateRequest, Feed, FreeAgentPanel, FreeAgentSearch, Offer, Offers, Requests } from './MatchFlow';
-import { Rivals } from './RivalsFlow';
+import { Rivals, Suggestions } from './RivalsFlow';
 
 /** Devuelve la pantalla de partidos para la ruta, o null si la ruta no es de este flujo. */
 export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null {
@@ -116,6 +116,8 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <MatchChat {...ctx} contractId={route.contractId} />;
     case 'checkIn':
       return <CheckIn {...ctx} contractId={route.contractId} />;
+    case 'suggestions':
+      return <Suggestions {...ctx} teamId={route.teamId} isAdmin={route.isAdmin} />;
     case 'badges':
       return <Badges {...ctx} owner={route.owner} id={route.id} title={route.title} />;
     case 'cup':

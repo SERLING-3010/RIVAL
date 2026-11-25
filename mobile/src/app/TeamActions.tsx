@@ -19,6 +19,11 @@ export function TeamActions({ team, isAdmin, navigator }: Props) {
         onPress={() => navigator.push({ name: 'rivals', teamId: team.id, isAdmin })}
       />
       <PrimaryButton
+        label="Rivales sugeridos"
+        variant="secondary"
+        onPress={() => navigator.push({ name: 'suggestions', teamId: team.id, isAdmin })}
+      />
+      <PrimaryButton
         label="Modo manager"
         onPress={() => navigator.push({ name: 'manager', teamId: team.id })}
       />
