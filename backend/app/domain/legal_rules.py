@@ -11,7 +11,7 @@ from datetime import date
 
 from app.domain.errors import DomainError
 
-TERMS_VERSION = "2026-11-25"  # cambia cuando cambian los textos; obliga a aceptar de nuevo
+TERMS_VERSION = "2026-11-25.2"  # cambia cuando cambian los textos; obliga a aceptar de nuevo
 DELETED_NAME = "Jugador eliminado"
 DELETED_BIRTH_DATE = date(1900, 1, 1)  # la columna no admite vacío; no identifica a nadie
 DELETED_PLACE = "—"

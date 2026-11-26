@@ -31,6 +31,7 @@
   - El registro tiene una casilla con enlaces a los dos textos.
   - Las cuentas anteriores pasan por la pantalla «Antes de seguir».
   - En el inicio, «Mi cuenta» abre «Mis datos y privacidad». Ahí están los textos, descargar mis datos, eliminar la cuenta con contraseña y confirmación, y cerrar sesión.
+- **Política completa (versión `2026-11-25.2`):** cubre cada punto del artículo 13 del Decreto 1377 de 2013: responsable, tratamiento y finalidades, derechos, quién atiende las solicitudes, cómo se ejercen (consultas en 10 días hábiles y reclamos en 15, según la Ley 1581), encargados y transmisión al exterior (Expo, Apple, Google y el servidor), y vigencia. Los datos del responsable quedan como [POR DEFINIR].
 - **Textos legales:**
   - Son borradores en `docs/legal/`, idénticos a los de la app (`legalTerms.ts`, `legalPrivacy.ts`).
   - Si cambian, hay que subir la versión en el backend y en la app.

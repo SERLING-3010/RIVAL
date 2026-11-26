@@ -1,27 +1,38 @@
-// Política de tratamiento de datos de RIVAL (Sprint 27, Ley 1581 de 2012).
-// BORRADOR: debe revisarlo un abogado antes del piloto (responsable, contacto y plazos legales).
+// Política de tratamiento de datos de RIVAL (Sprint 27, Ley 1581 de 2012 y Decreto 1377 de 2013, art. 13).
+// BORRADOR: falta completar los datos del responsable y que alguien con formación jurídica lo revise.
 
 import type { LegalSection } from './legalTerms.ts';
+import { PRIVACY_RIGHTS } from './legalPrivacyRights.ts';
 
-export const PRIVACY: LegalSection[] = [
+const PRIVACY_DATA: LegalSection[] = [
+  {
+    title: 'Responsable del tratamiento',
+    body:
+      'Nombre: [POR DEFINIR]. Cédula o NIT: [POR DEFINIR]. Domicilio y dirección: [POR DEFINIR]. ' +
+      'Correo: [POR DEFINIR]. Teléfono: [POR DEFINIR].',
+  },
   {
     title: 'Qué datos guardamos',
     body:
       'Correo, nombre visible, fecha de nacimiento, ciudad, barrio, posición, deportes y roles. También ' +
       'tus equipos, partidos, goles, valoraciones que recibes (sin decir quién las dio), mensajes del chat ' +
-      'de cada partido y la hora de tus check-ins. Nunca guardamos tu ubicación exacta.',
+      'de cada partido y la hora de tus check-ins. Nunca guardamos tu ubicación exacta. No pedimos datos ' +
+      'sensibles (salud, origen, creencias, biometría) ni datos de menores de edad.',
   },
   {
-    title: 'Para qué los usamos',
+    title: 'Para qué los usamos (finalidades)',
     body:
-      'Para armar partidos y ligas, mostrar tu carta y tu historial, avisarte de pendientes y mantener la ' +
-      'convivencia. No vendemos tus datos ni los usamos para publicidad.',
+      'Crear y proteger tu cuenta; armar partidos, ligas y copas; mostrar tu carta, tu historial y el de ' +
+      'tu equipo; avisarte de pendientes; mantener la convivencia y atender reportes; y llevar un registro ' +
+      'de quién firmó, reportó o aceptó cada cosa para resolver dudas. No vendemos tus datos ni los usamos ' +
+      'para publicidad.',
   },
   {
-    title: 'Avisos en tu teléfono',
+    title: 'Cómo los tratamos',
     body:
-      'Si aceptas notificaciones, el aviso pasa por Expo y por Apple o Google. Por eso solo dice qué tipo ' +
-      'de cosa te espera, sin nombres, equipos, marcadores, horarios ni lugares.',
+      'Los recogemos cuando te registras y mientras usas la app; los guardamos, consultamos, actualizamos ' +
+      'y, si lo pides, los suprimimos. Solo acceden las personas que operan RIVAL, con contraseña, y los ' +
+      'datos viajan cifrados (HTTPS).',
   },
   {
     title: 'Quién ve qué',
@@ -30,22 +41,13 @@ export const PRIVACY: LegalSection[] = [
       'nacimiento no se muestran a nadie. La alineación de tu equipo solo la ve tu equipo.',
   },
   {
-    title: 'Tus derechos',
+    title: 'Encargados y transmisión al exterior',
     body:
-      'Puedes conocer, actualizar, rectificar y suprimir tus datos, y revocar esta autorización. Desde ' +
-      '«Mis datos» puedes descargarlos o eliminar tu cuenta.',
-  },
-  {
-    title: 'Si eliminas tu cuenta',
-    body:
-      'Borramos tu correo, nombre, fecha de nacimiento, barrio, posición, sesiones, teléfonos y el texto ' +
-      'de tus mensajes. Tus partidos y resultados quedan como de un «Jugador eliminado», porque también son ' +
-      'el historial de otros equipos. El registro de auditoría se conserva por seguridad.',
-  },
-  {
-    title: 'Responsable',
-    body:
-      'Responsable del tratamiento: [POR DEFINIR antes del piloto: nombre, cédula o NIT, dirección y correo de ' +
-      'contacto para ejercer tus derechos].',
+      'Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el servidor donde vive la ' +
+      'base de datos [POR DEFINIR] y, si aceptas notificaciones, Expo y Apple o Google, que pueden estar ' +
+      'fuera de Colombia. A ellos solo les llega lo necesario: los avisos no llevan nombres, equipos, ' +
+      'marcadores, horarios ni lugares.',
   },
 ];
+
+export const PRIVACY: LegalSection[] = [...PRIVACY_DATA, ...PRIVACY_RIGHTS];
