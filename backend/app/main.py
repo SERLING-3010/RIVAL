@@ -11,9 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
     routes_account, routes_achievements, routes_auth, routes_chat, routes_checkin, routes_contracts, routes_cup,
-    routes_goal_claims, routes_league_matches, routes_leagues, routes_loans, routes_manager, routes_matchday,
-    routes_matches, routes_moderation, routes_pending, routes_push, routes_scouting, routes_squad,
-    routes_suggestions, routes_tactics, routes_teams, routes_venues,
+    routes_goal_claims, routes_health, routes_league_matches, routes_leagues, routes_loans, routes_manager,
+    routes_matchday, routes_matches, routes_moderation, routes_pending, routes_push, routes_scouting,
+    routes_squad, routes_suggestions, routes_tactics, routes_teams, routes_venues,
 )
 from app.api.dependencies import IpLimits
 from app.api.errors import install_error_handling
@@ -31,7 +31,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-        create_schema(engine)
+        if config.auto_schema:  # desarrollo; en producción manda Alembic (Sprint 28)
+            create_schema(engine)
         yield
         engine.dispose()
 
@@ -58,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["Authorization", "Content-Type"],
     )
     install_error_handling(app)
+    app.include_router(routes_health.router)
     app.include_router(routes_auth.router)
     app.include_router(routes_account.router)
     app.include_router(routes_achievements.router)

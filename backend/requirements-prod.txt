@@ -1,0 +1,3 @@
+# Dependencias del servidor en producción (Sprint 28): las de ejecución más el driver de PostgreSQL.
+-r requirements.txt
+psycopg[binary]==3.2.12

@@ -94,3 +94,46 @@ jobs:
       - name: Sin any en TypeScript
         run: |
           if grep -rnE ':\s*any\b|<any>|as any\b' mobile/src mobile/__tests__ mobile/tests; then exit 1; fi
+
+  deploy:
+    # Sprint 28: la imagen se construye, todo arranca con docker compose, la API responde, y una
+    # copia de la base se hace y se restaura. Credenciales desechables, solo para este trabajo.
+    name: Despliegue (Docker)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: deploy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivo .env de prueba
+        run: |
+          cp .env.example .env
+          sed -i 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=solo_para_ci/' .env
+      - name: Construir y levantar
+        run: docker compose up -d --build
+      - name: La API responde y la base contesta
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/health; then exit 0; fi
+            sleep 2
+          done
+          docker compose ps; docker compose logs; exit 1
+      - name: Las migraciones quedaron al día (sin crear tablas al arrancar)
+        run: docker compose run --rm migrate python -m alembic check
+      - name: Copia de seguridad y restauración
+        run: |
+          ./backup.sh
+          FILE=$(ls backups/rival_*.dump | head -1)
+          echo RESTAURAR | ./restore.sh "$FILE"
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/health; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs api; exit 1
+      - name: Registros si algo falló
+        if: failure()
+        run: docker compose logs
+      - name: Apagar
+        if: always()
+        run: docker compose down -v

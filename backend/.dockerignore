@@ -1,0 +1,13 @@
+# Lo que nunca entra a la imagen: entornos, bases locales, pruebas y herramientas de desarrollo.
+venv/
+.venv/
+.pgdata/
+*.db
+*.db-journal
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/
+dev_tools/
+.env
+.env.*

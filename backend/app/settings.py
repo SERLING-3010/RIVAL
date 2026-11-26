@@ -25,3 +25,5 @@ class Settings:
     )
     catalog_path: Path = DEFAULT_CATALOG
     debug: bool = field(default_factory=lambda: os.getenv("RIVAL_DEBUG", "false").lower() == "true")
+    # Sprint 28: en producción las tablas las crea Alembic (`alembic upgrade head`), no el arranque.
+    auto_schema: bool = field(default_factory=lambda: os.getenv("RIVAL_AUTO_SCHEMA", "true").lower() == "true")
