@@ -1,6 +1,15 @@
 // Pendientes del usuario (Sprint 11): lo que espera su acción, calculado por el backend.
 
-export type PendingTarget = 'contract' | 'team' | 'league' | 'venue' | 'transfers' | 'referee' | 'loans';
+export type PendingTarget =
+  | 'contract'
+  | 'team'
+  | 'league'
+  | 'venue'
+  | 'transfers'
+  | 'referee'
+  | 'loans'
+  | 'feed' // Sprint 25: te retaron (id = tu equipo)
+  | 'offers'; // Sprint 25: ofertas para tu búsqueda (id = la búsqueda)
 
 export interface PendingItem {
   kind: string;
@@ -18,6 +27,8 @@ const URGENT = new Set([
   'CALLUP',
   'REFEREE_RESULT',
   'CONFIRM_GOAL_KINDS', // Sprint 23: vence a las 72 horas
+  'CHALLENGE_RECEIVED', // Sprint 25
+  'OFFERS_RECEIVED',
 ]);
 
 /** Insignia corta: "Urgente" si tiene hora en las próximas 24 h o es de un partido ya jugado. */

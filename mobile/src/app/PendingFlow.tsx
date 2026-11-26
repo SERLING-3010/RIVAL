@@ -24,6 +24,12 @@ export function routeFor(item: PendingItem): Route | null {
       return { name: 'refereeMatches' };
     case 'loans':
       return { name: 'loans' };
+    case 'feed': // te retaron: se responde con una oferta desde las búsquedas del equipo
+      return id === null ? null : { name: 'matchFeed', teamId: id, isAdmin: true };
+    case 'offers': // ofertas para tu búsqueda: el dueño de la búsqueda decide
+      return id === null
+        ? null
+        : { name: 'offers', requestId: id, isRequestAdmin: true, myTeamIds: [], requestOpen: true };
   }
 }
 

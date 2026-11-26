@@ -53,6 +53,18 @@ describe('routeFor', () => {
     });
     expect(routeFor(item({ target: 'transfers' }))).toEqual({ name: 'transferOffers' });
     expect(routeFor(item({ target: 'referee' }))).toEqual({ name: 'refereeMatches' });
+    expect(routeFor(item({ target: 'feed', target_id: 3 }))).toEqual({
+      name: 'matchFeed',
+      teamId: 3,
+      isAdmin: true,
+    });
+    expect(routeFor(item({ target: 'offers', target_id: 9 }))).toEqual({
+      name: 'offers',
+      requestId: 9,
+      isRequestAdmin: true,
+      myTeamIds: [],
+      requestOpen: true,
+    });
     expect(routeFor(item({ target_id: null }))).toBeNull();
   });
 });

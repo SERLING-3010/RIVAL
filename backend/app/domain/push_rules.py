@@ -4,12 +4,15 @@ El texto pasa por Expo y por Apple o Google y se ve en la pantalla bloqueada, as
 nombres, equipos, marcadores, horarios ni lugares: solo qué tipo de cosa espera en la app.
 """
 
+import hashlib
 import re
 
 from app.domain.errors import DomainError
 
 # Tipo de pendiente → aviso. Solo frases genéricas, sin datos.
 MESSAGES: dict[str, str] = {
+    "CHALLENGE_RECEIVED": "Tienes un reto nuevo.",
+    "OFFERS_RECEIVED": "Hay ofertas nuevas para tu búsqueda.",
     "SIGN_CONTRACT": "Hay un contrato por firmar.",
     "REPORT_RESULT": "Hay un marcador por reportar.",
     "RESULT_DISPUTED": "Hay un marcador en disputa.",
@@ -40,9 +43,11 @@ def validate_token(token: str) -> str:
     return token
 
 
-def item_key(kind: str, target_id: int | None) -> str:
-    """Identifica un pendiente para avisar una sola vez por él."""
-    return f"{kind}:{target_id if target_id is not None else '-'}"
+def item_key(kind: str, target_id: int | None, title: str = "") -> str:
+    """Identifica un pendiente para avisar una sola vez por él. La huella del título distingue, por
+    ejemplo, dos retos al mismo equipo o una oferta más en la misma búsqueda (Sprint 25)."""
+    mark = hashlib.sha1(title.encode(), usedforsecurity=False).hexdigest()[:10]  # huella, no seguridad
+    return f"{kind}:{target_id if target_id is not None else '-'}:{mark}"
 
 
 def body_for(kinds: list[str]) -> str:

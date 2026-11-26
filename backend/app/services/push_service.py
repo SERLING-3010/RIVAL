@@ -26,7 +26,7 @@ class Outgoing:
 
 
 def _keys(ctx: ServiceContext, user: UserAccount) -> list[tuple[str, str]]:
-    return [(push_rules.item_key(i.kind, i.target_id), i.kind) for i in pending_service.pending(ctx, user)]
+    return [(push_rules.item_key(i.kind, i.target_id, i.title), i.kind) for i in pending_service.pending(ctx, user)]
 
 
 def _mark(ctx: ServiceContext, user_id: int, keys: list[str]) -> None:

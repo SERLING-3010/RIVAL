@@ -12,7 +12,7 @@ from sqlalchemy import select
 from app.domain.team_rules import is_matchday_staff, resolve_admin
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team, TeamMembership
-from app.services import goal_claim_service, loan_queries
+from app.services import goal_claim_service, loan_queries, pending_match_sources
 from app.services import pending_sources as sources
 from app.services.context import ServiceContext
 from app.services.team_service import member_views
@@ -23,7 +23,7 @@ class PendingItem:
     kind: str  # SIGN_CONTRACT, REPORT_RESULT, RESULT_DISPUTED, CALLUP, CONFIRM_GOAL_KINDS, TRANSFER_PLAYER, ...
     title: str
     detail: str
-    target: str  # contract, team, league, venue, transfers, referee, loans
+    target: str  # contract, team, league, venue, transfers, referee, loans, feed, offers (Sprint 25)
     target_id: int | None
     due_at: datetime | None
 
@@ -39,6 +39,8 @@ def pending(ctx: ServiceContext, actor: UserAccount) -> list[PendingItem]:
     staff = [t.id for t in member_teams if is_matchday_staff(member_views(t), actor.id)]
     raw = (
         sources.contracts(ctx, admin_teams)
+        + pending_match_sources.challenges(ctx, admin_teams)  # Sprint 25
+        + pending_match_sources.offers(ctx, admin_teams)
         + sources.callups(ctx, actor)
         + sources.transfers(ctx, actor, admin_teams)
         + sources.join_requests(ctx, admin_teams)

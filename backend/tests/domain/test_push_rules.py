@@ -16,7 +16,10 @@ def test_one_message_per_round():
     assert body_for(["CALLUP"]) == "Tienes una convocatoria nueva."
     assert body_for(["DESCONOCIDO"]) == GENERIC
     assert body_for(["CALLUP", "SIGN_CONTRACT"]) == "Tienes 2 cosas nuevas por revisar en RIVAL."
-    assert (item_key("CALLUP", 7), item_key("JOIN_REQUESTS", None)) == ("CALLUP:7", "JOIN_REQUESTS:-")
+    assert item_key("CALLUP", 7).startswith("CALLUP:7:")
+    assert item_key("JOIN_REQUESTS", None).startswith("JOIN_REQUESTS:-:")
+    assert item_key("CHALLENGE_RECEIVED", 3, "Te retaron: A") != item_key("CHALLENGE_RECEIVED", 3, "Te retaron: B")
+    assert len(item_key("OFFERS_RECEIVED", 99999, "x" * 200)) <= 80
 
 
 def test_only_expo_push_tokens():
