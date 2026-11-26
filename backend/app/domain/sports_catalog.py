@@ -36,6 +36,10 @@ class SportCatalog:
         )
         return cls(sports=sports)
 
+    def only(self, codes: tuple[str, ...]) -> "SportCatalog":
+        """Solo esos deportes (Sprint 29: lanzamiento solo con fútbol). Vacío = todos."""
+        return self if not codes else SportCatalog(sports=tuple(s for s in self.sports if s.code in codes))
+
     def has_sport(self, code: str) -> bool:
         return any(s.code == code for s in self.sports)
 

@@ -8,11 +8,12 @@ from datetime import datetime
 
 from sqlalchemy import select
 
+from app.domain import launch_rules
 from app.domain.contract_rules import default_terms
 from app.domain.errors import ConflictError, PermissionDeniedError
 from app.domain.fixture_rules import round_dates, round_robin
 from app.domain.league_rules import EnrollmentStatus, StaffRole
-from app.domain.match_rules import PlaceKind, RefereeMode
+from app.domain.match_rules import PlaceKind
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_league_matches import LeagueFixture
@@ -39,8 +40,8 @@ def generate(ctx: ServiceContext, actor: UserAccount, league_id: int, first_kick
         for host_id, guest_id in pairs:
             contract = contract_service.create_contract(ctx, MatchContract(
                 league_id=league.id, host_team_id=host_id, guest_team_id=guest_id, sport_code=league.sport_code,
-                modality_code=league.modality_code), default_terms(kickoff, RefereeMode.WITH, PlaceKind.TO_AGREE, None),
-                actor.id)
+                modality_code=league.modality_code),
+                default_terms(kickoff, launch_rules.default_referee(ctx.features), PlaceKind.TO_AGREE, None), actor.id)
             fixture = LeagueFixture(league_id=league.id, round=number, contract_id=contract.id,
                                     host_team_id=host_id, guest_team_id=guest_id)
             ctx.db.add(fixture)

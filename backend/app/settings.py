@@ -26,4 +26,9 @@ class Settings:
     catalog_path: Path = DEFAULT_CATALOG
     debug: bool = field(default_factory=lambda: os.getenv("RIVAL_DEBUG", "false").lower() == "true")
     # Sprint 28: en producción las tablas las crea Alembic (`alembic upgrade head`), no el arranque.
+    # Sprint 29: alcance del lanzamiento. Vacío = todos los deportes; "false" apaga árbitros o canchas.
+    sports: tuple[str, ...] = field(default_factory=lambda: tuple(
+        s.strip() for s in os.getenv("RIVAL_SPORTS", "").split(",") if s.strip()))
+    referees: bool = field(default_factory=lambda: os.getenv("RIVAL_ENABLE_REFEREES", "true").lower() == "true")
+    venues: bool = field(default_factory=lambda: os.getenv("RIVAL_ENABLE_VENUES", "true").lower() == "true")
     auto_schema: bool = field(default_factory=lambda: os.getenv("RIVAL_AUTO_SCHEMA", "true").lower() == "true")

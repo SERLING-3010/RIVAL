@@ -1,15 +1,9 @@
 """Rival automático para probar en el teléfono [SIMULACIÓN]. Solo contra la API local de desarrollo.
 
-Usa al usuario de `seed_test_rival.py` y, cada 10 segundos:
-- hace una oferta a las búsquedas de partido que ve en su ciudad (incluidos los retos a su equipo);
-- firma la versión vigente de cada contrato de su equipo;
-- contesta una vez cada mensaje nuevo del chat;
-- si el otro equipo ya reportó el resultado, reporta el mismo marcador;
-- confirma los goles con tipo (chilena, olímpico…) que el otro equipo marcó en su planilla;
-- como dueño del establecimiento de `seed_test_venue.py`, confirma las reservas pendientes.
-
-Uso (con el backend corriendo):  python dev_tools/rival_bot.py
-Se detiene con Ctrl+C. Nunca usarlo contra una base con datos reales.
+Con el usuario de `seed_test_rival.py`, cada 10 segundos: oferta a las búsquedas de su ciudad (y a los
+retos a su equipo), firma los contratos, contesta el chat, reporta el mismo marcador que el otro equipo,
+confirma sus goles con tipo y, como dueño de la cancha de `seed_test_venue.py`, confirma reservas.
+Uso (con el backend corriendo): python dev_tools/rival_bot.py. Ctrl+C para parar. Nunca con datos reales.
 """
 
 import json
@@ -110,9 +104,18 @@ def confirm_goal_claims(cid: int, contract: dict[str, object]) -> None:
 
 
 def confirm_bookings() -> None:
+    global VENUE_TOKEN
     if not VENUE_TOKEN:
         return
-    for venue in call("GET", "/me/venues", token=VENUE_TOKEN):  # type: ignore[union-attr]
+    try:
+        venues = call("GET", "/me/venues", token=VENUE_TOKEN)
+    except urllib.error.HTTPError as error:
+        if error.code == 404:  # Sprint 29: establecimientos apagados en el lanzamiento
+            VENUE_TOKEN = ""
+            log("Los establecimientos están apagados: no confirmaré reservas.")
+            return
+        raise
+    for venue in venues:  # type: ignore[union-attr]
         detail = call("GET", f"/venues/{venue['id']}", token=VENUE_TOKEN)
         for booking in detail["pending_bookings"]:  # type: ignore[index]
             call("POST", f"/bookings/{booking['id']}/confirm", token=VENUE_TOKEN)

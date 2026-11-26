@@ -2,6 +2,7 @@
 
 from sqlalchemy import func, select
 
+from app.domain import launch_rules
 from app.domain.errors import ConflictError, DomainError, NotFoundError
 from app.domain.geo import DistanceBand, SearchScope, validate_radius_km
 from app.domain.match_rules import MAX_OPEN_REQUESTS_PER_TEAM, OfferStatus, RequestStatus, validate_window
@@ -61,10 +62,11 @@ def create_request(ctx: ServiceContext, actor: UserAccount, team_id: int, data: 
             team.sport_code, team.modality_code, team.city_key)
         if target.id == team.id or not same_game:
             raise DomainError("INVALID_CHALLENGE", "Solo puedes retar a otro equipo de tu ciudad, deporte y modalidad.")
+    referee = launch_rules.match_terms(ctx.features, data.referee_mode, data.place_kind)  # Sprint 29
     request = MatchRequest(
         team_id=team.id, target_team_id=data.target_team_id, sport_code=team.sport_code,
         modality_code=team.modality_code, scope=data.scope.value, radius_km=radius,
-        window_start=data.window_start, window_end=data.window_end, referee_mode=data.referee_mode.value,
+        window_start=data.window_start, window_end=data.window_end, referee_mode=referee.value,
         place_kind=data.place_kind.value, place_note=(data.place_note or "").strip()[:120] or None,
         message=(data.message or "").strip()[:200] or None, status=RequestStatus.OPEN.value,
         created_by=actor.id, created_at=now,

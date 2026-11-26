@@ -8,9 +8,10 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import select
 
+from app.domain import launch_rules
 from app.domain import cup_rules
 from app.domain.contract_rules import default_terms
-from app.domain.match_rules import PlaceKind, RefereeMode
+from app.domain.match_rules import PlaceKind
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_cup import CupMatch, LeagueCup
 from app.persistence.models_leagues import League
@@ -36,7 +37,8 @@ def open_match(ctx: ServiceContext, cup: LeagueCup, match: CupMatch, actor_id: i
     contract = contract_service.create_contract(ctx, MatchContract(
         league_id=league.id, host_team_id=match.host_team_id, guest_team_id=match.guest_team_id,
         sport_code=league.sport_code, modality_code=league.modality_code),
-        default_terms(round_kickoff(ctx, cup, match.round), RefereeMode.WITH, PlaceKind.TO_AGREE, None), actor_id)
+        default_terms(round_kickoff(ctx, cup, match.round), launch_rules.default_referee(ctx.features),
+                      PlaceKind.TO_AGREE, None), actor_id)
     match.contract_id = contract.id
     ctx.db.flush()
 

@@ -5,6 +5,7 @@ import type { TransferWindowController } from '../../controllers/useTransferWind
 import { ENTRY_STATUS_LABEL, leagueActions, myEntries, STAFF_ROLE_LABEL } from '../../domain/leagueRules';
 import type { MyTeam, User } from '../../domain/models';
 import { Card } from '../components/Card';
+import { useFeatures } from '../FeaturesContext';
 import { PendingRequests } from '../components/PendingRequests';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
@@ -33,6 +34,7 @@ export function LeagueScreen({
   onBack,
 }: Props) {
   const busy = controller.action.busy;
+  const features = useFeatures();
   return (
     <Screen title="Liga" onBack={onBack}>
       <StateView state={controller.state} onRetry={controller.handleReload}>
@@ -55,13 +57,15 @@ export function LeagueScreen({
                   </Text>
                 ))}
               </Card>
-              <Card title={`Cuerpo arbitral (${detail.referees.length})`}>
-                {detail.referees.map((r) => (
-                  <Text key={r.id} style={styles.line}>
-                    {r.display_name}
-                  </Text>
-                ))}
-              </Card>
+              {features.referees ? ( // Sprint 29: sin árbitros en el lanzamiento
+                <Card title={`Cuerpo arbitral (${detail.referees.length})`}>
+                  {detail.referees.map((r) => (
+                    <Text key={r.id} style={styles.line}>
+                      {r.display_name}
+                    </Text>
+                  ))}
+                </Card>
+              ) : null}
               <SeasonCloseCard
                 detail={detail}
                 busy={busy}
@@ -104,7 +108,7 @@ export function LeagueScreen({
                   onPress={() => void controller.handleRequestTeam(t.team.id)}
                 />
               ))}
-              {can.canJoinAsReferee ? (
+              {can.canJoinAsReferee && features.referees ? (
                 <PrimaryButton
                   label="Unirme al cuerpo arbitral"
                   disabled={busy}

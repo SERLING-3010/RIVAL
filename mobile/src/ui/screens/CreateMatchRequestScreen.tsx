@@ -3,7 +3,9 @@ import { StyleSheet, Text } from 'react-native';
 import type { FormController, RequestForm } from '../../controllers/useMatchForms';
 import { PLACE_LABEL, REFEREE_LABEL, SCOPE_LABEL } from '../../domain/matchLabels';
 import type { PlaceKind, RefereeMode, SearchScope } from '../../domain/matchModels';
+import { placeChoices, refereeChoices } from '../../domain/features';
 import { ChoiceChips } from '../components/ChoiceChips';
+import { useFeatures } from '../FeaturesContext';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { TextField } from '../components/TextField';
@@ -20,6 +22,7 @@ const REFEREES: RefereeMode[] = ['EITHER', 'WITH', 'WITHOUT'];
 const PLACES: PlaceKind[] = ['TO_AGREE', 'INFORMAL', 'VENUE'];
 
 export function CreateMatchRequestScreen({ controller, isChallenge, onBack }: Props) {
+  const features = useFeatures(); // Sprint 29: sin árbitros ni establecimientos en el lanzamiento
   const { form, handleChange, action } = controller;
   return (
     <Screen title={isChallenge ? 'Retar equipo' : 'Publicar búsqueda'} onBack={onBack}>
@@ -41,16 +44,18 @@ export function CreateMatchRequestScreen({ controller, isChallenge, onBack }: Pr
           onToggle={(v) => handleChange('scope', v as SearchScope)}
         />
       ) : null}
-      <ChoiceChips
-        label="Árbitro"
-        selected={[form.referee]}
-        choices={REFEREES.map((r) => ({ value: r, label: REFEREE_LABEL[r] }))}
-        onToggle={(v) => handleChange('referee', v as RefereeMode)}
-      />
+      {refereeChoices(REFEREES, features).length > 1 ? (
+        <ChoiceChips
+          label="Árbitro"
+          selected={[form.referee]}
+          choices={refereeChoices(REFEREES, features).map((r) => ({ value: r, label: REFEREE_LABEL[r] }))}
+          onToggle={(v) => handleChange('referee', v as RefereeMode)}
+        />
+      ) : null}
       <ChoiceChips
         label="Lugar"
         selected={[form.place]}
-        choices={PLACES.map((p) => ({ value: p, label: PLACE_LABEL[p] }))}
+        choices={placeChoices(PLACES, features).map((p) => ({ value: p, label: PLACE_LABEL[p] }))}
         onToggle={(v) => handleChange('place', v as PlaceKind)}
       />
       <TextField

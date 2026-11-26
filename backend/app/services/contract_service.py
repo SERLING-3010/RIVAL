@@ -6,6 +6,7 @@ quien propone; la versión firmada sigue vigente hasta que el rival firme el cam
 
 from sqlalchemy import func, select
 
+from app.domain import launch_rules
 from app.domain.contract_rules import (
     ContractStatus, ContractTerms, default_terms, diff_terms, terms_to_dict, validate_terms,
 )
@@ -90,6 +91,7 @@ def propose(ctx: ServiceContext, actor: UserAccount, contract_id: int, base_vers
     contract, side, team, current = _open_for_changes(ctx, contract_id, actor, base_version)
     require_not_started(ctx, contract)
     validate_terms(terms, ctx.clock.now())
+    launch_rules.match_terms(ctx.features, terms.referee_mode, terms.place_kind)  # Sprint 29
     diff = diff_terms(terms_of(current), terms)
     if not diff["after"]:
         raise DomainError("NO_CHANGES", "La propuesta es igual al contrato actual. Cambia al menos una condición.")

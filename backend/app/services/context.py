@@ -5,6 +5,7 @@ from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
+from app.domain.launch_rules import ALL, Features
 from app.domain.sports_catalog import SportCatalog
 from app.services.clock import Clock
 
@@ -16,3 +17,4 @@ class ServiceContext:
     catalog: SportCatalog
     session_ttl: timedelta
     session_idle: timedelta
+    features: Features = ALL  # Sprint 29: alcance del lanzamiento

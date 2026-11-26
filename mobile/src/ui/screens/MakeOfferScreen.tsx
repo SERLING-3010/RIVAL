@@ -4,7 +4,9 @@ import type { FormController, OfferForm } from '../../controllers/useMatchForms'
 import { formatLocal } from '../../domain/dateTime';
 import { PLACE_LABEL, REFEREE_LABEL } from '../../domain/matchLabels';
 import type { MatchRequest, PlaceKind } from '../../domain/matchModels';
+import { placeChoices, refereeChoices } from '../../domain/features';
 import { ChoiceChips } from '../components/ChoiceChips';
+import { useFeatures } from '../FeaturesContext';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { TextField } from '../components/TextField';
@@ -20,8 +22,11 @@ const PLACES: PlaceKind[] = ['TO_AGREE', 'INFORMAL', 'VENUE'];
 
 export function MakeOfferScreen({ controller, request, onBack }: Props) {
   const { form, handleChange, action } = controller;
-  const refereeChoices: OfferForm['referee'][] =
-    request.referee_mode === 'EITHER' ? ['WITHOUT', 'WITH'] : [request.referee_mode];
+  const features = useFeatures(); // Sprint 29: sin árbitros ni establecimientos en el lanzamiento
+  const referees = refereeChoices<OfferForm['referee']>(
+    request.referee_mode === 'EITHER' ? ['WITHOUT', 'WITH'] : [request.referee_mode],
+    features,
+  );
   return (
     <Screen title={`Oferta a ${request.team.name}`} onBack={onBack}>
       <Text style={styles.meta}>
@@ -32,16 +37,18 @@ export function MakeOfferScreen({ controller, request, onBack }: Props) {
         value={form.start}
         onChangeText={(v) => handleChange('start', v)}
       />
-      <ChoiceChips
-        label="Árbitro"
-        selected={[form.referee]}
-        choices={refereeChoices.map((r) => ({ value: r, label: REFEREE_LABEL[r] }))}
-        onToggle={(v) => handleChange('referee', v as OfferForm['referee'])}
-      />
+      {referees.length > 1 ? (
+        <ChoiceChips
+          label="Árbitro"
+          selected={[form.referee]}
+          choices={referees.map((r) => ({ value: r, label: REFEREE_LABEL[r] }))}
+          onToggle={(v) => handleChange('referee', v as OfferForm['referee'])}
+        />
+      ) : null}
       <ChoiceChips
         label="Lugar"
         selected={[form.place]}
-        choices={PLACES.map((p) => ({ value: p, label: PLACE_LABEL[p] }))}
+        choices={placeChoices(PLACES, features).map((p) => ({ value: p, label: PLACE_LABEL[p] }))}
         onToggle={(v) => handleChange('place', v as PlaceKind)}
       />
       <TextField

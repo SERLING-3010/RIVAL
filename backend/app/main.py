@@ -6,7 +6,7 @@ Desarrollo local:  uvicorn app.main:app --host 127.0.0.1 --port 8000
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
@@ -15,8 +15,9 @@ from app.api import (
     routes_matchday, routes_matches, routes_moderation, routes_pending, routes_push, routes_scouting,
     routes_squad, routes_suggestions, routes_tactics, routes_teams, routes_venues,
 )
-from app.api.dependencies import IpLimits
+from app.api.dependencies import IpLimits, venues_on
 from app.api.errors import install_error_handling
+from app.domain.launch_rules import Features
 from app.domain.sports_catalog import SportCatalog
 from app.persistence.database import create_schema, make_engine, make_session_factory
 from app.services.clock import SystemClock
@@ -46,7 +47,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = config
     app.state.session_factory = make_session_factory(engine)
-    app.state.catalog = SportCatalog.load(config.catalog_path)
+    app.state.catalog = SportCatalog.load(config.catalog_path).only(config.sports)  # Sprint 29
+    app.state.features = Features(sports=frozenset(config.sports) or None, referees=config.referees,
+                                  venues=config.venues)
     app.state.clock = SystemClock()
     app.state.login_limiter = LoginRateLimiter()
     app.state.ip_limits = IpLimits()
@@ -73,7 +76,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(routes_matches.router)
     app.include_router(routes_contracts.router)
     app.include_router(routes_leagues.router)
-    app.include_router(routes_venues.router)
+    app.include_router(routes_venues.router, dependencies=[Depends(venues_on)])  # Sprint 29
     app.include_router(routes_manager.router)
     app.include_router(routes_league_matches.router)
     app.include_router(routes_matchday.router)

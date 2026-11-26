@@ -7,6 +7,7 @@ dos solicitudes activas del mismo equipo o árbitro en la misma liga.
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from app.domain import launch_rules
 from app.domain.errors import ConflictError, DomainError, NotFoundError, PermissionDeniedError
 from app.domain.league_rules import ACTIVE_STATUSES, EnrollmentKind, EnrollmentStatus, check_can_decide
 from app.domain.roles import UserRole
@@ -49,6 +50,7 @@ def request_team(ctx: ServiceContext, actor: UserAccount, league_id: int, team_i
 
 
 def request_referee(ctx: ServiceContext, actor: UserAccount, league_id: int) -> LeagueReferee:
+    launch_rules.require(ctx.features.referees, "árbitros")  # Sprint 29
     league = get_league(ctx, league_id, lock=True)
     if not any(r.role == UserRole.REFEREE for r in actor.roles):
         raise PermissionDeniedError("REFEREE_ROLE_REQUIRED", "Agrega el rol de árbitro para unirte al cuerpo arbitral.")

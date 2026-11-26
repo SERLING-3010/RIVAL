@@ -6,6 +6,7 @@ import type { GoalClaimsController } from '../../controllers/useGoalClaims';
 import type { Contract } from '../../domain/contractModels';
 import { CONTRACT_STATUS_LABEL, contractActions } from '../../domain/contractRules';
 import { BookingCard } from '../components/BookingCard';
+import { useFeatures } from '../FeaturesContext';
 import type { MatchdayHandlers } from '../components/MatchdayButtons';
 import { MatchdayButtons } from '../components/MatchdayButtons';
 import { ContractVersionCard as VersionCard } from '../components/ContractVersionCard';
@@ -32,6 +33,7 @@ export function ContractScreen(props: Props) {
   const { controller, onPropose, onActivity, onBookVenue, onLineup, onBack } = props;
   const [reason, setReason] = useState('');
   const busy = controller.action.busy;
+  const features = useFeatures();
   return (
     <Screen title="Contrato del partido" onBack={onBack}>
       <StateView state={controller.state} onRetry={controller.handleReload}>
@@ -69,12 +71,14 @@ export function ContractScreen(props: Props) {
               {amendment && contract.signed ? (
                 <VersionCard contract={contract} version={contract.signed} title="Versión firmada vigente" />
               ) : null}
-              <BookingCard
-                contract={contract}
-                busy={busy}
-                onBook={() => onBookVenue(contract)}
-                onCancel={(id) => void controller.handleCancelBooking(id)}
-              />
+              {features.venues ? ( // Sprint 29: sin establecimientos en el lanzamiento
+                <BookingCard
+                  contract={contract}
+                  busy={busy}
+                  onBook={() => onBookVenue(contract)}
+                  onCancel={(id) => void controller.handleCancelBooking(id)}
+                />
+              ) : null}
               <ResultPanel
                 contract={contract}
                 canReport={can.canReportResult}

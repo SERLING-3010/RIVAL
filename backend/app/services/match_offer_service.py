@@ -7,6 +7,7 @@ Aceptar bloquea la solicitud (FOR UPDATE): dos aceptaciones simultáneas no pued
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
+from app.domain import launch_rules
 from app.domain.errors import ConflictError, NotFoundError
 from app.domain.match_rules import (
     OfferStatus,
@@ -52,9 +53,10 @@ def make_offer(ctx: ServiceContext, actor: UserAccount, team_id: int, request_id
     if previous is not None:
         previous.status = OfferStatus.SUPERSEDED.value
         ctx.db.flush()  # libera el índice único de oferta pendiente antes de crear la nueva versión
+    referee = launch_rules.match_terms(ctx.features, data.referee_mode, data.place_kind)  # Sprint 29
     offer = MatchOffer(
         request_id=request.id, team_id=team.id, version=_next_version(ctx, request.id, team.id),
-        proposed_start=data.proposed_start, referee_mode=data.referee_mode.value, place_kind=data.place_kind.value,
+        proposed_start=data.proposed_start, referee_mode=referee.value, place_kind=data.place_kind.value,
         place_note=(data.place_note or "").strip()[:120] or None, message=(data.message or "").strip()[:200] or None,
         status=_PENDING, created_by=actor.id, created_at=ctx.clock.now(),
     )

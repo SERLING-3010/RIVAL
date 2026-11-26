@@ -2,9 +2,9 @@
 
 from dataclasses import asdict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.api.dependencies import CtxDep, UserDep
+from app.api.dependencies import CtxDep, UserDep, referees_on
 from app.api.schemas_league_matches import (
     AssignRefereeBody, FixtureBody, FixtureOut, RefereeMatchOut, RefereeScoreBody, StandingOut,
 )
@@ -39,30 +39,30 @@ def table(league_id: int, ctx: CtxDep, _user: UserDep) -> list[StandingOut]:
     return [StandingOut.model_validate(asdict(r)) for r in standings_queries.table(ctx, league_id)]
 
 
-@router.post("/contracts/{contract_id}/referee", status_code=201)
+@router.post("/contracts/{contract_id}/referee", status_code=201, dependencies=[Depends(referees_on)])
 def assign_referee(contract_id: int, body: AssignRefereeBody, ctx: CtxDep, user: UserDep) -> dict[str, object]:
     assignment = referee_service.assign(ctx, user, contract_id, body.referee_id)
     return {"assignment_id": assignment.id, "status": assignment.status}
 
 
-@router.get("/me/referee-matches")
+@router.get("/me/referee-matches", dependencies=[Depends(referees_on)])
 def my_referee_matches(ctx: CtxDep, user: UserDep) -> list[RefereeMatchOut]:
     return _mine(ctx, user)
 
 
-@router.post("/referee-assignments/{assignment_id}/accept")
+@router.post("/referee-assignments/{assignment_id}/accept", dependencies=[Depends(referees_on)])
 def accept_assignment(assignment_id: int, ctx: CtxDep, user: UserDep) -> list[RefereeMatchOut]:
     referee_service.respond(ctx, user, assignment_id, accept=True)
     return _mine(ctx, user)
 
 
-@router.post("/referee-assignments/{assignment_id}/decline")
+@router.post("/referee-assignments/{assignment_id}/decline", dependencies=[Depends(referees_on)])
 def decline_assignment(assignment_id: int, ctx: CtxDep, user: UserDep) -> list[RefereeMatchOut]:
     referee_service.respond(ctx, user, assignment_id, accept=False)
     return _mine(ctx, user)
 
 
-@router.post("/contracts/{contract_id}/referee-result")
+@router.post("/contracts/{contract_id}/referee-result", dependencies=[Depends(referees_on)])
 def referee_result(contract_id: int, body: RefereeScoreBody, ctx: CtxDep, user: UserDep) -> list[RefereeMatchOut]:
     referee_service.report_result(ctx, user, contract_id, body.host_score, body.guest_score)
     return _mine(ctx, user)

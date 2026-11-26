@@ -1,10 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
+import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { LoadingScreen, SignedInFlow } from './src/app/SignedInFlow';
 import { SignedOutFlow } from './src/app/SignedOutFlow';
+import { FeaturesContext } from './src/ui/FeaturesContext';
 import { TermsGateScreen } from './src/ui/screens/TermsGateScreen';
+import { useLaunchFeatures } from './src/controllers/useLaunchFeatures';
 import { useNavigator } from './src/controllers/useNavigator';
 import { usePushRegistration } from './src/controllers/usePushRegistration';
 import { useSession } from './src/controllers/useSession';
@@ -42,11 +45,18 @@ function Root() {
   return <SignedOutFlow session={session} navigator={navigator} />;
 }
 
+/** Sprint 29: lo que está prendido en este lanzamiento (solo fútbol, sin árbitros ni canchas). */
+function LaunchFeatures({ children }: { children: ReactNode }) {
+  return <FeaturesContext.Provider value={useLaunchFeatures()}>{children}</FeaturesContext.Provider>;
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <Root />
+      <LaunchFeatures>
+        <Root />
+      </LaunchFeatures>
     </SafeAreaProvider>
   );
 }

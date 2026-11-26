@@ -5,6 +5,7 @@ from typing import Annotated
 
 from fastapi import Depends, Header, Request
 
+from app.domain import launch_rules
 from app.domain.errors import AuthenticationError, PermissionDeniedError
 from app.persistence.database import session_scope
 from app.persistence.models_identity import UserAccount
@@ -24,7 +25,18 @@ def get_ctx(request: Request) -> Iterator[ServiceContext]:
             catalog=state.catalog,
             session_ttl=state.settings.session_ttl,
             session_idle=state.settings.session_idle,
+            features=state.features,
         )
+
+
+def referees_on(request: Request) -> None:
+    """Sprint 29: con los árbitros apagados, sus rutas responden como si no existieran."""
+    launch_rules.require(request.app.state.features.referees, "árbitros")
+
+
+def venues_on(request: Request) -> None:
+    """Sprint 29: con los establecimientos apagados, sus rutas responden como si no existieran."""
+    launch_rules.require(request.app.state.features.venues, "establecimientos deportivos")
 
 
 def get_limiter(request: Request) -> LoginRateLimiter:
