@@ -1,4 +1,5 @@
-"""Envío de avisos por el servicio de Expo (Sprint 24). Solo se manda el título y la frase genérica.
+"""Envío de avisos por el servicio de Expo (Sprints 24 y 26). Solo va el título, la frase genérica y el
+nombre de la pantalla que abre el aviso.
 
 Devuelve los tokens que Expo marcó como dados de baja (DeviceNotRegistered) para borrarlos.
 `post` se puede reemplazar en las pruebas: nunca se llama a Expo desde las pruebas.
@@ -14,10 +15,11 @@ from app.services.push_service import Outgoing
 EXPO_URL = "https://exp.host/--/api/v2/push/send"
 BATCH = 100  # límite de Expo por pedido
 
-Post = Callable[[list[dict[str, str]]], list[dict[str, object]]]
+Message = dict[str, object]
+Post = Callable[[list[Message]], list[dict[str, object]]]
 
 
-def _post(messages: list[dict[str, str]]) -> list[dict[str, object]]:
+def _post(messages: list[Message]) -> list[dict[str, object]]:
     request = urllib.request.Request(
         EXPO_URL, data=json.dumps(messages).encode(), method="POST",
         headers={"Content-Type": "application/json", "Accept": "application/json"})
@@ -27,8 +29,9 @@ def _post(messages: list[dict[str, str]]) -> list[dict[str, object]]:
 
 
 def send(outgoing: list[Outgoing], post: Post = _post) -> list[str]:
-    messages = [{"to": token, "title": TITLE, "body": o.body, "sound": "default"}
-                for o in outgoing for token in o.tokens]
+    messages: list[Message] = [
+        {"to": token, "title": TITLE, "body": o.body, "sound": "default", "data": {"open": o.open}}
+        for o in outgoing for token in o.tokens]
     dead = []
     for start in range(0, len(messages), BATCH):
         chunk = messages[start:start + BATCH]
@@ -36,5 +39,5 @@ def send(outgoing: list[Outgoing], post: Post = _post) -> list[str]:
             details = ticket.get("details")
             if (ticket.get("status") == "error" and isinstance(details, dict)
                     and details.get("error") == "DeviceNotRegistered"):
-                dead.append(message["to"])
+                dead.append(str(message["to"]))
     return dead

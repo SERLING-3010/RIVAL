@@ -11,6 +11,8 @@ from app.domain.errors import DomainError
 
 # Tipo de pendiente → aviso. Solo frases genéricas, sin datos.
 MESSAGES: dict[str, str] = {
+    "NEW_CARD": "¡Ganaste una carta nueva!",
+    "TEAM_NEW_CARD": "Tu equipo ganó una carta nueva.",
     "CHALLENGE_RECEIVED": "Tienes un reto nuevo.",
     "OFFERS_RECEIVED": "Hay ofertas nuevas para tu búsqueda.",
     "SIGN_CONTRACT": "Hay un contrato por firmar.",
@@ -55,3 +57,13 @@ def body_for(kinds: list[str]) -> str:
     if len(kinds) == 1:
         return MESSAGES.get(kinds[0], GENERIC)
     return f"Tienes {len(kinds)} cosas nuevas por revisar en RIVAL."
+
+
+def open_for(kinds: list[str]) -> str:
+    """Pantalla que abre el aviso (Sprint 26): la ficha propia si es solo una carta tuya, el inicio si es
+    solo del equipo, y «Pendientes» en el resto. Es un nombre de pantalla, no un dato personal."""
+    if set(kinds) == {"NEW_CARD"}:
+        return "myCard"
+    if set(kinds) == {"TEAM_NEW_CARD"}:
+        return "home"
+    return "pending"

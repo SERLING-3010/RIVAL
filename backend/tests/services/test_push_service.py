@@ -52,4 +52,5 @@ def test_expo_send_batches_and_reports_dead_tokens():
     dead = expo_push.send([Outgoing(1, ["ExponentPushToken[vivo]", "ExponentPushToken[muerto]"], "Hola.")],
                           post=fake_post)
     assert dead == ["ExponentPushToken[muerto]"]
-    assert seen[0][0] == {"to": "ExponentPushToken[vivo]", "title": "RIVAL", "body": "Hola.", "sound": "default"}
+    assert seen[0][0] == {"to": "ExponentPushToken[vivo]", "title": "RIVAL", "body": "Hola.", "sound": "default",
+                          "data": {"open": "pending"}}

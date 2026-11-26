@@ -14,6 +14,7 @@ from app.domain.special_cards import CLAIM_WINDOW
 from app.persistence.models_cards import GoalClaim
 from app.persistence.models_contracts import MatchContract
 from app.persistence.models_identity import UserAccount
+from app.services import card_awards
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import load_contract, member_side, side_teams
@@ -86,6 +87,8 @@ def decide(ctx: ServiceContext, actor: UserAccount, claim_id: int, accept: bool)
                  entity_id=claim.contract_id, initiated_by=claim.claimed_by, approved_by=actor.id,
                  before={"status": PENDING},
                  after={"claim_id": claim.id, "user_id": claim.user_id, "kind": claim.kind, "status": claim.status})
+    if accept:
+        card_awards.refresh_players(ctx, [claim.user_id])  # Sprint 26: puede completar una hazaña
     return claim
 
 

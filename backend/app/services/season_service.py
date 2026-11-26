@@ -15,7 +15,7 @@ from app.persistence.models_identity import UserAccount
 from app.persistence.models_league_matches import LeagueFixture
 from app.persistence.models_leagues import League
 from app.persistence.models_results import MatchResult
-from app.services import standings_queries
+from app.services import card_awards, standings_queries
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.league_queries import get_league, staff_role
@@ -45,4 +45,5 @@ def close(ctx: ServiceContext, actor: UserAccount, league_id: int) -> League:
     record_event(ctx, action="LEAGUE_SEASON_CLOSED", entity="league", entity_id=league.id, initiated_by=actor.id,
                  after={"champion_team_id": champion.team_id, "points": champion.points,
                         "season": league.season})
+    card_awards.refresh_teams(ctx, [champion.team_id])  # Sprint 26: Prisma o Galaxia al momento
     return league

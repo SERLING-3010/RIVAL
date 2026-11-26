@@ -12,8 +12,13 @@ function Root() {
   const session = useSession();
   const navigator = useNavigator({ name: 'rolePicker' });
   const { reset, push } = navigator;
-  // Sprint 24: registra el teléfono para avisos; tocar uno abre «Pendientes».
-  usePushRegistration(session.status === 'signedIn' ? session.token : null, () => push({ name: 'pending' }));
+  // Sprints 24 y 26: registra el teléfono; tocar un aviso abre su pantalla (tu ficha, el inicio o Pendientes).
+  const me = session.user?.id ?? null;
+  usePushRegistration(session.status === 'signedIn' ? session.token : null, (screen) => {
+    if (screen === 'myCard' && me !== null) push({ name: 'playerCard', userId: me });
+    else if (screen === 'home') reset({ name: 'home' });
+    else push({ name: 'pending' });
+  });
 
   // Al entrar o salir de sesión, la pila de navegación vuelve a empezar.
   useEffect(() => {

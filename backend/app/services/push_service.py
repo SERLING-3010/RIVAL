@@ -13,7 +13,9 @@ from sqlalchemy import delete, func, select
 from app.domain import push_rules
 from app.domain.errors import ConflictError
 from app.persistence.models_identity import UserAccount
+from app.persistence.models_cards import SpecialCard, TeamSpecialCard
 from app.persistence.models_push import PushDevice, PushSent
+from app.persistence.models_teams import TeamMembership
 from app.services import pending_service
 from app.services.context import ServiceContext
 
@@ -23,10 +25,22 @@ class Outgoing:
     user_id: int
     tokens: list[str]
     body: str
+    open: str = "pending"  # pantalla que abre el aviso (Sprint 26)
+
+
+def _card_keys(ctx: ServiceContext, user: UserAccount) -> list[tuple[str, str]]:
+    """Sprint 26: especiales ganadas por la persona y por sus equipos."""
+    mine = [(f"CARD:{code}", "NEW_CARD") for code in ctx.db.scalars(
+        select(SpecialCard.code).where(SpecialCard.user_id == user.id))]
+    teams = select(TeamMembership.team_id).where(TeamMembership.user_id == user.id)
+    team_cards = [(f"TEAMCARD:{team_id}:{code}", "TEAM_NEW_CARD") for team_id, code in ctx.db.execute(
+        select(TeamSpecialCard.team_id, TeamSpecialCard.code).where(TeamSpecialCard.team_id.in_(teams)))]
+    return mine + team_cards
 
 
 def _keys(ctx: ServiceContext, user: UserAccount) -> list[tuple[str, str]]:
-    return [(push_rules.item_key(i.kind, i.target_id, i.title), i.kind) for i in pending_service.pending(ctx, user)]
+    pending = [(push_rules.item_key(i.kind, i.target_id, i.title), i.kind) for i in pending_service.pending(ctx, user)]
+    return pending + _card_keys(ctx, user)
 
 
 def _mark(ctx: ServiceContext, user_id: int, keys: list[str]) -> None:
@@ -73,7 +87,8 @@ def collect(ctx: ServiceContext) -> list[Outgoing]:
         fresh = [(key, kind) for key, kind in _keys(ctx, user) if key not in sent]
         if fresh:
             _mark(ctx, user.id, [key for key, _kind in fresh])
-            out.append(Outgoing(user.id, tokens[user.id], push_rules.body_for([kind for _key, kind in fresh])))
+            kinds = [kind for _key, kind in fresh]
+            out.append(Outgoing(user.id, tokens[user.id], push_rules.body_for(kinds), push_rules.open_for(kinds)))
     return out
 
 

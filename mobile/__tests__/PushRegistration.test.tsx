@@ -27,8 +27,8 @@ describe('usePushRegistration', () => {
       expect(pushApi.register).toHaveBeenCalledWith('sesion-1', 'ExponentPushToken[telefono01]'),
     );
     const tapped = jest.mocked(device.onNoticeTapped).mock.calls[0]?.[0];
-    tapped?.();
-    expect(openPending).toHaveBeenCalled();
+    tapped?.('myCard');
+    expect(openPending).toHaveBeenCalledWith('myCard');
   });
 
   test('sin sesión o sin permiso no registra nada', async () => {

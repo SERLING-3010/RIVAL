@@ -45,8 +45,14 @@ export function registeredToken(): string | null {
   return lastToken;
 }
 
-/** Al tocar un aviso se abre la app en «Pendientes». Devuelve cómo dejar de escuchar. */
-export function onNoticeTapped(open: () => void): () => void {
-  const subscription = Notifications.addNotificationResponseReceivedListener(() => open());
+export type NoticeScreen = 'pending' | 'myCard' | 'home';
+
+/** Al tocar un aviso se abre la pantalla que trae (Sprint 26): tu ficha, el inicio o «Pendientes». */
+export function onNoticeTapped(open: (screen: NoticeScreen) => void): () => void {
+  const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+    const data: unknown = response.notification.request.content.data;
+    const screen = typeof data === 'object' && data !== null && 'open' in data ? data.open : null;
+    open(screen === 'myCard' || screen === 'home' ? screen : 'pending');
+  });
   return () => subscription.remove();
 }

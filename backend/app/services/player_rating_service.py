@@ -18,6 +18,7 @@ from app.persistence.models_identity import UserAccount
 from app.persistence.models_manager import MatchAppearance
 from app.persistence.models_matchday import PlayerRating
 from app.persistence.models_teams import Team
+from app.services import card_awards
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import get_version, load_contract, member_side, side_teams, terms_of
@@ -59,6 +60,7 @@ def rate(ctx: ServiceContext, actor: UserAccount, contract_id: int, rated_id: in
     ctx.db.flush()
     record_event(ctx, action="PLAYER_RATED", entity="match_contract", entity_id=contract.id, initiated_by=actor.id,
                  after={"rated_id": rated_id})
+    card_awards.refresh_players(ctx, [rated_id])  # Sprint 26: la valoración mueve la media
     return rating
 
 

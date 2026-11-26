@@ -15,7 +15,7 @@ from app.domain.special_cards import validate_kinds
 from app.persistence.models_cards import GoalClaim
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_manager import MatchAppearance
-from app.services import loan_service
+from app.services import card_awards, loan_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import load_contract
@@ -56,3 +56,5 @@ def record(ctx: ServiceContext, actor: UserAccount, contract_id: int, entries: l
                  initiated_by=actor.id, before=before,
                  after={"team_id": team.id, "players": {str(u): g for u, g in entries},
                         "goal_kinds": {str(u): k for u, k in kinds.items() if k}})
+    card_awards.refresh_players(ctx, [user_id for user_id, _goals in entries])  # Sprint 26
+    card_awards.refresh_teams(ctx, [team.id])
