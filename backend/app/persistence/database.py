@@ -70,6 +70,7 @@ def load_models() -> None:
         models_matches,
         models_moderation,
         models_places,
+        models_push,
         models_results,
         models_scouting,
         models_tactics,

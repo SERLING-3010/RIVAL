@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { toAppError } from '../domain/appError';
 import type { RegisterPayload, SessionResponse, User } from '../domain/models';
 import { authApi } from '../services/authApi';
+import { pushApi } from '../services/pushApi';
+import { registeredToken } from '../services/pushDevice';
 import { setUnauthorizedHandler } from '../services/httpClient';
 import { clearToken, readToken, saveToken } from '../services/tokenStore';
 
@@ -80,6 +82,8 @@ export function useSession(): Session {
 
   const handleLogout = useCallback(async () => {
     if (token) {
+      const device = registeredToken(); // Sprint 24: este teléfono deja de recibir avisos de la cuenta
+      if (device) await pushApi.remove(token, device).catch(() => undefined);
       await authApi.logout(token).catch(() => undefined);
     }
     await clearToken().catch(() => undefined);

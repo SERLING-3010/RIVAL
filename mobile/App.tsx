@@ -5,12 +5,15 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { LoadingScreen, SignedInFlow } from './src/app/SignedInFlow';
 import { SignedOutFlow } from './src/app/SignedOutFlow';
 import { useNavigator } from './src/controllers/useNavigator';
+import { usePushRegistration } from './src/controllers/usePushRegistration';
 import { useSession } from './src/controllers/useSession';
 
 function Root() {
   const session = useSession();
   const navigator = useNavigator({ name: 'rolePicker' });
-  const { reset } = navigator;
+  const { reset, push } = navigator;
+  // Sprint 24: registra el teléfono para avisos; tocar uno abre «Pendientes».
+  usePushRegistration(session.status === 'signedIn' ? session.token : null, () => push({ name: 'pending' }));
 
   // Al entrar o salir de sesión, la pila de navegación vuelve a empezar.
   useEffect(() => {
