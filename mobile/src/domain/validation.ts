@@ -15,6 +15,7 @@ export interface RegistrationForm {
   city: string;
   neighborhood: string;
   position: string;
+  acceptTerms: boolean; // Sprint 27
 }
 
 export type FieldErrors<K extends string> = Partial<Record<K, string>>;
@@ -77,6 +78,9 @@ export function validateRegistration(
   }
   if (form.neighborhood.trim().length < 2) {
     errors.neighborhood = 'Escribe tu barrio. Solo se muestra el barrio, nunca tu ubicación exacta.';
+  }
+  if (!form.acceptTerms) {
+    errors.acceptTerms = 'Para crear tu cuenta debes aceptar los Términos y la Política de privacidad.';
   }
   return errors;
 }

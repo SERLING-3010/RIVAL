@@ -22,6 +22,10 @@ class UserAccount(Base):
     neighborhood_key: Mapped[str] = mapped_column(String(60))
     position: Mapped[str | None] = mapped_column(String(40), nullable=True)
     created_at: Mapped[datetime] = mapped_column(UtcDateTime)
+    # Sprint 27: versión de Términos y Privacidad aceptada y cuándo; fecha de eliminación (anonimizada).
+    terms_version: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    terms_accepted_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(UtcDateTime, nullable=True)
 
     roles: Mapped[list["UserRoleRow"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", lazy="selectin"

@@ -26,7 +26,8 @@ def owner_token(city: str, neighborhood: str, sport: str) -> str:
     except SystemExit:
         session = call("/auth/register", {
             "email": EMAIL, "password": PASSWORD, "display_name": "Cancha de Prueba", "birth_date": "1988-03-14",
-            "role": "VENUE_OWNER", "sports": [sport], "city": city, "neighborhood": neighborhood, "position": None})
+            "role": "VENUE_OWNER", "sports": [sport], "city": city, "neighborhood": neighborhood,
+            "position": None, "accept_terms": True})
     return str(session["token"])
 
 

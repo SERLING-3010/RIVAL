@@ -39,7 +39,8 @@ def main(city: str, neighborhood: str, sport: str, modality: str) -> None:
     except SystemExit:
         session = call("/auth/register", {
             "email": EMAIL, "password": PASSWORD, "display_name": "Rival de Prueba", "birth_date": "1995-05-20",
-            "role": "COACH", "sports": [sport], "city": city, "neighborhood": neighborhood, "position": None})
+            "role": "COACH", "sports": [sport], "city": city, "neighborhood": neighborhood,
+            "position": None, "accept_terms": True})
         print("Usuario de prueba creado.")
     token = str(session["token"])
     team = call("/teams", {"name": "Rivales de Prueba", "sport_code": sport, "modality_code": modality, "city": city,

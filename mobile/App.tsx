@@ -4,6 +4,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { LoadingScreen, SignedInFlow } from './src/app/SignedInFlow';
 import { SignedOutFlow } from './src/app/SignedOutFlow';
+import { TermsGateScreen } from './src/ui/screens/TermsGateScreen';
 import { useNavigator } from './src/controllers/useNavigator';
 import { usePushRegistration } from './src/controllers/usePushRegistration';
 import { useSession } from './src/controllers/useSession';
@@ -28,6 +29,12 @@ function Root() {
 
   if (session.status === 'restoring') {
     return <LoadingScreen />;
+  }
+  if (session.status === 'signedIn' && session.user?.needs_terms) {
+    // Sprint 27: cuentas anteriores o versión nueva de los textos: aceptar antes de seguir.
+    return (
+      <TermsGateScreen onAccept={session.handleAcceptTerms} onLogout={() => void session.handleLogout()} />
+    );
   }
   if (session.status === 'signedIn' && session.user && session.token) {
     return <SignedInFlow session={session} user={session.user} token={session.token} navigator={navigator} />;

@@ -14,6 +14,8 @@ export type Route =
   | { name: 'rolePicker' }
   | { name: 'register'; role: UserRole }
   | { name: 'login' }
+  | { name: 'legal'; doc: 'terms' | 'privacy' } // Sprint 27
+  | { name: 'myData' }
   | { name: 'home' }
   | { name: 'teamSearch' }
   | { name: 'createTeam' }

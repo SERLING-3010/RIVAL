@@ -15,8 +15,9 @@ export interface RegistrationController {
   errors: FieldErrors<Field>;
   submitError: string | null;
   submitting: boolean;
-  handleChange: (field: Exclude<Field, 'sports' | 'role'>, value: string) => void;
+  handleChange: (field: Exclude<Field, 'sports' | 'role' | 'acceptTerms'>, value: string) => void;
   handleToggleSport: (code: string) => void;
+  handleToggleTerms: () => void; // Sprint 27
   handleSubmit: () => Promise<void>;
 }
 
@@ -34,16 +35,20 @@ export function useRegistrationForm(
     city: '',
     neighborhood: '',
     position: '',
+    acceptTerms: false,
   });
   const [errors, setErrors] = useState<FieldErrors<Field>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const lock = useSubmitLock();
 
-  const handleChange = useCallback((field: Exclude<Field, 'sports' | 'role'>, value: string) => {
-    setForm((f) => ({ ...f, [field]: value }));
-    setErrors((e) => ({ ...e, [field]: undefined }));
-  }, []);
+  const handleChange = useCallback(
+    (field: Exclude<Field, 'sports' | 'role' | 'acceptTerms'>, value: string) => {
+      setForm((f) => ({ ...f, [field]: value }));
+      setErrors((e) => ({ ...e, [field]: undefined }));
+    },
+    [],
+  );
 
   const handleToggleSport = useCallback((code: string) => {
     setForm((f) => ({
@@ -51,6 +56,11 @@ export function useRegistrationForm(
       sports: f.sports.includes(code) ? f.sports.filter((s) => s !== code) : [...f.sports, code],
     }));
     setErrors((e) => ({ ...e, sports: undefined }));
+  }, []);
+
+  const handleToggleTerms = useCallback(() => {
+    setForm((f) => ({ ...f, acceptTerms: !f.acceptTerms }));
+    setErrors((e) => ({ ...e, acceptTerms: undefined }));
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -71,6 +81,7 @@ export function useRegistrationForm(
           city: form.city.trim(),
           neighborhood: form.neighborhood.trim(),
           position: form.position.trim() || null,
+          accept_terms: form.acceptTerms,
         });
       } catch (error) {
         setSubmitError(toAppError(error).message);
@@ -80,5 +91,14 @@ export function useRegistrationForm(
     });
   }, [form, lock, onRegister]);
 
-  return { form, errors, submitError, submitting, handleChange, handleToggleSport, handleSubmit };
+  return {
+    form,
+    errors,
+    submitError,
+    submitting,
+    handleChange,
+    handleToggleSport,
+    handleToggleTerms,
+    handleSubmit,
+  };
 }

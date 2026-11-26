@@ -67,4 +67,5 @@ def register_input(
         city="Barranquilla",
         neighborhood="El Prado",
         position="Delantero",
+        accept_terms=True,
     )

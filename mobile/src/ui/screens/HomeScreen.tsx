@@ -32,7 +32,7 @@ interface Props {
   onMySanctions: () => void;
   onModeration: () => void;
   onOpenTeam: (teamId: number) => void;
-  onLogout: () => void;
+  onAccount: () => void; // Sprint 27: Mis datos, privacidad y cerrar sesión
 }
 
 export function HomeScreen({
@@ -53,7 +53,7 @@ export function HomeScreen({
   onMySanctions,
   onModeration,
   onOpenTeam,
-  onLogout,
+  onAccount,
 }: Props) {
   const plays = user.roles.includes('PLAYER') || user.roles.includes('COACH');
   const hasTeam = myTeams.kind === 'success';
@@ -138,7 +138,7 @@ export function HomeScreen({
           onPress={onMyVenues}
         />
       ) : null}
-      <PrimaryButton label="Cerrar sesión" variant="secondary" onPress={onLogout} />
+      <Card title="Mi cuenta" subtitle="Mis datos, privacidad y cerrar sesión" onPress={onAccount} />
     </Screen>
   );
 }
