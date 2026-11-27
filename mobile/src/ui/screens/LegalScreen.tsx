@@ -2,13 +2,16 @@
 
 import { StyleSheet, Text, View } from 'react-native';
 
+import { fillLegal } from '../../domain/legalContact';
 import { PRIVACY } from '../../domain/legalPrivacy';
 import { TERMS, TERMS_VERSION } from '../../domain/legalTerms';
 import { Screen } from '../components/Screen';
+import { useLegalContactInfo } from '../LegalContactContext';
 import { colors, font, space } from '../theme';
 
 export function LegalScreen({ doc, onBack }: { doc: 'terms' | 'privacy'; onBack: () => void }) {
-  const sections = doc === 'terms' ? TERMS : PRIVACY;
+  const contact = useLegalContactInfo(); // Sprint 29: datos del responsable desde el servidor
+  const sections = fillLegal(doc === 'terms' ? TERMS : PRIVACY, contact);
   return (
     <Screen title={doc === 'terms' ? 'Términos de uso' : 'Política de privacidad'} onBack={onBack}>
       <Text style={styles.meta}>Versión {TERMS_VERSION} · borrador para el piloto</Text>

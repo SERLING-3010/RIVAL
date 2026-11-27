@@ -31,4 +31,9 @@ class Settings:
         s.strip() for s in os.getenv("RIVAL_SPORTS", "").split(",") if s.strip()))
     referees: bool = field(default_factory=lambda: os.getenv("RIVAL_ENABLE_REFEREES", "true").lower() == "true")
     venues: bool = field(default_factory=lambda: os.getenv("RIVAL_ENABLE_VENUES", "true").lower() == "true")
+    # Sprint 29: responsable del tratamiento de datos (Ley 1581). Vive en la configuración del servidor
+    # y no en el código, para que los datos de contacto no queden en el repositorio público.
+    legal_contact: dict[str, str] = field(default_factory=lambda: {
+        key: os.getenv(f"RIVAL_LEGAL_{key.upper()}", "").strip()
+        for key in ("name", "address", "email", "phone", "attends", "hosting", "since")})
     auto_schema: bool = field(default_factory=lambda: os.getenv("RIVAL_AUTO_SCHEMA", "true").lower() == "true")

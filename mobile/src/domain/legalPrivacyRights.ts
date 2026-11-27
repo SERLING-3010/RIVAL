@@ -15,9 +15,10 @@ export const PRIVACY_RIGHTS: LegalSection[] = [
     title: 'Cómo ejercerlos',
     body:
       'Desde la app, en «Mi cuenta», puedes descargar tus datos y eliminar tu cuenta. Para lo demás ' +
-      '(corregir, preguntar, revocar o reclamar), escribe al correo del responsable con tu nombre, el ' +
+      '(corregir, preguntar, revocar o reclamar), escribe a {email} (o toca «Escribir a privacidad» en ' +
+      '«Mi cuenta») con tu nombre, el ' +
       'correo de tu cuenta, lo que pides y, si es un reclamo, los hechos y los documentos que quieras ' +
-      'aportar. Atiende estas solicitudes: [POR DEFINIR: persona o área].',
+      'aportar. Atiende estas solicitudes: {attends}.',
   },
   {
     title: 'Plazos',
@@ -43,7 +44,7 @@ export const PRIVACY_RIGHTS: LegalSection[] = [
   {
     title: 'Vigencia',
     body:
-      'Esta política rige desde [POR DEFINIR: fecha de inicio del piloto]. Guardamos tus datos mientras ' +
+      'Esta política rige desde {since}. Guardamos tus datos mientras ' +
       'tengas tu cuenta y, después de eliminarla, solo lo anonimizado. Si cambiamos esta política, te lo ' +
       'mostraremos en la app y te pediremos aceptarla de nuevo.',
   },

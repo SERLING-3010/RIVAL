@@ -1,7 +1,7 @@
 // Mis datos (Sprint 27): descargar lo que RIVAL guarda de ti y eliminar la cuenta (anonimizar).
 
 import { useCallback, useState } from 'react';
-import { Share } from 'react-native';
+import { Linking, Share } from 'react-native';
 
 import { toAppError } from '../domain/appError';
 import { accountApi } from '../services/accountApi';
@@ -15,6 +15,7 @@ export interface MyDataController {
   handlePassword: (text: string) => void;
   handleExport: () => Promise<void>;
   handleDelete: () => Promise<void>;
+  handleContact: (mailto: string) => Promise<void>; // Sprint 29: escribir a privacidad
 }
 
 export function useMyData(token: string, onDeleted: () => Promise<void>): MyDataController {
@@ -46,5 +47,12 @@ export function useMyData(token: string, onDeleted: () => Promise<void>): MyData
     }
   }, [onDeleted, password, token]);
 
-  return { action, password, error, handlePassword: setPassword, handleExport, handleDelete };
+  const handleContact = useCallback(async (mailto: string) => {
+    // Abre la app de correo con la solicitud ya armada; la persona revisa y decide si la envía.
+    await Linking.openURL(mailto).catch(() =>
+      setError('No encontramos una app de correo. Escríbenos desde tu correo a la dirección de privacidad.'),
+    );
+  }, []);
+
+  return { action, password, error, handlePassword: setPassword, handleExport, handleDelete, handleContact };
 }

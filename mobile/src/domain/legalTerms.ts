@@ -1,7 +1,7 @@
 // Términos de uso de RIVAL (Sprint 27). BORRADOR: debe revisarlo un abogado antes del piloto.
 // La versión debe coincidir con la del backend (legal_rules.TERMS_VERSION).
 
-export const TERMS_VERSION = '2026-11-25.2';
+export const TERMS_VERSION = '2026-11-26';
 
 export interface LegalSection {
   title: string;

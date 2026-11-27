@@ -1,10 +1,12 @@
 # Política de tratamiento de datos de RIVAL (Ley 1581 de 2012 y Decreto 1377 de 2013)
 
-> **BORRADOR para el piloto (versión 2026-11-25.2).** Debe revisarlo alguien con formación jurídica (un consultorio jurídico, la Cámara de Comercio o un abogado por horas) antes de publicarlo. Es el mismo texto que muestra la app (`mobile/src/domain/legalPrivacy.ts` y `legalPrivacyRights.ts`); si cambia, hay que subir `TERMS_VERSION` en `backend/app/domain/legal_rules.py` y en `mobile/src/domain/legalTerms.ts`.
+> **BORRADOR para el piloto (versión 2026-11-26).** Debe revisarlo alguien con formación jurídica (un consultorio jurídico, la Cámara de Comercio o un abogado por horas). Es el mismo texto que muestra la app (`mobile/src/domain/legalPrivacy.ts` y `legalPrivacyRights.ts`); si cambia, hay que subir `TERMS_VERSION` en `backend/app/domain/legal_rules.py` y en `mobile/src/domain/legalTerms.ts`.
+
+> **Los datos entre llaves no están en el código** (el repositorio es público): la app los llena con lo que configura el servidor en `deploy/.env` (`RIVAL_LEGAL_NAME` → {name}, `RIVAL_LEGAL_ADDRESS` → {address}, `RIVAL_LEGAL_EMAIL` → {email}, `RIVAL_LEGAL_PHONE` → {phone}, `RIVAL_LEGAL_ATTENDS` → {attends}, `RIVAL_LEGAL_HOSTING` → {hosting}, `RIVAL_LEGAL_SINCE` → {since}). Lo que falte se muestra «por definir».
 
 ## Responsable del tratamiento
 
-Nombre: [POR DEFINIR]. Cédula o NIT: [POR DEFINIR]. Domicilio y dirección: [POR DEFINIR]. Correo: [POR DEFINIR]. Teléfono: [POR DEFINIR].
+Nombre o razón social: {name}. Domicilio y dirección: {address}. Correo: {email}. Teléfono: {phone}.
 
 ## Qué datos guardamos
 
@@ -24,7 +26,7 @@ Tu ficha (nombre, posición, carta y estadísticas) la ven otros usuarios. Tu co
 
 ## Encargados y transmisión al exterior
 
-Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el servidor donde vive la base de datos [POR DEFINIR] y, si aceptas notificaciones, Expo y Apple o Google, que pueden estar fuera de Colombia. A ellos solo les llega lo necesario: los avisos no llevan nombres, equipos, marcadores, horarios ni lugares.
+Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el servidor donde vive la base de datos ({hosting}) y, si aceptas notificaciones, Expo y Apple o Google, que pueden estar fuera de Colombia. A ellos solo les llega lo necesario: los avisos no llevan nombres, equipos, marcadores, horarios ni lugares.
 
 ## Tus derechos
 
@@ -32,7 +34,7 @@ Puedes conocer, actualizar y rectificar tus datos; pedir prueba de la autorizaci
 
 ## Cómo ejercerlos
 
-Desde la app, en «Mi cuenta», puedes descargar tus datos y eliminar tu cuenta. Para lo demás (corregir, preguntar, revocar o reclamar), escribe al correo del responsable con tu nombre, el correo de tu cuenta, lo que pides y, si es un reclamo, los hechos y los documentos que quieras aportar. Atiende estas solicitudes: [POR DEFINIR: persona o área].
+Desde la app, en «Mi cuenta», puedes descargar tus datos y eliminar tu cuenta. Para lo demás (corregir, preguntar, revocar o reclamar), escribe a {email} (o toca «Escribir a privacidad» en «Mi cuenta») con tu nombre, el correo de tu cuenta, lo que pides y, si es un reclamo, los hechos y los documentos que quieras aportar. Atiende estas solicitudes: {attends}.
 
 ## Plazos
 
@@ -48,4 +50,4 @@ Borramos tu correo, nombre, fecha de nacimiento, barrio, posición, sesiones, te
 
 ## Vigencia
 
-Esta política rige desde [POR DEFINIR: fecha de inicio del piloto]. Guardamos tus datos mientras tengas tu cuenta y, después de eliminarla, solo lo anonimizado. Si cambiamos esta política, te lo mostraremos en la app y te pediremos aceptarla de nuevo.
+Esta política rige desde {since}. Guardamos tus datos mientras tengas tu cuenta y, después de eliminarla, solo lo anonimizado. Si cambiamos esta política, te lo mostraremos en la app y te pediremos aceptarla de nuevo.

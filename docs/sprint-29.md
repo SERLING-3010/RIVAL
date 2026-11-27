@@ -31,6 +31,14 @@ Lanzar solo con fútbol, sin árbitro y sin establecimiento deportivo. El resto 
   - Si la app no logra preguntar, muestra todo, pero el backend igual rechaza lo apagado: nunca se habilita algo que no esté disponible.
 - **Bot de prueba:** si los establecimientos están apagados, deja de confirmar reservas sin fallar.
 
+## Datos del responsable fuera del código (pedido del dueño, 26/11/2026)
+
+- **El repositorio de GitHub es público**, así que el nombre, la dirección, el correo y el teléfono del responsable del tratamiento ya no van en el texto de la política. Se configuran en el `.env` del servidor (`RIVAL_LEGAL_*`), el backend los entrega en `GET /api/v1/legal` y la app los pone en la política. Lo que falte se muestra «por definir».
+- **Se quitó la cédula o NIT:** el artículo 13 del Decreto 1377 de 2013 pide nombre o razón social, domicilio, dirección, correo y teléfono, pero no un documento de identidad.
+- **Para el usuario:** en «Mi cuenta» aparece «Escribir a privacidad» cuando el servidor tiene un correo configurado. Abre su app de correo con la solicitud ya armada (conocer, corregir, suprimir o revocar) y muestra los plazos de respuesta.
+- **Para el dueño:** cambia sus datos de contacto sin tocar el código ni publicar una versión nueva de la app, y le llegan solicitudes ordenadas.
+- La versión de los textos sube a `2026-11-26`, así que las cuentas los aceptan de nuevo.
+
 ## Loop 4 — Verificación (salidas reales del 26/11/2026)
 
 | Verificación | Resultado |

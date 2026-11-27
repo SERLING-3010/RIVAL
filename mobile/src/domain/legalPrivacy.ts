@@ -1,5 +1,6 @@
 // Política de tratamiento de datos de RIVAL (Sprint 27, Ley 1581 de 2012 y Decreto 1377 de 2013, art. 13).
-// BORRADOR: falta completar los datos del responsable y que alguien con formación jurídica lo revise.
+// BORRADOR para revisión jurídica. Los {marcadores} se llenan con los datos del responsable que manda el
+// servidor (Sprint 29: viven en su configuración, no en el código público).
 
 import type { LegalSection } from './legalTerms.ts';
 import { PRIVACY_RIGHTS } from './legalPrivacyRights.ts';
@@ -8,8 +9,8 @@ const PRIVACY_DATA: LegalSection[] = [
   {
     title: 'Responsable del tratamiento',
     body:
-      'Nombre: [POR DEFINIR]. Cédula o NIT: [POR DEFINIR]. Domicilio y dirección: [POR DEFINIR]. ' +
-      'Correo: [POR DEFINIR]. Teléfono: [POR DEFINIR].',
+      'Nombre o razón social: {name}. Domicilio y dirección: {address}. Correo: {email}. ' +
+      'Teléfono: {phone}.',
   },
   {
     title: 'Qué datos guardamos',
@@ -44,7 +45,7 @@ const PRIVACY_DATA: LegalSection[] = [
     title: 'Encargados y transmisión al exterior',
     body:
       'Para funcionar usamos proveedores que tratan datos por nuestra cuenta: el servidor donde vive la ' +
-      'base de datos [POR DEFINIR] y, si aceptas notificaciones, Expo y Apple o Google, que pueden estar ' +
+      'base de datos ({hosting}) y, si aceptas notificaciones, Expo y Apple o Google, que pueden estar ' +
       'fuera de Colombia. A ellos solo les llega lo necesario: los avisos no llevan nombres, equipos, ' +
       'marcadores, horarios ni lugares.',
   },

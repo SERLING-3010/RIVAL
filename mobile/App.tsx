@@ -6,8 +6,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { LoadingScreen, SignedInFlow } from './src/app/SignedInFlow';
 import { SignedOutFlow } from './src/app/SignedOutFlow';
 import { FeaturesContext } from './src/ui/FeaturesContext';
+import { LegalContactContext } from './src/ui/LegalContactContext';
 import { TermsGateScreen } from './src/ui/screens/TermsGateScreen';
 import { useLaunchFeatures } from './src/controllers/useLaunchFeatures';
+import { useLegalContact } from './src/controllers/useLegalContact';
 import { useNavigator } from './src/controllers/useNavigator';
 import { usePushRegistration } from './src/controllers/usePushRegistration';
 import { useSession } from './src/controllers/useSession';
@@ -47,7 +49,11 @@ function Root() {
 
 /** Sprint 29: lo que está prendido en este lanzamiento (solo fútbol, sin árbitros ni canchas). */
 function LaunchFeatures({ children }: { children: ReactNode }) {
-  return <FeaturesContext.Provider value={useLaunchFeatures()}>{children}</FeaturesContext.Provider>;
+  return (
+    <FeaturesContext.Provider value={useLaunchFeatures()}>
+      <LegalContactContext.Provider value={useLegalContact()}>{children}</LegalContactContext.Provider>
+    </FeaturesContext.Provider>
+  );
 }
 
 export default function App() {

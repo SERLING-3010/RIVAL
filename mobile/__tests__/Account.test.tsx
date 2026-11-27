@@ -3,7 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
 import type { MyDataController } from '../src/controllers/useMyData';
+import { EMPTY_CONTACT } from '../src/domain/legalContact';
 import { TERMS_VERSION } from '../src/domain/legalTerms';
+import { LegalContactContext } from '../src/ui/LegalContactContext';
 import { LegalScreen } from '../src/ui/screens/LegalScreen';
 import { MyDataScreen } from '../src/ui/screens/MyDataScreen';
 import { TermsGateScreen } from '../src/ui/screens/TermsGateScreen';
@@ -15,6 +17,7 @@ const myData = (): MyDataController => ({
   handlePassword: jest.fn(),
   handleExport: jest.fn(async () => undefined),
   handleDelete: jest.fn(async () => undefined),
+  handleContact: jest.fn(async (_mailto: string) => undefined),
 });
 
 describe('Términos y Mis datos (Sprint 27)', () => {
@@ -46,5 +49,17 @@ describe('Términos y Mis datos (Sprint 27)', () => {
     await fireEvent.press(screen.getAllByText('Eliminar mi cuenta')[1]!);
     expect(alert).toHaveBeenCalledWith('¿Eliminar tu cuenta?', expect.any(String), expect.any(Array));
     expect(c.handleDelete).not.toHaveBeenCalled(); // solo después de confirmar
+  });
+
+  test('con correo de privacidad configurado aparece el botón para escribir', async () => {
+    const c = myData();
+    const contact = { ...EMPTY_CONTACT, email: 'privacidad@rival.example', attends: 'Equipo RIVAL' };
+    await render(
+      <LegalContactContext.Provider value={contact}>
+        <MyDataScreen controller={c} onOpenLegal={jest.fn()} onBack={jest.fn()} onLogout={jest.fn()} />
+      </LegalContactContext.Provider>,
+    );
+    await fireEvent.press(screen.getAllByText('Escribir a privacidad')[1]!);
+    expect(c.handleContact).toHaveBeenCalledWith(expect.stringContaining('mailto:privacidad@rival.example'));
   });
 });

@@ -1,6 +1,6 @@
 # Términos de uso de RIVAL
 
-> **BORRADOR para el piloto (versión 2026-11-25.2).** Debe revisarlo alguien con formación jurídica (un consultorio jurídico, la Cámara de Comercio o un abogado por horas) antes de publicarlo. Es el mismo texto que muestra la app (`mobile/src/domain/legalTerms.ts`); si cambia, hay que subir `TERMS_VERSION` en `backend/app/domain/legal_rules.py` y en `mobile/src/domain/legalTerms.ts`.
+> **BORRADOR para el piloto (versión 2026-11-26).** Debe revisarlo alguien con formación jurídica (un consultorio jurídico, la Cámara de Comercio o un abogado por horas). Es el mismo texto que muestra la app (`mobile/src/domain/legalTerms.ts`); si cambia, hay que subir `TERMS_VERSION` en `backend/app/domain/legal_rules.py` y en `mobile/src/domain/legalTerms.ts`.
 
 ## Qué es RIVAL
 

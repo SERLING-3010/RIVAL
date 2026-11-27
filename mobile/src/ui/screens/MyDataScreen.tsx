@@ -3,7 +3,9 @@
 import { Alert, StyleSheet, Text } from 'react-native';
 
 import type { MyDataController } from '../../controllers/useMyData';
+import { privacyMailto } from '../../domain/legalContact';
 import { Card } from '../components/Card';
+import { useLegalContactInfo } from '../LegalContactContext';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { TextField } from '../components/TextField';
@@ -17,6 +19,7 @@ interface Props {
 }
 
 export function MyDataScreen({ controller, onOpenLegal, onBack, onLogout }: Props) {
+  const mail = privacyMailto(useLegalContactInfo()); // Sprint 29: solo si el servidor tiene correo
   const confirmDelete = () =>
     Alert.alert(
       '¿Eliminar tu cuenta?',
@@ -37,6 +40,19 @@ export function MyDataScreen({ controller, onOpenLegal, onBack, onLogout }: Prop
           onPress={() => onOpenLegal('privacy')}
         />
       </Card>
+      {mail ? (
+        <Card title="Escribir a privacidad">
+          <Text style={styles.meta}>
+            Para corregir, preguntar, revocar la autorización o reclamar. Respondemos consultas en máximo 10
+            días hábiles y reclamos en máximo 15.
+          </Text>
+          <PrimaryButton
+            label="Escribir a privacidad"
+            variant="secondary"
+            onPress={() => void controller.handleContact(mail)}
+          />
+        </Card>
+      ) : null}
       <Card title="Descargar mis datos">
         <Text style={styles.meta}>
           Todo lo que RIVAL guarda de ti: perfil, equipos, partidos, valoraciones recibidas, mensajes y

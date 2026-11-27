@@ -45,3 +45,13 @@ def test_delete_account_anonymizes_and_frees_the_email(client):
     assert login.status_code == 401
     again = register(client, "borrar@rival.test")  # el correo queda libre para una cuenta nueva
     assert again["user"]["email"] == "borrar@rival.test"
+
+
+def test_legal_contact_comes_from_server_config(client, monkeypatch):
+    """Los datos del responsable no están en el código: llegan de la configuración del servidor."""
+    body = client.get("/api/v1/legal").json()
+    assert set(body["contact"]) == {"name", "address", "email", "phone", "attends", "hosting", "since"}
+    from app.settings import Settings
+
+    monkeypatch.setenv("RIVAL_LEGAL_EMAIL", "privacidad@rival.example")
+    assert Settings().legal_contact["email"] == "privacidad@rival.example"

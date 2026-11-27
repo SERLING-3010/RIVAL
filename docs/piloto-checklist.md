@@ -5,7 +5,7 @@ Lo que falta para pasar de «probar en mi iPhone» a un piloto con equipos reale
 ## Legal y datos personales (Ley 1581 de 2012)
 
 - [ ] (D) Revisión de `docs/legal/terminos.md` y `docs/legal/politica-privacidad.md` por alguien con formación jurídica: un consultorio jurídico universitario, la Cámara de Comercio o un abogado por horas.
-- [ ] (D) Llenar los [POR DEFINIR] de la política: nombre, cédula o NIT, dirección, correo, teléfono, quién atiende las solicitudes, el proveedor del servidor y la fecha de inicio.
+- [ ] (D) Configurar en el `.env` del servidor los datos del responsable (`RIVAL_LEGAL_*`): nombre o razón social, dirección, correo y teléfono de contacto, quién atiende las solicitudes, proveedor del servidor y fecha de inicio. No van en el código porque el repositorio es público. Mejor un correo de privacidad del dominio que el personal.
 - [ ] (D) Inscribir la base de datos en el RNBD de la SIC, si aplica según el tamaño de la empresa [POR VERIFICAR con el abogado].
 - [x] (C) Aceptación versionada de términos y privacidad, con la mayoría de edad declarada (Sprint 27).
 - [x] (C) Descargar mis datos y eliminar la cuenta anonimizándola (Sprint 27).

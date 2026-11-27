@@ -1,6 +1,6 @@
 """Mis datos (Sprint 27): aceptar términos, descargar mis datos y eliminar la cuenta (Ley 1581)."""
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Request, Response
 from pydantic import Field
 
 from app.api.dependencies import CtxDep, UserDep
@@ -22,6 +22,13 @@ class DeleteAccountBody(StrictModel):
 @router.get("/legal/terms-version")
 def terms_version() -> dict[str, str]:
     return {"version": TERMS_VERSION}
+
+
+@router.get("/legal")
+def legal(request: Request) -> dict[str, object]:
+    """Versión de los textos y datos del responsable (Ley 1581), tomados de la configuración del servidor.
+    Lo que falte llega vacío y la app muestra «por definir». No pide sesión: se lee antes de registrarse."""
+    return {"version": TERMS_VERSION, "contact": request.app.state.settings.legal_contact}
 
 
 @router.post("/me/accept-terms")
