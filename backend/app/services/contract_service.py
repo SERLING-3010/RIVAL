@@ -1,4 +1,4 @@
-"""Contrato del partido: nace al aceptar una oferta; se firma cuando ambos firman la misma versión.
+"""Contrato del partido: nace de una oferta aceptada o del calendario de una liga; se firma cuando ambos firman la misma versión.
 
 Toda acción bloquea la fila del contrato (FOR UPDATE). Proponer crea una versión nueva firmada por
 quien propone; la versión firmada sigue vigente hasta que el rival firme el cambio.
@@ -6,40 +6,46 @@ quien propone; la versión firmada sigue vigente hasta que el rival firme el cam
 
 from sqlalchemy import func, select
 
+from app.domain import launch_rules
 from app.domain.contract_rules import (
     ContractStatus, ContractTerms, default_terms, diff_terms, terms_to_dict, validate_terms,
 )
-from app.domain.errors import ConflictError, DomainError, PermissionDeniedError
+from app.domain.errors import ConflictError, DomainError
 from app.domain.match_rules import PlaceKind, RefereeMode
 from app.persistence.models_contracts import MatchContract, MatchContractSignature, MatchContractVersion
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import Team
+from app.services import booking_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.contract_queries import (
-    get_version, is_admin_of, load_contract, member_side, require_not_started, side_teams, signed_sides, terms_of,
+    admin_side, get_version, load_contract, require_not_started, signed_sides, terms_of,
 )
 
 _ENTITY = "match_contract"
 
 
 def create_from_offer(ctx: ServiceContext, request: MatchRequest, offer: MatchOffer, actor_id: int) -> MatchContract:
-    now = ctx.clock.now()
-    contract = MatchContract(
-        request_id=request.id, offer_id=offer.id, host_team_id=request.team_id, guest_team_id=offer.team_id,
-        sport_code=request.sport_code, modality_code=request.modality_code,
-        status=ContractStatus.NEGOTIATING.value, created_at=now, updated_at=now,
-    )
-    ctx.db.add(contract)
-    ctx.db.flush()
     terms = default_terms(offer.proposed_start, RefereeMode(offer.referee_mode), PlaceKind(offer.place_kind),
                           offer.place_note)
+    return create_contract(ctx, MatchContract(request_id=request.id, offer_id=offer.id, host_team_id=request.team_id,
+                                              guest_team_id=offer.team_id, sport_code=request.sport_code,
+                                              modality_code=request.modality_code), terms, actor_id)
+
+
+def create_contract(ctx: ServiceContext, contract: MatchContract, terms: ContractTerms, actor_id: int) -> MatchContract:
+    """Guarda un contrato nuevo (de una oferta o del calendario de una liga) con su versión 1 sin firmas."""
+    contract.status, contract.created_at = ContractStatus.NEGOTIATING.value, ctx.clock.now()
+    contract.updated_at = contract.created_at
+    ctx.db.add(contract)
+    ctx.db.flush()
     version = _insert_version(ctx, contract, terms, team_id=None, actor_id=None, note=None)
     contract.current_version_id = version.id
     ctx.db.flush()
     record_event(ctx, action="CONTRACT_CREATED", entity=_ENTITY, entity_id=contract.id, initiated_by=actor_id,
-                 actor_type="SYSTEM_RULE", after={"offer_id": offer.id, "terms": terms_to_dict(terms)})
+                 actor_type="SYSTEM_RULE", after={"offer_id": contract.offer_id, "league_id": contract.league_id,
+                                                  "terms": terms_to_dict(terms)})
     return contract
 
 
@@ -55,22 +61,11 @@ def _insert_version(ctx: ServiceContext, contract: MatchContract, terms: Contrac
     return version
 
 
-def _admin_side(ctx: ServiceContext, contract: MatchContract, actor: UserAccount) -> tuple[str, Team]:
-    teams = side_teams(ctx, contract)
-    member_side(teams, actor)  # 404 si no pertenece a ninguno de los dos equipos
-    sides = [side for side, team in teams.items() if is_admin_of(team, actor)]
-    if len(sides) == 2:
-        raise ConflictError("SAME_ADMIN_BOTH_TEAMS", "No puedes firmar por los dos equipos del mismo partido.")
-    if not sides:
-        raise PermissionDeniedError("ADMIN_ONLY", "Solo el administrador del equipo (DT o capitán) puede hacer esto.")
-    return sides[0], teams[sides[0]]
-
-
 def _open_for_changes(
     ctx: ServiceContext, contract_id: int, actor: UserAccount, version: int | None
 ) -> tuple[MatchContract, str, Team, MatchContractVersion]:
     contract = load_contract(ctx, contract_id, lock=True)
-    side, team = _admin_side(ctx, contract, actor)
+    side, team = admin_side(ctx, contract, actor)
     if contract.status == ContractStatus.CANCELLED:
         raise ConflictError("CONTRACT_CANCELLED", "Este partido fue cancelado.")
     current = get_version(ctx, contract.current_version_id)
@@ -96,6 +91,7 @@ def propose(ctx: ServiceContext, actor: UserAccount, contract_id: int, base_vers
     contract, side, team, current = _open_for_changes(ctx, contract_id, actor, base_version)
     require_not_started(ctx, contract)
     validate_terms(terms, ctx.clock.now())
+    launch_rules.match_terms(ctx.features, terms.referee_mode, terms.place_kind)  # Sprint 29
     diff = diff_terms(terms_of(current), terms)
     if not diff["after"]:
         raise DomainError("NO_CHANGES", "La propuesta es igual al contrato actual. Cambia al menos una condición.")
@@ -142,6 +138,7 @@ def cancel(ctx: ServiceContext, actor: UserAccount, contract_id: int, reason: st
     require_not_started(ctx, contract)
     before = contract.status
     contract.status, contract.cancel_reason, contract.cancelled_by = ContractStatus.CANCELLED.value, clean, actor.id
+    booking_service.cancel_for_contract(ctx, contract.id, actor.id)
     contract.updated_at = ctx.clock.now()
     ctx.db.flush()
     record_event(ctx, action="CONTRACT_CANCELLED", entity=_ENTITY, entity_id=contract.id, initiated_by=actor.id,

@@ -1,0 +1,63 @@
+# Despliegue de RIVAL con Docker Compose (Sprint 28). Ver docs/despliegue.md.
+# Uso:  cd deploy && cp .env.example .env  (y llenar los valores)  &&  docker compose up -d --build
+# La API queda solo en 127.0.0.1:8000: el proxy HTTPS del servidor (Caddy, Nginx…) la publica.
+
+x-backend: &backend
+  build: ../backend
+  image: rival-backend:latest
+  env_file: .env
+  environment:
+    RIVAL_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    RIVAL_AUTO_SCHEMA: "false"  # las tablas las crea Alembic (servicio migrate), no el arranque
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:  # sube las migraciones y termina; los demás esperan a que salga bien
+    <<: *backend
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  avisos:  # enviador de notificaciones push, cada minuto
+    <<: *backend
+    command: ["python", "-m", "app.tools.push_worker"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  mantenimiento:  # borra sesiones vencidas una vez al día
+    <<: *backend
+    command: ["sh", "-c", "while true; do python -m app.tools.purge_sessions; sleep 86400; done"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:

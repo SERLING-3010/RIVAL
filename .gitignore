@@ -1,2 +1,6 @@
 # Copias de respaldo que crea el script de cada Sprint
 *.bak-*
+
+# Despliegue (Sprint 28): secretos del servidor y copias de la base, nunca al repositorio
+deploy/.env
+deploy/backups/

@@ -5,15 +5,20 @@ import { renderMatchRoute } from './MatchRoutes';
 import { TeamActions } from './TeamActions';
 import { useCreateTeamForm } from '../controllers/useCreateTeamForm';
 import { useMyTeams } from '../controllers/useMyTeams';
+import { useModerationMe } from '../controllers/useModeration';
+import { pendingCount, usePending } from '../controllers/usePending';
 import type { Navigator } from '../controllers/useNavigator';
 import type { Session } from '../controllers/useSession';
 import { useTeamDetail } from '../controllers/useTeamDetail';
 import { useTeamSearch } from '../controllers/useTeamSearch';
+import { useMyData } from '../controllers/useMyData';
 import type { Sport, User } from '../domain/models';
 import { Screen } from '../ui/components/Screen';
 import { StateView } from '../ui/components/StateView';
 import { CreateTeamScreen } from '../ui/screens/CreateTeamScreen';
 import { HomeScreen } from '../ui/screens/HomeScreen';
+import { LegalScreen } from '../ui/screens/LegalScreen';
+import { MyDataScreen } from '../ui/screens/MyDataScreen';
 import { TeamScreen } from '../ui/screens/TeamScreen';
 import { TeamSearchScreen } from '../ui/screens/TeamSearchScreen';
 
@@ -28,8 +33,10 @@ interface Ctx extends Props {
   sports: Sport[];
 }
 
-function HomeContainer({ session, user, token, navigator }: Ctx) {
+function HomeContainer({ user, token, navigator }: Ctx) {
   const teams = useMyTeams(token);
+  const pending = usePending(token);
+  const moderation = useModerationMe(token);
   return (
     <HomeScreen
       user={user}
@@ -38,8 +45,18 @@ function HomeContainer({ session, user, token, navigator }: Ctx) {
       onSearchTeam={() => navigator.push({ name: 'teamSearch' })}
       onCreateTeam={() => navigator.push({ name: 'createTeam' })}
       onFreeAgent={() => navigator.push({ name: 'freeAgentPanel' })}
+      onLeagues={() => navigator.push({ name: 'leagues' })}
+      onMyVenues={() => navigator.push({ name: 'myVenues' })}
+      onTransferOffers={() => navigator.push({ name: 'transferOffers' })}
+      onRefereeMatches={() => navigator.push({ name: 'refereeMatches' })}
+      onMyCallUps={() => navigator.push({ name: 'myCallups' })}
+      pendingCount={pendingCount(pending)}
+      onPending={() => navigator.push({ name: 'pending' })}
+      moderation={moderation.state.kind === 'success' ? moderation.state.data : null}
+      onMySanctions={() => navigator.push({ name: 'mySanctions' })}
+      onModeration={() => navigator.push({ name: 'moderation' })}
       onOpenTeam={(teamId) => navigator.push({ name: 'team', teamId })}
-      onLogout={() => void session.handleLogout()}
+      onAccount={() => navigator.push({ name: 'myData' })}
     />
   );
 }
@@ -84,6 +101,17 @@ function TeamContainer({ user, token, navigator, teamId }: Ctx & { teamId: numbe
   );
 }
 
+function MyDataContainer({ session, token, navigator }: Props) {
+  return (
+    <MyDataScreen
+      controller={useMyData(token, session.handleAccountDeleted)}
+      onOpenLegal={(doc) => navigator.push({ name: 'legal', doc })}
+      onBack={navigator.goBack}
+      onLogout={() => void session.handleLogout()}
+    />
+  );
+}
+
 export function SignedInFlow(props: Props) {
   const catalog = useCatalog();
   const route = props.navigator.current;
@@ -98,6 +126,8 @@ export function SignedInFlow(props: Props) {
   return (
     <StateView state={catalog.state} onRetry={catalog.handleRetry}>
       {(sports) => {
+        if (route.name === 'legal') return <LegalScreen doc={route.doc} onBack={props.navigator.goBack} />;
+        if (route.name === 'myData') return <MyDataContainer {...props} />;
         if (route.name === 'teamSearch') return <SearchContainer {...props} sports={sports} />;
         if (route.name === 'createTeam') return <CreateContainer {...props} sports={sports} />;
         if (route.name === 'team') return <TeamContainer {...props} sports={sports} teamId={route.teamId} />;

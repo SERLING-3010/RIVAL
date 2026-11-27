@@ -3,15 +3,20 @@
 from sqlalchemy import or_, select
 
 from app.domain.contract_rules import ContractStatus, ContractTerms, terms_from_dict
-from app.domain.errors import ConflictError, NotFoundError
-from app.domain.team_rules import resolve_admin
+from app.domain.errors import ConflictError, NotFoundError, PermissionDeniedError
+from app.domain.match_rules import PlaceKind
+from app.domain.team_rules import is_matchday_staff, resolve_admin
 from app.persistence.models_contracts import MatchContract, MatchContractSignature, MatchContractVersion
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_teams import Team
+from app.persistence.models_venues import Booking
 from app.services.context import ServiceContext
 from app.services.contract_views import ContractSummaryView, ContractView, VersionView
+from app.services.result_queries import get_result, result_view
 from app.services.rival_service import require_member
 from app.services.team_service import get_active_team, member_views, summary
+from app.services.referee_queries import referee_view
+from app.services.venue_queries import booking_view
 
 HOST, GUEST = "HOST", "GUEST"
 
@@ -38,6 +43,17 @@ def member_side(teams: dict[str, Team], actor: UserAccount) -> str:
 
 def is_admin_of(team: Team, actor: UserAccount) -> bool:
     return resolve_admin(member_views(team)) == actor.id
+
+
+def admin_side(ctx: ServiceContext, contract: MatchContract, actor: UserAccount) -> tuple[str, Team]:
+    teams = side_teams(ctx, contract)
+    member_side(teams, actor)  # 404 si no pertenece a ninguno de los dos equipos
+    sides = [side for side, team in teams.items() if is_admin_of(team, actor)]
+    if len(sides) == 2:
+        raise ConflictError("SAME_ADMIN_BOTH_TEAMS", "No puedes firmar por los dos equipos del mismo partido.")
+    if not sides:
+        raise PermissionDeniedError("ADMIN_ONLY", "Solo el administrador del equipo (DT o capitán) puede hacer esto.")
+    return sides[0], teams[sides[0]]
 
 
 def get_version(ctx: ServiceContext, version_id: int | None) -> MatchContractVersion:
@@ -81,12 +97,23 @@ def get_contract(ctx: ServiceContext, actor: UserAccount, contract_id: int) -> C
         MatchContractVersion.contract_id == contract.id).order_by(MatchContractVersion.version)))
     by_id = {v.id: version_view(ctx, contract, v) for v in versions}
     signed = by_id.get(contract.signed_version_id) if contract.signed_version_id is not None else None
+    booking = ctx.db.scalar(select(Booking).where(Booking.contract_id == contract.id).order_by(Booking.id.desc()))
     return ContractView(
-        id=contract.id, request_id=contract.request_id, host=summary(teams[HOST]), guest=summary(teams[GUEST]),
+        id=contract.id, request_id=contract.request_id, league_id=contract.league_id,
+        host=summary(teams[HOST]), guest=summary(teams[GUEST]),
         status=contract.status, my_side=side, is_admin=is_admin_of(teams[side], actor),
+        is_staff=is_matchday_staff(member_views(teams[side]), actor.id),
         current=by_id[contract.current_version_id or 0], signed=signed, versions=list(by_id.values()),
-        cancel_reason=contract.cancel_reason,
+        cancel_reason=contract.cancel_reason, result=result_view(ctx, contract),
+        booking=booking_view(ctx, booking) if booking else None, ready_to_play=_ready(contract, signed, booking),
+        referee=referee_view(ctx, contract.id),
     )
+
+
+def _ready(contract: MatchContract, signed: VersionView | None, booking: Booking | None) -> bool:
+    if signed is None or contract.status == ContractStatus.CANCELLED:
+        return False
+    return signed.terms.place_kind != PlaceKind.VENUE or (booking is not None and booking.status == "CONFIRMED")
 
 
 def contract_id_for_offer(ctx: ServiceContext, offer_id: int) -> int | None:
@@ -106,7 +133,10 @@ def team_contracts(ctx: ServiceContext, actor: UserAccount, team_id: int) -> lis
         current = get_version(ctx, contract.current_version_id)
         effective = get_version(ctx, contract.signed_version_id or contract.current_version_id)
         awaiting = contract.status == ContractStatus.NEGOTIATING and side not in signed_sides(ctx, contract, current)
+        outcome = get_result(ctx, contract.id)
         result.append(ContractSummaryView(
             id=contract.id, host=summary(teams[HOST]), guest=summary(teams[GUEST]), status=contract.status,
-            kickoff_at=terms_of(effective).kickoff_at, my_side=side, awaiting_my_signature=awaiting))
+            kickoff_at=terms_of(effective).kickoff_at, my_side=side, awaiting_my_signature=awaiting,
+            result_status=outcome.status if outcome else None, host_score=outcome.host_score if outcome else None,
+            guest_score=outcome.guest_score if outcome else None))
     return result

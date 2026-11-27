@@ -18,7 +18,8 @@ export const team = (id: number, name: string): TeamSummary => ({
 });
 
 export const terms: ContractTerms = {
-  kickoff_at: '2026-11-28T23:00:00+00:00',
+  // Siempre en el futuro respecto al día en que corren las pruebas.
+  kickoff_at: new Date(Date.now() + 2 * 86_400_000).toISOString(),
   duration_minutes: 60,
   referee_mode: 'WITHOUT',
   place_kind: 'INFORMAL',
@@ -52,10 +53,16 @@ export function contract(overrides: Partial<Contract> = {}): Contract {
     status: 'NEGOTIATING',
     my_side: 'HOST',
     is_admin: true,
+    is_staff: true,
     current,
     signed: null,
     versions: [current],
     cancel_reason: null,
+    result: null,
+    booking: null,
+    ready_to_play: false,
+    referee: null,
+    league_id: null,
     ...overrides,
   };
 }
@@ -70,5 +77,7 @@ export function contractController(data: Contract): ContractController {
     handleSign: jest.fn(async () => undefined),
     handleRejectAmendment: jest.fn(async () => undefined),
     handleCancel: jest.fn(async () => undefined),
+    handleReport: jest.fn(async () => undefined),
+    handleCancelBooking: jest.fn(async () => undefined),
   };
 }

@@ -10,6 +10,8 @@ export type PlaceKind = 'VENUE' | 'INFORMAL' | 'TO_AGREE';
 export interface Rival {
   team: TeamSummary;
   distance_band: DistanceBand | null;
+  level: number | null; // nivel Glicko-2 (Sprint 10)
+  level_reliable: boolean;
 }
 
 export interface RivalPage {

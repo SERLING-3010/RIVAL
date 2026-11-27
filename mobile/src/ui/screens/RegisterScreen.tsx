@@ -6,6 +6,7 @@ import type { Sport } from '../../domain/models';
 import type { ViewState } from '../../domain/viewState';
 import { ChoiceChips } from '../components/ChoiceChips';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { TermsCheck } from '../components/TermsCheck';
 import { Screen } from '../components/Screen';
 import { StateView } from '../components/StateView';
 import { TextField } from '../components/TextField';
@@ -16,9 +17,10 @@ interface Props {
   catalog: ViewState<Sport[]>;
   onRetryCatalog: () => void;
   onBack: () => void;
+  onOpenLegal: (doc: 'terms' | 'privacy') => void; // Sprint 27
 }
 
-export function RegisterScreen({ controller, catalog, onRetryCatalog, onBack }: Props) {
+export function RegisterScreen({ controller, catalog, onRetryCatalog, onBack, onOpenLegal }: Props) {
   const { form, errors } = controller;
   const plays = form.role === 'PLAYER' || form.role === 'COACH';
   return (
@@ -84,6 +86,12 @@ export function RegisterScreen({ controller, catalog, onRetryCatalog, onBack }: 
           onChangeText={(v) => controller.handleChange('position', v)}
         />
       ) : null}
+      <TermsCheck
+        checked={form.acceptTerms}
+        error={errors.acceptTerms}
+        onToggle={controller.handleToggleTerms}
+        onOpen={onOpenLegal}
+      />
       {controller.submitError ? (
         <Text style={styles.error} accessibilityLiveRegion="assertive">
           {controller.submitError}

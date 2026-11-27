@@ -1,3 +1,4 @@
+import type { ActivityItem } from '../domain/activityLabels';
 import type { Contract, ContractSummary, ContractTerms } from '../domain/contractModels';
 import { request } from './httpClient';
 
@@ -31,4 +32,13 @@ export const contractApi = {
 
   cancel: (token: string, contractId: number, reason: string) =>
     request<Contract>('POST', `/api/v1/contracts/${contractId}/cancel`, { token, body: { reason } }),
+
+  reportResult: (token: string, contractId: number, hostScore: number, guestScore: number) =>
+    request<Contract>('POST', `/api/v1/contracts/${contractId}/result`, {
+      token,
+      body: { host_score: hostScore, guest_score: guestScore },
+    }),
+
+  activity: (token: string, scope: 'contracts' | 'teams', id: number) =>
+    request<ActivityItem[]>('GET', `/api/v1/${scope}/${id}/activity`, { token }),
 };

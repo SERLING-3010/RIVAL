@@ -7,6 +7,7 @@ Aceptar bloquea la solicitud (FOR UPDATE): dos aceptaciones simultáneas no pued
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
+from app.domain import launch_rules
 from app.domain.errors import ConflictError, NotFoundError
 from app.domain.match_rules import (
     OfferStatus,
@@ -18,7 +19,7 @@ from app.domain.match_rules import (
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import Team
-from app.services import contract_service
+from app.services import block_service, contract_service
 from app.services.audit_service import record_event
 from app.services.context import ServiceContext
 from app.services.match_feed_service import is_visible_to, viewer_distances
@@ -42,7 +43,8 @@ def make_offer(ctx: ServiceContext, actor: UserAccount, team_id: int, request_id
     if request.team_id == team.id:
         raise ConflictError("OWN_REQUEST", "No puedes ofertar a la búsqueda de tu propio equipo.")
     owner = ctx.db.get(Team, request.team_id)
-    if owner is None or not is_visible_to(request, owner, team, viewer_distances(ctx, team)):
+    blocked = owner is not None and block_service.is_blocked(ctx, owner.id, team.id)
+    if owner is None or blocked or not is_visible_to(request, owner, team, viewer_distances(ctx, team)):
         raise NotFoundError("MATCH_REQUEST_NOT_FOUND", "La búsqueda de partido no existe.")
     check_proposed_start(data.proposed_start, request.window_start, request.window_end, ctx.clock.now())
     check_offer_referee(RefereeMode(request.referee_mode), data.referee_mode)
@@ -51,9 +53,10 @@ def make_offer(ctx: ServiceContext, actor: UserAccount, team_id: int, request_id
     if previous is not None:
         previous.status = OfferStatus.SUPERSEDED.value
         ctx.db.flush()  # libera el índice único de oferta pendiente antes de crear la nueva versión
+    referee = launch_rules.match_terms(ctx.features, data.referee_mode, data.place_kind)  # Sprint 29
     offer = MatchOffer(
         request_id=request.id, team_id=team.id, version=_next_version(ctx, request.id, team.id),
-        proposed_start=data.proposed_start, referee_mode=data.referee_mode.value, place_kind=data.place_kind.value,
+        proposed_start=data.proposed_start, referee_mode=referee.value, place_kind=data.place_kind.value,
         place_note=(data.place_note or "").strip()[:120] or None, message=(data.message or "").strip()[:200] or None,
         status=_PENDING, created_by=actor.id, created_at=ctx.clock.now(),
     )
@@ -101,12 +104,12 @@ def decide(ctx: ServiceContext, actor: UserAccount, offer_id: int, accept: bool)
                 MatchOffer.request_id == request.id, MatchOffer.status == _PENDING, MatchOffer.id != offer.id)):
             other.status, other.decided_by, other.decided_at = OfferStatus.SUPERSEDED.value, actor.id, now
     ctx.db.flush()
-    if accept:
-        contract_service.create_from_offer(ctx, request, offer, actor.id)
     offering_admin = resolve_admin_id(ctx, offer.team_id)
     record_event(ctx, action="MATCH_OFFER_ACCEPTED" if accept else "MATCH_OFFER_REJECTED", entity="match_offer",
                  entity_id=offer.id, initiated_by=offering_admin, approved_by=actor.id,
                  before={"status": _PENDING}, after={"status": offer.status, "request_status": request.status})
+    if accept:  # después del evento de la oferta, para que la actividad se lea en orden
+        contract_service.create_from_offer(ctx, request, offer, actor.id)
     return offer
 
 

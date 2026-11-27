@@ -18,7 +18,7 @@ def test_minor_rejected_with_spanish_message_and_correlation(client):
     response = client.post("/api/v1/auth/register", json={
         "email": "menor@rival.test", "password": "mi equipo juega los sábados", "display_name": "Ana",
         "birth_date": "2012-01-01", "role": "PLAYER", "sports": ["FOOTBALL"],
-        "city": "Barranquilla", "neighborhood": "El Prado"})
+        "city": "Barranquilla", "neighborhood": "El Prado", "accept_terms": True})
     assert response.status_code == 422
     body = response.json()
     assert body["code"] == "UNDERAGE"

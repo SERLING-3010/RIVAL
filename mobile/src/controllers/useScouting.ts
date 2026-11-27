@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 
 import type { FreeAgent, Rival, SearchScope } from '../domain/matchModels';
 import type { TeamSummary } from '../domain/models';
+import type { RivalOrder } from '../services/scoutingApi';
 import { scoutingApi } from '../services/scoutingApi';
 import type { Action } from './useAction';
 import { useAction } from './useAction';
@@ -13,19 +14,30 @@ import { usePagedLoader } from './usePagedLoader';
 export interface RivalSearchController extends PagedLoader<Rival> {
   scope: SearchScope;
   radiusKm: number;
+  order: RivalOrder;
   handleScope: (scope: SearchScope) => void;
   handleRadius: (km: number) => void;
+  handleOrder: (order: RivalOrder) => void;
 }
 
 export function useRivalSearch(token: string, teamId: number): RivalSearchController {
   const [scope, setScope] = useState<SearchScope>('NEARBY');
   const [radiusKm, setRadiusKm] = useState(5);
+  const [order, setOrder] = useState<RivalOrder>('default');
   const loader = usePagedLoader(
-    (page) => scoutingApi.rivals(token, teamId, scope, radiusKm, page),
+    (page) => scoutingApi.rivals(token, teamId, scope, radiusKm, page, order),
     'No hay equipos de tu deporte y modalidad en ese alcance. Prueba con "Mi ciudad".',
-    `${teamId}|${scope}|${radiusKm}`,
+    `${teamId}|${scope}|${radiusKm}|${order}`,
   );
-  return { ...loader, scope, radiusKm, handleScope: setScope, handleRadius: setRadiusKm };
+  return {
+    ...loader,
+    scope,
+    radiusKm,
+    order,
+    handleScope: setScope,
+    handleRadius: setRadiusKm,
+    handleOrder: setOrder,
+  };
 }
 
 export interface FreeAgentSearchController extends PagedLoader<FreeAgent> {

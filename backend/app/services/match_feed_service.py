@@ -12,7 +12,7 @@ from app.domain.match_rules import OfferStatus, RequestStatus
 from app.persistence.models_identity import UserAccount
 from app.persistence.models_matches import MatchOffer, MatchRequest
 from app.persistence.models_teams import Team
-from app.services import neighborhood_service
+from app.services import block_service, neighborhood_service
 from app.services.context import ServiceContext
 from app.services.match_request_service import to_view
 from app.services.match_views import MatchRequestView
@@ -67,7 +67,10 @@ def open_requests_for(
         ).order_by(MatchRequest.window_start, MatchRequest.id).limit(MAX_RESULTS * 2)
     ).all()
     visible = []
+    blocked = block_service.blocked_ids(ctx, viewer.id)
     for request, owner in rows:
+        if owner.id in blocked:  # bloqueos entre equipos (Sprint 12)
+            continue
         km = distances.get(owner.neighborhood_key)
         same_barrio = owner.neighborhood_key == viewer.neighborhood_key
         direct = request.target_team_id == viewer.id

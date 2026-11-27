@@ -1,0 +1,69 @@
+"""Notificaciones push (Sprint 24). Decisión del dueño (25/11/2026): avisos breves y sin datos.
+
+El texto pasa por Expo y por Apple o Google y se ve en la pantalla bloqueada, así que nunca lleva
+nombres, equipos, marcadores, horarios ni lugares: solo qué tipo de cosa espera en la app.
+"""
+
+import hashlib
+import re
+
+from app.domain.errors import DomainError
+
+# Tipo de pendiente → aviso. Solo frases genéricas, sin datos.
+MESSAGES: dict[str, str] = {
+    "NEW_CARD": "¡Ganaste una carta nueva!",
+    "TEAM_NEW_CARD": "Tu equipo ganó una carta nueva.",
+    "CHALLENGE_RECEIVED": "Tienes un reto nuevo.",
+    "OFFERS_RECEIVED": "Hay ofertas nuevas para tu búsqueda.",
+    "SIGN_CONTRACT": "Hay un contrato por firmar.",
+    "REPORT_RESULT": "Hay un marcador por reportar.",
+    "RESULT_DISPUTED": "Hay un marcador en disputa.",
+    "CALLUP": "Tienes una convocatoria nueva.",
+    "CONFIRM_GOAL_KINDS": "Hay goles especiales por confirmar.",
+    "TRANSFER_PLAYER": "Tienes una oferta de traspaso.",
+    "TRANSFER_OWNER": "Hay una oferta por un jugador de tu equipo.",
+    "JOIN_REQUESTS": "Alguien quiere unirse a tu equipo.",
+    "LEAGUE_REQUESTS": "Hay solicitudes nuevas en tu liga.",
+    "REFEREE_ASSIGNMENT": "Tienes un partido para arbitrar.",
+    "REFEREE_RESULT": "Hay un resultado por registrar como árbitro.",
+    "CONFIRM_BOOKING": "Hay una reserva por confirmar.",
+    "RATE_TEAMMATES": "Ya puedes valorar a tus compañeros.",
+    "LOAN_PLAYER": "Tienes una propuesta de préstamo.",
+    "LOAN_OWNER": "Hay una propuesta de préstamo en tu equipo.",
+}
+GENERIC = "Tienes algo pendiente en RIVAL."
+TITLE = "RIVAL"
+MAX_DEVICES_PER_USER = 5
+
+_TOKEN = re.compile(r"^Expo(nent)?PushToken\[[A-Za-z0-9_-]{10,120}\]$")
+
+
+def validate_token(token: str) -> str:
+    token = token.strip()
+    if not _TOKEN.fullmatch(token):
+        raise DomainError("INVALID_PUSH_TOKEN", "El identificador de notificaciones del teléfono no es válido.")
+    return token
+
+
+def item_key(kind: str, target_id: int | None, title: str = "") -> str:
+    """Identifica un pendiente para avisar una sola vez por él. La huella del título distingue, por
+    ejemplo, dos retos al mismo equipo o una oferta más en la misma búsqueda (Sprint 25)."""
+    mark = hashlib.sha1(title.encode(), usedforsecurity=False).hexdigest()[:10]  # huella, no seguridad
+    return f"{kind}:{target_id if target_id is not None else '-'}:{mark}"
+
+
+def body_for(kinds: list[str]) -> str:
+    """Un solo aviso por persona y por ronda: el del pendiente, o un resumen si son varios."""
+    if len(kinds) == 1:
+        return MESSAGES.get(kinds[0], GENERIC)
+    return f"Tienes {len(kinds)} cosas nuevas por revisar en RIVAL."
+
+
+def open_for(kinds: list[str]) -> str:
+    """Pantalla que abre el aviso (Sprint 26): la ficha propia si es solo una carta tuya, el inicio si es
+    solo del equipo, y «Pendientes» en el resto. Es un nombre de pantalla, no un dato personal."""
+    if set(kinds) == {"NEW_CARD"}:
+        return "myCard"
+    if set(kinds) == {"TEAM_NEW_CARD"}:
+        return "home"
+    return "pending"

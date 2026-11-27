@@ -1,0 +1,4 @@
+# Opcional, solo para desarrollo: PostgreSQL 16 embebido para correr las pruebas de concurrencia
+# sin instalar PostgreSQL ni Docker. Ver backend/README.md ("Pruebas con PostgreSQL local").
+-r requirements-dev.txt
+pgserver==0.1.4

@@ -1,9 +1,9 @@
 // Pruebas de las reglas locales del contrato. Ejecutar: node --experimental-strip-types --test tests/
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-
 import { formFromTerms, termsFromForm } from '../src/domain/contractForm.ts';
 import type { Contract, ContractTerms } from '../src/domain/contractModels.ts';
+import { actionLabel, actorText, changeLines } from '../src/domain/activityLabels.ts';
 import { changedFields, contractActions } from '../src/domain/contractRules.ts';
 
 const now = new Date('2026-11-23T15:00:00Z');
@@ -45,10 +45,16 @@ function contract(overrides: Partial<Contract>): Contract {
     status: 'NEGOTIATING',
     my_side: 'HOST',
     is_admin: true,
+    is_staff: true,
     current: version,
     signed: null,
     versions: [version],
     cancel_reason: null,
+    result: null,
+    booking: null,
+    ready_to_play: false,
+    referee: null,
+    league_id: null,
     ...overrides,
   };
 }
@@ -77,13 +83,22 @@ test('una hora pasada se rechaza', () => {
 });
 
 test('quién puede firmar: solo el administrador que aún no firmó', () => {
-  assert.equal(contractActions(contract({})).canSign, true);
+  assert.equal(contractActions(contract({}), now).canSign, true);
   const signedByMe = contract({ current: { ...contract({}).current, signed_by: ['HOST'] } });
-  assert.equal(contractActions(signedByMe).canSign, false);
-  assert.match(contractActions(signedByMe).status, /rival/);
-  assert.equal(contractActions(contract({ is_admin: false })).canSign, false);
-  const cancelled = contractActions(contract({ status: 'CANCELLED' }));
+  assert.equal(contractActions(signedByMe, now).canSign, false);
+  assert.match(contractActions(signedByMe, now).status, /rival/);
+  assert.equal(contractActions(contract({ is_admin: false }), now).canSign, false);
+  const cancelled = contractActions(contract({ status: 'CANCELLED' }), now);
   assert.equal(cancelled.canCancel || cancelled.canPropose, false);
+});
+
+test('el capitán (con DT) reporta el resultado pero no firma (Sprint 21)', () => {
+  const signed: Contract['current'] = { ...contract({}).current, signed_by: ['HOST', 'GUEST'] };
+  const played = new Date(Date.parse(terms.kickoff_at) + 3_600_000);
+  const role = (is_staff: boolean) => contract({ is_admin: false, is_staff, status: 'SIGNED', signed });
+  assert.equal(contractActions(role(true), played).canReportResult, true);
+  assert.equal(contractActions(role(false), played).canReportResult, false);
+  assert.equal(contractActions(contract({ is_admin: false, is_staff: true }), now).canSign, false);
 });
 
 test('un cambio sobre un contrato firmado se puede rechazar y avisa que vale la versión firmada', () => {
@@ -92,7 +107,44 @@ test('un cambio sobre un contrato firmado se puede rechazar y avisa que vale la 
     signed: base.current,
     current: { ...base.current, version: 2, signed_by: ['GUEST'] },
   });
-  const actions = contractActions(amended);
+  const actions = contractActions(amended, now);
   assert.equal(actions.canRejectAmendment, true);
   assert.match(actions.status, /versión firmada/);
+});
+
+test('después de la hora: no se cambia ni se cancela; se reporta si estaba firmado', () => {
+  const later = new Date('2026-11-26T00:00:00Z');
+  const signed = contract({ status: 'SIGNED', signed: contract({}).current });
+  const actions = contractActions(signed, later);
+  assert.deepEqual([actions.canPropose, actions.canCancel, actions.canReportResult], [false, false, true]);
+  assert.equal(contractActions(signed, now).canReportResult, false);
+  assert.equal(contractActions(contract({}), later).canReportResult, false);
+  const done = {
+    status: 'CONFIRMED' as const,
+    host_score: 1,
+    guest_score: 0,
+    reports: [],
+    by_referee: false,
+  };
+  assert.equal(contractActions({ ...signed, result: done }, later).canReportResult, false);
+});
+
+test('la actividad muestra antes → después solo de campos conocidos', () => {
+  const item = {
+    occurred_at: '2026-11-23T15:00:00Z',
+    action: 'CONTRACT_VERSION_PROPOSED',
+    entity: 'match_contract',
+    entity_id: '1',
+    actor_type: 'HUMAN',
+    actor_name: 'José',
+    approver_name: null,
+    before: { duration_minutes: 60 },
+    after: { duration_minutes: 90, version: 2 },
+  };
+  assert.equal(actionLabel(item.action), 'Propuso cambios al contrato');
+  assert.deepEqual(changeLines(item), ['duración: 60 → 90']);
+  assert.equal(
+    actorText({ ...item, actor_name: null, actor_type: 'SYSTEM_RULE' }),
+    'RIVAL (regla automática)',
+  );
 });

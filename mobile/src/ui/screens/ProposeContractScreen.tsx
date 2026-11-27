@@ -6,7 +6,9 @@ import type { CostSplit } from '../../domain/contractModels';
 import { COST_SPLIT_LABEL } from '../../domain/contractRules';
 import { PLACE_LABEL, REFEREE_LABEL } from '../../domain/matchLabels';
 import type { PlaceKind } from '../../domain/matchModels';
+import { placeChoices, refereeChoices } from '../../domain/features';
 import { ChoiceChips } from '../components/ChoiceChips';
+import { useFeatures } from '../FeaturesContext';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { TextField } from '../components/TextField';
@@ -25,6 +27,8 @@ const REFEREES: ContractForm['referee'][] = ['WITHOUT', 'WITH'];
 
 export function ProposeContractScreen({ controller, hostName, guestName, onBack }: Props) {
   const { form, handleChange, action } = controller;
+  const features = useFeatures(); // Sprint 29
+  const referees = refereeChoices(REFEREES, features);
   const splitChoices = SPLITS.map((s) => ({ value: s, label: COST_SPLIT_LABEL[s] }));
   return (
     <Screen title="Proponer cambios" onBack={onBack}>
@@ -42,16 +46,18 @@ export function ProposeContractScreen({ controller, hostName, guestName, onBack 
         value={form.duration}
         onChangeText={(v) => handleChange('duration', v)}
       />
-      <ChoiceChips
-        label="Árbitro"
-        selected={[form.referee]}
-        choices={REFEREES.map((r) => ({ value: r, label: REFEREE_LABEL[r] }))}
-        onToggle={(v) => handleChange('referee', v as ContractForm['referee'])}
-      />
+      {referees.length > 1 ? (
+        <ChoiceChips
+          label="Árbitro"
+          selected={[form.referee]}
+          choices={referees.map((r) => ({ value: r, label: REFEREE_LABEL[r] }))}
+          onToggle={(v) => handleChange('referee', v as ContractForm['referee'])}
+        />
+      ) : null}
       <ChoiceChips
         label="Lugar"
         selected={[form.place]}
-        choices={PLACES.map((p) => ({ value: p, label: PLACE_LABEL[p] }))}
+        choices={placeChoices(PLACES, features).map((p) => ({ value: p, label: PLACE_LABEL[p] }))}
         onToggle={(v) => handleChange('place', v as PlaceKind)}
       />
       <TextField

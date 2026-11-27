@@ -4,7 +4,10 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { toAppError } from '../domain/appError';
 import type { RegisterPayload, SessionResponse, User } from '../domain/models';
+import { accountApi } from '../services/accountApi';
 import { authApi } from '../services/authApi';
+import { pushApi } from '../services/pushApi';
+import { registeredToken } from '../services/pushDevice';
 import { setUnauthorizedHandler } from '../services/httpClient';
 import { clearToken, readToken, saveToken } from '../services/tokenStore';
 
@@ -17,6 +20,8 @@ export interface Session {
   handleRegister: (payload: RegisterPayload) => Promise<void>;
   handleLogin: (email: string, password: string) => Promise<void>;
   handleLogout: () => Promise<void>;
+  handleAcceptTerms: (version: string) => Promise<void>; // Sprint 27
+  handleAccountDeleted: () => Promise<void>;
 }
 
 export function useSession(): Session {
@@ -80,6 +85,8 @@ export function useSession(): Session {
 
   const handleLogout = useCallback(async () => {
     if (token) {
+      const device = registeredToken(); // Sprint 24: este teléfono deja de recibir avisos de la cuenta
+      if (device) await pushApi.remove(token, device).catch(() => undefined);
       await authApi.logout(token).catch(() => undefined);
     }
     await clearToken().catch(() => undefined);
@@ -88,5 +95,29 @@ export function useSession(): Session {
     setStatus('signedOut');
   }, [token]);
 
-  return { status, user, token, handleRegister, handleLogin, handleLogout };
+  const handleAcceptTerms = useCallback(
+    async (version: string) => {
+      if (token) setUser(await accountApi.acceptTerms(token, version));
+    },
+    [token],
+  );
+
+  // La cuenta ya no existe en el servidor: solo se limpia el teléfono.
+  const handleAccountDeleted = useCallback(async () => {
+    await clearToken().catch(() => undefined);
+    setToken(null);
+    setUser(null);
+    setStatus('signedOut');
+  }, []);
+
+  return {
+    status,
+    user,
+    token,
+    handleRegister,
+    handleLogin,
+    handleLogout,
+    handleAcceptTerms,
+    handleAccountDeleted,
+  };
 }

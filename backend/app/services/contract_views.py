@@ -5,6 +5,7 @@ from datetime import datetime
 
 from app.domain.contract_rules import ContractTerms
 from app.services.team_views import TeamSummaryView
+from app.services.venue_views import BookingView
 
 
 @dataclass(frozen=True)
@@ -18,18 +19,49 @@ class VersionView:
 
 
 @dataclass(frozen=True)
+class ResultReportView:
+    side: str
+    host_score: int
+    guest_score: int
+    reported_at: datetime
+
+
+@dataclass(frozen=True)
+class ResultView:
+    status: str  # PENDING, CONFIRMED o DISPUTED; el marcador solo existe si está CONFIRMED
+    host_score: int | None
+    guest_score: int | None
+    reports: list[ResultReportView]
+    by_referee: bool  # True si lo fijó el árbitro asignado (vale aunque los equipos no coincidan)
+
+
+@dataclass(frozen=True)
+class RefereeView:
+    assignment_id: int
+    referee_id: int
+    display_name: str
+    status: str  # PENDING, ACCEPTED
+
+
+@dataclass(frozen=True)
 class ContractView:
     id: int
-    request_id: int
+    request_id: int | None
+    league_id: int | None
     host: TeamSummaryView
     guest: TeamSummaryView
     status: str
     my_side: str
     is_admin: bool
+    is_staff: bool  # administrador o capitán: convocatoria, alineación y resultado (Sprint 21)
     current: VersionView
     signed: VersionView | None
     versions: list[VersionView]
     cancel_reason: str | None
+    result: ResultView | None
+    booking: BookingView | None  # la reserva más reciente de cancha, si el lugar es un establecimiento
+    ready_to_play: bool  # firmado y, si es en establecimiento, con la franja confirmada
+    referee: RefereeView | None  # árbitro asignado por la liga (pendiente o aceptado)
 
 
 @dataclass(frozen=True)
@@ -41,3 +73,6 @@ class ContractSummaryView:
     kickoff_at: datetime
     my_side: str
     awaiting_my_signature: bool
+    result_status: str | None
+    host_score: int | None
+    guest_score: int | None

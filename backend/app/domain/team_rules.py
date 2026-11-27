@@ -30,6 +30,13 @@ def resolve_admin(members: list[MemberView]) -> int | None:
     return None
 
 
+def is_matchday_staff(members: list[MemberView], user_id: int) -> bool:
+    """Convocatoria, alineación, planilla y resultado (Sprint 21): el administrador y, si hay DT,
+    también el capitán. Firmas, retos, cancha, mercado y traspasos siguen siendo solo del administrador."""
+    return resolve_admin(members) == user_id or any(
+        m.user_id == user_id and m.role == TeamRole.CAPTAIN for m in members)
+
+
 def check_can_leave(user_id: int, members: list[MemberView]) -> None:
     """Impide que el equipo quede sin administrador cuando todavía tiene jugadores."""
     if not any(m.user_id == user_id for m in members):

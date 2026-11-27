@@ -16,6 +16,7 @@ from app.domain.identity_rules import (
 )
 from app.domain.roles import UserRole
 from app.domain.text_keys import search_key
+from app.domain.legal_rules import TERMS_VERSION, require_acceptance
 from app.persistence.models_identity import AuthSession, UserAccount, UserRoleRow, UserSport
 from app.services.audit_service import record_event
 from app.services.clock import local_today
@@ -44,6 +45,7 @@ def _check_sports(ctx: ServiceContext, sports: list[str]) -> list[str]:
 
 def register_user(ctx: ServiceContext, data: RegisterInput) -> UserAccount:
     email = normalize_email(data.email)
+    require_acceptance(data.accept_terms)  # Sprint 27
     validate_password(data.password)
     if not is_adult(data.birth_date, local_today(ctx.clock)):
         raise DomainError("UNDERAGE", "Por ahora RIVAL es solo para mayores de 18 años.")
@@ -64,6 +66,8 @@ def register_user(ctx: ServiceContext, data: RegisterInput) -> UserAccount:
         neighborhood_key=search_key(neighborhood),
         position=(data.position or "").strip()[:40] or None,
         created_at=now,
+        terms_version=TERMS_VERSION,
+        terms_accepted_at=now,
         roles=[UserRoleRow(role=data.role.value, created_at=now)],
         sports=[UserSport(sport_code=code) for code in sports],
     )
@@ -72,14 +76,9 @@ def register_user(ctx: ServiceContext, data: RegisterInput) -> UserAccount:
         ctx.db.flush()
     except IntegrityError as error:  # dos registros simultáneos con el mismo correo
         raise ConflictError("EMAIL_TAKEN", "Ya existe una cuenta con ese correo.") from error
-    record_event(
-        ctx,
-        action="USER_REGISTERED",
-        entity="user_account",
-        entity_id=user.id,
-        initiated_by=user.id,
-        after={"display_name": user.display_name, "role": data.role.value, "sports": sports},
-    )
+    record_event(ctx, action="USER_REGISTERED", entity="user_account", entity_id=user.id, initiated_by=user.id,
+                 after={"display_name": user.display_name, "role": data.role.value, "sports": sports,
+                        "terms_version": TERMS_VERSION})
     return user
 
 

@@ -1,20 +1,19 @@
-// Elige la pantalla de los Sprints 2 y 3 según la ruta actual.
+// Elige la pantalla de partidos, ligas, establecimientos y modo manager (Sprints 2 a 7) según la ruta.
 
 import type { ReactNode } from 'react';
 
 import type { Route } from '../controllers/useNavigator';
-import { ContractDetail, Contracts, ProposeContract } from './ContractFlow';
+import { Activity, ContractDetail, Contracts, ProposeContract } from './ContractFlow';
+import { CreateLeague, CupRoute, LeagueDetail, Leagues, RefereeMatches, Season } from './LeagueFlow';
+import { Badges, Lineup, Manager, Market, PlayerCardRoute, SquadRoute, TransferOffers } from './ManagerFlow';
+import { CheckIn, LoanRequest, MatchChat, MyLoans, Tactics } from './LoansFlow';
+import { CallUp, MyCallUps, RateTeammates } from './MatchdayFlow';
 import type { MatchCtx } from './MatchFlow';
-import {
-  CreateRequest,
-  Feed,
-  FreeAgentPanel,
-  FreeAgentSearch,
-  Offer,
-  Offers,
-  Requests,
-  Rivals,
-} from './MatchFlow';
+import { BlockedTeams, Moderation, MySanctions, Report } from './ModerationFlow';
+import { Pending } from './PendingFlow';
+import { BookVenue, CreateVenue, MyVenues, VenueDetail } from './VenueFlow';
+import { CreateRequest, Feed, FreeAgentPanel, FreeAgentSearch, Offer, Offers, Requests } from './MatchFlow';
+import { Rivals, Suggestions } from './RivalsFlow';
 
 /** Devuelve la pantalla de partidos para la ruta, o null si la ruta no es de este flujo. */
 export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null {
@@ -49,6 +48,84 @@ export function renderMatchRoute(route: Route, ctx: MatchCtx): ReactNode | null 
       return <ContractDetail {...ctx} contractId={route.contractId} />;
     case 'proposeContract':
       return <ProposeContract {...ctx} contract={route.contract} />;
+    case 'activity':
+      return <Activity {...ctx} scope={route.scope} id={route.id} title={route.title} />;
+    case 'leagues':
+      return <Leagues {...ctx} />;
+    case 'createLeague':
+      return <CreateLeague {...ctx} />;
+    case 'league':
+      return <LeagueDetail {...ctx} leagueId={route.leagueId} />;
+    case 'myVenues':
+      return <MyVenues {...ctx} />;
+    case 'createVenue':
+      return <CreateVenue {...ctx} />;
+    case 'venue':
+      return <VenueDetail {...ctx} venueId={route.venueId} match={route.match} />;
+    case 'bookVenue':
+      return <BookVenue {...ctx} match={route.match} city={route.city} />;
+    case 'manager':
+      return <Manager {...ctx} teamId={route.teamId} />;
+    case 'market':
+      return (
+        <Market
+          {...ctx}
+          teamId={route.teamId}
+          sport={route.sport}
+          city={route.city}
+          balance={route.balance}
+        />
+      );
+    case 'playerCard':
+      return <PlayerCardRoute {...ctx} userId={route.userId} />;
+    case 'transferOffers':
+      return <TransferOffers {...ctx} />;
+    case 'lineup':
+      return (
+        <Lineup {...ctx} contractId={route.contractId} teamId={route.teamId} teamScore={route.teamScore} />
+      );
+    case 'season':
+      return (
+        <Season {...ctx} leagueId={route.leagueId} canManage={route.canManage} referees={route.referees} />
+      );
+    case 'refereeMatches':
+      return <RefereeMatches {...ctx} />;
+    case 'callup':
+      return <CallUp {...ctx} contractId={route.contractId} teamId={route.teamId} isAdmin={route.isAdmin} />;
+    case 'rate':
+      return <RateTeammates {...ctx} contractId={route.contractId} />;
+    case 'myCallups':
+      return <MyCallUps {...ctx} />;
+    case 'pending':
+      return <Pending {...ctx} />;
+    case 'report':
+      return <Report {...ctx} target={route.target} />;
+    case 'mySanctions':
+      return <MySanctions {...ctx} />;
+    case 'moderation':
+      return <Moderation {...ctx} />;
+    case 'blockedTeams':
+      return <BlockedTeams {...ctx} teamId={route.teamId} />;
+    case 'loanRequest':
+      return (
+        <LoanRequest {...ctx} contractId={route.contractId} teamId={route.teamId} rivalId={route.rivalId} />
+      );
+    case 'loans':
+      return <MyLoans {...ctx} />;
+    case 'chat':
+      return <MatchChat {...ctx} contractId={route.contractId} />;
+    case 'checkIn':
+      return <CheckIn {...ctx} contractId={route.contractId} />;
+    case 'squad':
+      return <SquadRoute {...ctx} teamId={route.teamId} />;
+    case 'tactics':
+      return <Tactics {...ctx} contractId={route.contractId} />;
+    case 'suggestions':
+      return <Suggestions {...ctx} teamId={route.teamId} isAdmin={route.isAdmin} />;
+    case 'badges':
+      return <Badges {...ctx} owner={route.owner} id={route.id} title={route.title} />;
+    case 'cup':
+      return <CupRoute {...ctx} leagueId={route.leagueId} canManage={route.canManage} />;
     default:
       return null;
   }

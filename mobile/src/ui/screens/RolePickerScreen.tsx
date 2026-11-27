@@ -6,6 +6,8 @@ import { Card } from '../components/Card';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
 import { colors, font } from '../theme';
+import { roleOptions } from '../../domain/features';
+import { useFeatures } from '../FeaturesContext';
 
 interface Props {
   onPickRole: (role: UserRole) => void;
@@ -13,12 +15,13 @@ interface Props {
 }
 
 export function RolePickerScreen({ onPickRole, onLogin }: Props) {
+  const features = useFeatures(); // Sprint 29: solo jugadores y DT en el lanzamiento
   return (
     <Screen title="Bienvenido a RIVAL">
       <Text style={styles.lead}>
         ¿Cómo quieres registrarte? Luego puedes agregar otro rol desde tu perfil.
       </Text>
-      {ROLE_OPTIONS.map((option) => (
+      {roleOptions(ROLE_OPTIONS, features).map((option) => (
         <Card
           key={option.role}
           title={option.title}

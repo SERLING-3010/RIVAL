@@ -1,7 +1,8 @@
-// Contrato del partido (Sprint 3): versiones inmutables y firmas de los dos administradores.
+// Contrato del partido (Sprint 3) y resultado (Sprint 4): versiones inmutables, firmas y marcador.
 
 import type { PlaceKind, RefereeMode } from './matchModels';
 import type { TeamSummary } from './models';
+import type { Booking } from './venueModels';
 
 export type ContractStatus = 'NEGOTIATING' | 'SIGNED' | 'CANCELLED';
 export type CostSplit = 'HALF' | 'HOST' | 'GUEST';
@@ -32,18 +33,46 @@ export interface ContractVersion {
   signed_by: Side[];
 }
 
+export type ResultStatus = 'PENDING' | 'CONFIRMED' | 'DISPUTED';
+
+export interface ResultReport {
+  side: Side;
+  host_score: number;
+  guest_score: number;
+  reported_at: string;
+}
+
+export interface MatchResult {
+  status: ResultStatus;
+  host_score: number | null;
+  guest_score: number | null;
+  reports: ResultReport[];
+  by_referee: boolean;
+}
+
 export interface Contract {
   id: number;
-  request_id: number;
+  request_id: number | null;
+  league_id: number | null;
   host: TeamSummary;
   guest: TeamSummary;
   status: ContractStatus;
   my_side: Side;
   is_admin: boolean;
+  is_staff: boolean; // DT o capitán: convocatoria, alineación, planilla y resultado (Sprint 21)
   current: ContractVersion;
   signed: ContractVersion | null;
   versions: ContractVersion[];
   cancel_reason: string | null;
+  result: MatchResult | null;
+  booking: Booking | null;
+  ready_to_play: boolean;
+  referee: {
+    assignment_id: number;
+    referee_id: number;
+    display_name: string;
+    status: 'PENDING' | 'ACCEPTED';
+  } | null;
 }
 
 export interface ContractSummary {
@@ -54,4 +83,7 @@ export interface ContractSummary {
   kickoff_at: string;
   my_side: Side;
   awaiting_my_signature: boolean;
+  result_status: ResultStatus | null;
+  host_score: number | null;
+  guest_score: number | null;
 }

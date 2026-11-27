@@ -19,9 +19,36 @@ export function TeamActions({ team, isAdmin, navigator }: Props) {
         onPress={() => navigator.push({ name: 'rivals', teamId: team.id, isAdmin })}
       />
       <PrimaryButton
+        label="Rivales sugeridos"
+        variant="secondary"
+        onPress={() => navigator.push({ name: 'suggestions', teamId: team.id, isAdmin })}
+      />
+      <PrimaryButton
+        label="Plantilla (modo juego)"
+        onPress={() => navigator.push({ name: 'squad', teamId: team.id })}
+      />
+      <PrimaryButton
+        label="Modo manager"
+        onPress={() => navigator.push({ name: 'manager', teamId: team.id })}
+      />
+      <PrimaryButton
+        label="Insignias del equipo"
+        variant="secondary"
+        onPress={() =>
+          navigator.push({ name: 'badges', owner: 'team', id: team.id, title: `Insignias de ${team.name}` })
+        }
+      />
+      <PrimaryButton
         label="Partidos pactados"
         variant="secondary"
         onPress={() => navigator.push({ name: 'contracts', teamId: team.id })}
+      />
+      <PrimaryButton
+        label="Actividad del equipo"
+        variant="secondary"
+        onPress={() =>
+          navigator.push({ name: 'activity', scope: 'teams', id: team.id, title: 'Actividad del equipo' })
+        }
       />
       <PrimaryButton
         label="Partidos para mi equipo"
@@ -33,6 +60,13 @@ export function TeamActions({ team, isAdmin, navigator }: Props) {
         variant="secondary"
         onPress={() => navigator.push({ name: 'matchRequests', teamId: team.id, isAdmin })}
       />
+      {isAdmin ? (
+        <PrimaryButton
+          label="Equipos bloqueados"
+          variant="secondary"
+          onPress={() => navigator.push({ name: 'blockedTeams', teamId: team.id })}
+        />
+      ) : null}
       {isAdmin ? (
         <PrimaryButton
           label="Buscar agentes libres"

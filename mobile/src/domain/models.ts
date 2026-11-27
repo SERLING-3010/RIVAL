@@ -24,6 +24,7 @@ export interface User {
   city: string;
   neighborhood: string;
   position: string | null;
+  needs_terms?: boolean; // Sprint 27: debe aceptar la versión vigente
 }
 
 export interface SessionResponse {
@@ -41,6 +42,7 @@ export interface RegisterPayload {
   city: string;
   neighborhood: string;
   position: string | null;
+  accept_terms: boolean; // Sprint 27
 }
 
 export interface TeamSummary {

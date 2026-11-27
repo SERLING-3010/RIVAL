@@ -11,6 +11,8 @@ from app.domain.match_rules import PlaceKind, RefereeMode
 class RivalOut(BaseModel):
     team: TeamSummaryOut
     distance_band: DistanceBand | None
+    level: int | None
+    level_reliable: bool
 
 
 class RivalPageOut(BaseModel):

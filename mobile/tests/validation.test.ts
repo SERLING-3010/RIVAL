@@ -33,9 +33,15 @@ test('formulario de menor muestra el mensaje de edad', () => {
       city: 'Barranquilla',
       neighborhood: 'El Prado',
       position: '',
+      acceptTerms: false,
     },
     today,
   );
   assert.equal(errors.birthDate, 'Por ahora RIVAL es solo para mayores de 18 años.');
   assert.equal(errors.displayName, undefined);
+  // Sprint 27: sin aceptar Términos y Privacidad no se puede crear la cuenta.
+  assert.equal(
+    errors.acceptTerms,
+    'Para crear tu cuenta debes aceptar los Términos y la Política de privacidad.',
+  );
 });

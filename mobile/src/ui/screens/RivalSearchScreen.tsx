@@ -1,6 +1,8 @@
 import { StyleSheet, Text } from 'react-native';
 
 import type { RivalSearchController } from '../../controllers/useScouting';
+import type { TeamSummary } from '../../domain/models';
+import { levelText } from '../../domain/matchdayModels';
 import { SCOPE_LABEL, distanceText } from '../../domain/matchLabels';
 import type { SearchScope } from '../../domain/matchModels';
 import { Card } from '../components/Card';
@@ -15,13 +17,22 @@ interface Props {
   controller: RivalSearchController;
   canChallenge: boolean;
   onChallenge: (teamId: number) => void;
+  onReport: (team: TeamSummary) => void;
+  onBlock: (teamId: number) => void;
   onBack: () => void;
 }
 
 const SCOPES: SearchScope[] = ['NEARBY', 'NEIGHBORHOOD', 'CITY'];
 const RADII = [2, 5, 10, 15];
 
-export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBack }: Props) {
+export function RivalSearchScreen({
+  controller,
+  canChallenge,
+  onChallenge,
+  onBack,
+  onReport,
+  onBlock,
+}: Props) {
   return (
     <Screen title="Buscar rival" onBack={onBack}>
       <Text style={styles.note}>
@@ -41,6 +52,15 @@ export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBac
           onToggle={(value) => controller.handleRadius(Number(value))}
         />
       ) : null}
+      <ChoiceChips
+        label="Ordenar"
+        selected={[controller.order]}
+        choices={[
+          { value: 'default', label: controller.scope === 'NEARBY' ? 'Más cerca' : 'Por nombre' },
+          { value: 'level', label: 'Nivel parecido' },
+        ]}
+        onToggle={(value) => controller.handleOrder(value === 'level' ? 'level' : 'default')}
+      />
       <StateView state={controller.state} onRetry={controller.handleReload}>
         {(page) => (
           <>
@@ -48,7 +68,7 @@ export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBac
               <Card
                 key={rival.team.id}
                 title={rival.team.name}
-                subtitle={`${rival.team.neighborhood}, ${rival.team.city} ${distanceText(rival.distance_band)} · ${rival.team.member_count} jugador(es)`}
+                subtitle={`${rival.team.neighborhood}, ${rival.team.city} ${distanceText(rival.distance_band)} · ${rival.team.member_count} jugador(es) · ${levelText(rival.level, rival.level_reliable)}`}
                 badge={rival.team.has_coach ? 'Con DT' : 'Sin DT'}
               >
                 {canChallenge ? (
@@ -57,6 +77,10 @@ export function RivalSearchScreen({ controller, canChallenge, onChallenge, onBac
                     variant="secondary"
                     onPress={() => onChallenge(rival.team.id)}
                   />
+                ) : null}
+                <PrimaryButton label="Reportar" variant="secondary" onPress={() => onReport(rival.team)} />
+                {canChallenge ? (
+                  <PrimaryButton label="Bloquear" variant="danger" onPress={() => onBlock(rival.team.id)} />
                 ) : null}
               </Card>
             ))}

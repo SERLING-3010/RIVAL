@@ -17,6 +17,7 @@ class RegisterInput:
     city: str
     neighborhood: str
     position: str | None = None
+    accept_terms: bool = False  # Sprint 27: Términos, Privacidad y mayoría de edad
 
 
 @dataclass

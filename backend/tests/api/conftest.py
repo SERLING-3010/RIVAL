@@ -32,6 +32,7 @@ def register(client: TestClient, email: str, role: str = "PLAYER") -> dict[str, 
             "sports": ["FOOTBALL"],
             "city": "Barranquilla",
             "neighborhood": "El Prado",
+            "accept_terms": True,
         },
     )
     assert response.status_code == 201, response.text

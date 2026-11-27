@@ -2,14 +2,20 @@
 
 import { useCallback, useState } from 'react';
 
+import type { BadgeOwner } from '../domain/badgeModels';
 import type { Contract } from '../domain/contractModels';
+import type { RefereeEntry } from '../domain/leagueModels';
 import type { MatchRequest } from '../domain/matchModels';
+import type { ReportTarget } from '../domain/moderationModels';
+import type { MatchToBook } from '../domain/venueModels';
 import type { TeamSummary, UserRole } from '../domain/models';
 
 export type Route =
   | { name: 'rolePicker' }
   | { name: 'register'; role: UserRole }
   | { name: 'login' }
+  | { name: 'legal'; doc: 'terms' | 'privacy' } // Sprint 27
+  | { name: 'myData' }
   | { name: 'home' }
   | { name: 'teamSearch' }
   | { name: 'createTeam' }
@@ -24,7 +30,39 @@ export type Route =
   | { name: 'offers'; requestId: number; isRequestAdmin: boolean; myTeamIds: number[]; requestOpen: boolean }
   | { name: 'contracts'; teamId: number }
   | { name: 'contract'; contractId: number }
-  | { name: 'proposeContract'; contract: Contract };
+  | { name: 'proposeContract'; contract: Contract }
+  | { name: 'activity'; scope: 'contracts' | 'teams'; id: number; title: string }
+  | { name: 'leagues' }
+  | { name: 'createLeague' }
+  | { name: 'league'; leagueId: number }
+  | { name: 'myVenues' }
+  | { name: 'createVenue' }
+  | { name: 'venue'; venueId: number; match: MatchToBook | null }
+  | { name: 'bookVenue'; match: MatchToBook; city: string }
+  | { name: 'manager'; teamId: number }
+  | { name: 'market'; teamId: number; sport: string; city: string; balance: number }
+  | { name: 'playerCard'; userId: number }
+  | { name: 'transferOffers' }
+  | { name: 'lineup'; contractId: number; teamId: number; teamScore: number }
+  | { name: 'season'; leagueId: number; canManage: boolean; referees: RefereeEntry[] }
+  | { name: 'refereeMatches' }
+  | { name: 'callup'; contractId: number; teamId: number; isAdmin: boolean }
+  | { name: 'rate'; contractId: number }
+  | { name: 'myCallups' }
+  | { name: 'pending' }
+  | { name: 'report'; target: ReportTarget }
+  | { name: 'mySanctions' }
+  | { name: 'moderation' }
+  | { name: 'blockedTeams'; teamId: number }
+  | { name: 'loanRequest'; contractId: number; teamId: number; rivalId: number }
+  | { name: 'loans' }
+  | { name: 'chat'; contractId: number }
+  | { name: 'checkIn'; contractId: number }
+  | { name: 'cup'; leagueId: number; canManage: boolean }
+  | { name: 'badges'; owner: BadgeOwner; id: number; title: string }
+  | { name: 'suggestions'; teamId: number; isAdmin: boolean }
+  | { name: 'tactics'; contractId: number }
+  | { name: 'squad'; teamId: number };
 
 export interface Navigator {
   current: Route;

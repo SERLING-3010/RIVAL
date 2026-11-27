@@ -7,11 +7,21 @@ import type {
 } from '../domain/matchModels';
 import { request } from './httpClient';
 
+/** default: por cercanía o nombre; level: nivel parecido al de mi equipo primero (Sprint 11). */
+export type RivalOrder = 'default' | 'level';
+
 export const scoutingApi = {
-  rivals: (token: string, teamId: number, scope: SearchScope, radiusKm: number, page: number) =>
+  rivals: (
+    token: string,
+    teamId: number,
+    scope: SearchScope,
+    radiusKm: number,
+    page: number,
+    order: RivalOrder = 'default',
+  ) =>
     request<RivalPage>('GET', `/api/v1/teams/${teamId}/rivals`, {
       token,
-      query: { scope, radius_km: String(radiusKm), page: String(page) },
+      query: { scope, radius_km: String(radiusKm), page: String(page), order },
     }),
 
   myFreeAgent: (token: string) => request<FreeAgentProfile[]>('GET', '/api/v1/me/free-agent', { token }),
